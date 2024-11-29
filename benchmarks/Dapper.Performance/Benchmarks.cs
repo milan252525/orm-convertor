@@ -200,4 +200,35 @@ public class Benchmarks
 
         return totalSales;
     }
+
+    public Order D1_1ToNRelationship()
+    {
+        string sql = """
+            SELECT o.*, ol.* FROM WideWorldImporters.Sales.Orders o
+            LEFT JOIN WideWorldImporters.Sales.OrderLines ol
+                ON ol.OrderID = o.OrderID
+            WHERE o.OrderID = @OrderID
+        """;
+
+        var order = connection.Query<Order, OrderLine, Order>(
+            sql,
+            (order, orderLine) =>
+            {
+                order.OrderLines.Add(orderLine);
+                return order;
+            },
+            new { OrderID = 530 },
+            splitOn: "OrderLineID"
+        )
+        .GroupBy(o => o.OrderID)
+        .Select(g =>
+        {
+            var groupedOrder = g.First();
+            groupedOrder.OrderLines = g.Select(o => o.OrderLines.Single()).ToList();
+            return groupedOrder;
+        })
+        .Single();
+
+        return order;
+    }
 }

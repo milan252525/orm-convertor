@@ -271,4 +271,78 @@ public class FeatureTests
 
         Assert.Equal(177634276.4m, totalSales);
     }
+
+    [Fact]
+    public void D1_1ToNRelationship()
+    {
+        string sql = """
+            SELECT o.*, ol.* FROM WideWorldImporters.Sales.Orders o
+            LEFT JOIN WideWorldImporters.Sales.OrderLines ol
+                ON ol.OrderID = o.OrderID
+            WHERE o.OrderID = @OrderID
+        """;
+
+        // Matching Order and OrderLines has to be done in memory and manually
+        // Dapper has no functionality to do this automatically
+        var order = connection.Query<Order, OrderLine, Order>(
+            sql,
+            (order, orderLine) =>
+            {
+                order.OrderLines.Add(orderLine);
+                return order;
+            },
+            new { OrderID = 530 },
+            splitOn: nameof(OrderLine.OrderLineID)
+        )
+        .GroupBy(o => o.OrderID)
+        .Select(g =>
+        {
+            var groupedOrder = g.First();
+            groupedOrder.OrderLines = g.Select(o => o.OrderLines.Single()).ToList();
+            return groupedOrder;
+        })
+        .Single();
+
+        var expectedOrder = new Order
+        {
+            OrderID = 530,
+            CustomerID = 115,
+            SalespersonPersonID = 3,
+            PickedByPersonID = 13,
+            ContactPersonID = 1229,
+            BackorderOrderID = null,
+            OrderDate = new DateTime(2013, 1, 10),
+            ExpectedDeliveryDate = new DateTime(2013, 1, 11),
+            CustomerPurchaseOrderNumber = "19446",
+            IsUndersupplyBackordered = true,
+            Comments = null,
+            DeliveryInstructions = null,
+            InternalComments = null,
+            PickingCompletedWhen = new DateTime(2013, 1, 10, 11, 0, 0),
+            LastEditedBy = 13,
+            LastEditedWhen = new DateTime(2013, 1, 10, 11, 0, 0),
+            OrderLines = null!
+        };
+
+        var expectedFirstLine = new OrderLine
+        {
+            OrderLineID = 1478,
+            OrderID = 530,
+            StockItemID = 129,
+            Description = "Plush shark slippers (Gray) XL",
+            PackageTypeID = 7,
+            Quantity = 7,
+            UnitPrice = 32.00m,
+            TaxRate = 15.000m,
+            PickedQuantity = 7,
+            PickingCompletedWhen = new DateTime(2013, 1, 10, 11, 0, 0),
+            LastEditedBy = 13,
+            LastEditedWhen = new DateTime(2013, 1, 10, 11, 0, 0)
+        };
+
+        Assert.Equal(expectedFirstLine, order.OrderLines.First());
+
+        order.OrderLines = null!; // null to test equality without OrderLines
+        Assert.Equal(expectedOrder, order);
+    }
 }

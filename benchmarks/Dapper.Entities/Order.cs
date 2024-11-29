@@ -13,9 +13,9 @@ public record class Order
 
     public int? BackorderOrderID { get; set; }
 
-    public int OrderDate { get; set; }
+    public DateTime OrderDate { get; set; }
 
-    public int ExpectedDeliveryDate { get; set; }
+    public DateTime ExpectedDeliveryDate { get; set; }
 
     public string? CustomerPurchaseOrderNumber { get; set; }
 
@@ -31,5 +31,7 @@ public record class Order
 
     public int LastEditedBy { get; set; }
 
-    public int LastEditedWhen { get; set; }
+    public DateTime LastEditedWhen { get; set; }
+
+    public List<OrderLine> OrderLines { get; set; } = [];
 }
