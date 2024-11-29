@@ -36,14 +36,6 @@ public class Benchmarks
     }
 
     [Benchmark]
-    public int ConnectionTest()
-    {
-        return connection.Query(
-            "SELECT * FROM WideWorldImporters.Purchasing.PurchaseOrders"
-        ).Count();
-    }
-
-    [Benchmark]
     public PurchaseOrder A1_EntityIdenticalToTable()
     {
         var order = connection.QuerySingle<PurchaseOrder>(
@@ -93,5 +85,119 @@ public class Benchmarks
         ).ToList();
 
         return orders;
+    }
+
+    [Benchmark]
+    public List<OrderLine> B1_SelectionOverIndexedColumn()
+    {
+        int orderId = 26866;
+
+        var orderLines = connection.Query<OrderLine>(
+            "SELECT * FROM WideWorldImporters.Sales.OrderLines WHERE OrderID = @OrderID",
+            new { OrderID = orderId }
+        ).ToList();
+
+        return orderLines;
+    }
+
+    [Benchmark]
+    public List<OrderLine> B2_SelectionOverNonIndexedColumn()
+    {
+        decimal unitPrice = 25m;
+
+        var orderLines = connection.Query<OrderLine>(
+            "SELECT * FROM WideWorldImporters.Sales.OrderLines WHERE UnitPrice = @UnitPrice",
+            new { UnitPrice = unitPrice }
+        ).ToList();
+
+        return orderLines;
+    }
+
+    [Benchmark]
+    public List<OrderLine> B3_RangeQuery()
+    {
+        var from = new DateTime(2014, 12, 20);
+        var to = new DateTime(2014, 12, 31);
+        var orderLines = connection.Query<OrderLine>(
+            "SELECT * FROM WideWorldImporters.Sales.OrderLines WHERE PickingCompletedWhen BETWEEN @Start AND @End",
+            new { Start = from, End = to }
+        ).ToList();
+
+        return orderLines;
+    }
+
+    [Benchmark]
+    public List<OrderLine> B4_InQuery()
+    {
+        var orderIds = new[] { 1, 10, 100, 1000, 10000 };
+
+        var orderLines = connection.Query<OrderLine>(
+            "SELECT * FROM WideWorldImporters.Sales.OrderLines WHERE OrderID IN @OrderIds",
+            new { OrderIds = orderIds }
+        ).ToList();
+
+        return orderLines;
+    }
+
+    [Benchmark]
+    public List<OrderLine> B5_TextSearch()
+    {
+        string text = "C++";
+
+        var orderLines = connection.Query<OrderLine>(
+            "SELECT * FROM WideWorldImporters.Sales.OrderLines WHERE Description LIKE @Text",
+            new { Text = $"%{text}%" }
+        ).ToList();
+
+        return orderLines;
+    }
+
+    [Benchmark]
+    public List<OrderLine> B6_PagingQuery()
+    {
+        int skip = 1000;
+        int take = 50;
+
+        var orderLines = connection.Query<OrderLine>(
+            "SELECT * FROM WideWorldImporters.Sales.OrderLines ORDER BY OrderLineID OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY",
+            new { Skip = skip, Take = take }
+        ).ToList();
+
+        return orderLines;
+    }
+
+    [Benchmark]
+    public Dictionary<decimal, int> C1_AggregationCount()
+    {
+        var taxRates = connection.Query<(decimal, int)>(
+            """
+                SELECT TaxRate, COUNT(TaxRate) as Count 
+                FROM WideWorldImporters.Sales.OrderLines 
+                GROUP BY TaxRate 
+                ORDER BY Count DESC
+            """
+        ).ToDictionary(x => x.Item1, x => x.Item2);
+
+        return taxRates;
+    }
+
+    [Benchmark]
+    public decimal C2_AggregationMax()
+    {
+        var maxUnitPrice = connection.Query<decimal>(
+            "SELECT MAX(UnitPrice) FROM WideWorldImporters.Sales.OrderLines"
+        ).Single();
+
+        return maxUnitPrice;
+    }
+
+    [Benchmark]
+    public decimal C3_AggregationSum()
+    {
+        var totalSales = connection.Query<decimal>(
+            "SELECT SUM(Quantity * UnitPrice) FROM WideWorldImporters.Sales.OrderLines"
+        ).Single();
+
+        return totalSales;
     }
 }

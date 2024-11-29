@@ -25,15 +25,6 @@ public class FeatureTests
     }
 
     [Fact]
-    public void ConnectionTest()
-    {
-        int count = connection.Query(
-            "SELECT * FROM WideWorldImporters.Purchasing.PurchaseOrders"
-        ).Count();
-        Assert.Equal(2074, count);
-    }
-
-    [Fact]
     public void A1_EntityIdenticalToTable()
     {
         var order = connection.QuerySingle<PurchaseOrder>(
@@ -140,5 +131,144 @@ public class FeatureTests
 
         Assert.Equal(expectedFirstUpdate, orders.First());
     }
-}
 
+    [Fact]
+    public void B1_SelectionOverIndexedColumn()
+    {
+        int orderId = 26866;
+
+        var orderLines = connection.Query<OrderLine>(
+            "SELECT * FROM WideWorldImporters.Sales.OrderLines WHERE OrderID = @OrderID",
+            new { OrderID = orderId }
+        ).ToList();
+
+        Assert.Equal(5, orderLines.Count);
+        Assert.True(orderLines.All(ol => ol.OrderID == orderId));
+
+        var expectedFirstOrderLine = new OrderLine
+        {
+            OrderLineID = 85261,
+            OrderID = orderId,
+            StockItemID = 141,
+            Description = "Furry animal socks (Pink) XL",
+            PackageTypeID = 10,
+            Quantity = 48,
+            UnitPrice = 5m,
+            TaxRate = 15m,
+            PickedQuantity = 48,
+            PickingCompletedWhen = new DateTime(2014, 5, 14, 11, 0, 0),
+            LastEditedBy = 19,
+            LastEditedWhen = new DateTime(2014, 5, 14, 11, 0, 0)
+        };
+
+        Assert.Equal(expectedFirstOrderLine, orderLines.First(ol => ol.OrderLineID == 85261));
+    }
+
+    [Fact]
+    public void B2_SelectionOverNonIndexedColumn()
+    {
+        decimal unitPrice = 25m;
+
+        var orderLines = connection.Query<OrderLine>(
+            "SELECT * FROM WideWorldImporters.Sales.OrderLines WHERE UnitPrice = @UnitPrice",
+            new { UnitPrice = unitPrice }
+        ).ToList();
+
+        Assert.Equal(13553, orderLines.Count);
+        Assert.True(orderLines.All(ol => ol.UnitPrice == unitPrice));
+    }
+
+    [Fact]
+    public void B3_RangeQuery()
+    {
+        var from = new DateTime(2014, 12, 20);
+        var to = new DateTime(2014, 12, 31);
+        var orderLines = connection.Query<OrderLine>(
+            "SELECT * FROM WideWorldImporters.Sales.OrderLines WHERE PickingCompletedWhen BETWEEN @Start AND @End",
+            new { Start = from, End = to }
+        ).ToList();
+
+        Assert.Equal(1883, orderLines.Count);
+        Assert.True(orderLines.All(ol => ol.PickingCompletedWhen >= from && ol.PickingCompletedWhen <= to));
+    }
+
+    [Fact]
+    public void B4_InQuery()
+    {
+        var orderIds = new[] { 1, 10, 100, 1000, 10000 };
+
+        var orderLines = connection.Query<OrderLine>(
+            "SELECT * FROM WideWorldImporters.Sales.OrderLines WHERE OrderID IN @OrderIds",
+            new { OrderIds = orderIds }
+        ).ToList();
+
+        Assert.Equal(15, orderLines.Count);
+        Assert.True(orderLines.All(ol => orderIds.Contains(ol.OrderID)));
+    }
+
+    [Fact]
+    public void B5_TextSearch()
+    {
+        string text = "C++";
+
+        var orderLines = connection.Query<OrderLine>(
+            "SELECT * FROM WideWorldImporters.Sales.OrderLines WHERE Description LIKE @Text",
+            new { Text = $"%{text}%" }
+        ).ToList();
+
+        Assert.Equal(2098, orderLines.Count);
+        Assert.True(orderLines.All(ol => ol.Description.Contains(text)));
+    }
+
+    [Fact]
+    public void B6_PagingQuery()
+    {
+        int skip = 1000;
+        int take = 50;
+
+        var orderLines = connection.Query<OrderLine>(
+            "SELECT * FROM WideWorldImporters.Sales.OrderLines ORDER BY OrderLineID OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY",
+            new { Skip = skip, Take = take }
+        ).ToList();
+
+        Assert.Equal(50, orderLines.Count);
+        Assert.Equal(Enumerable.Range(skip + 1, take), orderLines.Select(ol => ol.OrderLineID));
+    }
+
+    [Fact]
+    public void C1_AggregationCount()
+    {
+        var taxRates = connection.Query<(decimal, int)>(
+            """
+                SELECT TaxRate, COUNT(TaxRate) as Count 
+                FROM WideWorldImporters.Sales.OrderLines 
+                GROUP BY TaxRate 
+                ORDER BY Count DESC
+            """
+        ).ToDictionary(x => x.Item1, x => x.Item2);
+
+        Assert.Equal(2, taxRates.Count);
+        Assert.Equal(230376, taxRates[15m]);
+        Assert.Equal(1036, taxRates[10m]);
+    }
+
+    [Fact]
+    public void C2_AggregationMax()
+    {
+        var maxUnitPrice = connection.Query<decimal>(
+            "SELECT MAX(UnitPrice) FROM WideWorldImporters.Sales.OrderLines"
+        ).Single();
+
+        Assert.Equal(1899m, maxUnitPrice);
+    }
+
+    [Fact]
+    public void C3_AggregationSum()
+    {
+        var totalSales = connection.Query<decimal>(
+            "SELECT SUM(Quantity * UnitPrice) FROM WideWorldImporters.Sales.OrderLines"
+        ).Single();
+
+        Assert.Equal(177634276.4m, totalSales);
+    }
+}
