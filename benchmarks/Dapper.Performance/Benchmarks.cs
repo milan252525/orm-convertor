@@ -201,7 +201,7 @@ public class Benchmarks
         return totalSales;
     }
 
-    public Order D1_1ToNRelationship()
+    public Order D1_OneToManyRelationship()
     {
         string sql = """
             SELECT o.*, ol.* FROM WideWorldImporters.Sales.Orders o
@@ -230,5 +230,58 @@ public class Benchmarks
         .Single();
 
         return order;
+    }
+
+    [Benchmark]
+    public List<StockItem> D2_ManyToManyRelationship()
+    {
+        string sql = """
+            SELECT si.*, sg.*
+            FROM WideWorldImporters.Warehouse.StockItems si
+            INNER JOIN WideWorldImporters.Warehouse.StockItemStockGroups sisg
+                ON si.StockItemID = sisg.StockItemID
+            INNER JOIN WideWorldImporters.Warehouse.StockGroups sg
+                ON sisg.StockGroupID = sg.StockGroupID
+            ORDER BY si.StockItemID
+        """;
+
+        var stockItems = connection.Query<StockItem, StockGroup, StockItem>(
+            sql,
+            (stockItem, stockGroup) =>
+            {
+                stockItem.StockGroups.Add(stockGroup);
+                return stockItem;
+            },
+            splitOn: nameof(StockGroup.StockGroupID)
+        );
+
+        var result = stockItems.GroupBy(si => si.StockItemID).Select(g =>
+        {
+            var groupedStockItem = g.First();
+            groupedStockItem.StockGroups = g.Select(si => si.StockGroups.Single()).ToList();
+            return groupedStockItem;
+        }).ToList();
+
+       return result;
+    }
+
+    [Benchmark]
+    public List<PurchaseOrder> E1_ColumnSorting()
+    {
+        var orders = connection.Query<PurchaseOrder>(
+            "SELECT TOP (1000) * FROM WideWorldImporters.Purchasing.PurchaseOrders ORDER BY ExpectedDeliveryDate ASC"
+        ).ToList();
+
+        return orders;
+    }
+
+    [Benchmark]
+    public List<string> E2_Distinct()
+    {
+        var supplierReferences = connection.Query<string>(
+            "SELECT DISTINCT SupplierReference FROM WideWorldImporters.Purchasing.PurchaseOrders"
+        ).ToList();
+
+        return supplierReferences;
     }
 }

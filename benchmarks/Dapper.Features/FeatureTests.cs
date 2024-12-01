@@ -273,7 +273,7 @@ public class FeatureTests
     }
 
     [Fact]
-    public void D1_1ToNRelationship()
+    public void D1_OneToManyRelationship()
     {
         string sql = """
             SELECT o.*, ol.* FROM WideWorldImporters.Sales.Orders o
@@ -344,5 +344,71 @@ public class FeatureTests
 
         order.OrderLines = null!; // null to test equality without OrderLines
         Assert.Equal(expectedOrder, order);
+    }
+
+    [Fact]
+    public void D2_ManyToManyRelationship()
+    {
+        string sql = """
+            SELECT si.*, sg.*
+            FROM WideWorldImporters.Warehouse.StockItems si
+            INNER JOIN WideWorldImporters.Warehouse.StockItemStockGroups sisg
+                ON si.StockItemID = sisg.StockItemID
+            INNER JOIN WideWorldImporters.Warehouse.StockGroups sg
+                ON sisg.StockGroupID = sg.StockGroupID
+            ORDER BY si.StockItemID
+        """;
+
+        var stockItems = connection.Query<StockItem, StockGroup, StockItem>(
+            sql,
+            (stockItem, stockGroup) =>
+            {
+                stockItem.StockGroups.Add(stockGroup);
+                return stockItem;
+            },
+            splitOn: nameof(StockGroup.StockGroupID)
+        );
+
+        var result = stockItems.GroupBy(si => si.StockItemID).Select(g =>
+        {
+            var groupedStockItem = g.First();
+            groupedStockItem.StockGroups = g.Select(si => si.StockGroups.Single()).ToList();
+            return groupedStockItem;
+        }).ToList();
+
+        Assert.Equal(227, result.Count);
+
+        Assert.Equal(1, result[0].StockItemID);
+        Assert.Equal("USB missile launcher (Green)", result[0].StockItemName);
+        Assert.Equal(12, result[0].SupplierID);
+
+        Assert.Equal(3, result[0].StockGroups.Count);
+        var groupNames = result[0].StockGroups.Select(sg => sg.StockGroupName).ToList();
+        Assert.Equal(["Novelty Items", "Computing Novelties", "USB Novelties"], groupNames);
+    }
+
+    [Fact]
+    public void E1_ColumnSorting()
+    {
+        var orders = connection.Query<PurchaseOrder>(
+            "SELECT TOP (1000) * FROM WideWorldImporters.Purchasing.PurchaseOrders ORDER BY ExpectedDeliveryDate ASC"
+        ).ToList();
+
+        Assert.Equal(1000, orders.Count);
+        Assert.Equal(new DateTime(2013, 1, 15), orders.First().ExpectedDeliveryDate);
+        Assert.Equal(new DateTime(2014, 9, 17), orders.Last().ExpectedDeliveryDate);
+        Assert.True(orders.SequenceEqual(orders.OrderBy(o => o.ExpectedDeliveryDate)));
+    }
+
+    [Fact]
+    public void E2_Distinct()
+    {
+        var supplierReferences = connection.Query<string>(
+            "SELECT DISTINCT SupplierReference FROM WideWorldImporters.Purchasing.PurchaseOrders"
+        ).ToList();
+
+        Assert.Equal(7, supplierReferences.Count);
+        string[] expected = ["AA20384", "BC0280982", "ML0300202", "293092", "08803922", "237408032", "B2084020"];
+        Assert.Equal(expected, supplierReferences);
     }
 }
