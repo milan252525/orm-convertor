@@ -284,4 +284,43 @@ public class Benchmarks
 
         return supplierReferences;
     }
+
+    [Benchmark]
+    public List<Person> F1_NestedJSONQuery()
+    {
+        var sql = """
+                SELECT *
+                FROM WideWorldImporters.Application.People
+                WHERE JSON_VALUE(CustomFields, '$.Title') = @Title
+                ORDER BY PersonId
+            """;
+
+        var people = connection.Query<Person>(sql, new { Title = "Team Member" }).ToList();
+
+        // triggering JSON parsing
+        people.ForEach(p => p.GetCustomFields());
+
+        return people;
+    }
+
+    [Benchmark]
+    public List<Person> F2_JSONArrayQuery()
+    {
+        var sql = """
+                SELECT *
+                FROM WideWorldImporters.Application.People
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM OPENJSON(OtherLanguages)
+                    WHERE value = @Language
+                )
+            """;
+
+        var people = connection.Query<Person>(sql, new { Language = "Slovak" }).ToList();
+
+        // triggering JSON parsing
+        people.ForEach(p => p.GetOtherLanguages());
+
+        return people;
+    }
 }

@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Running;
-using DapperTests;
 
 namespace Dapper.Performance;
 

@@ -411,4 +411,49 @@ public class FeatureTests
         string[] expected = ["AA20384", "BC0280982", "ML0300202", "293092", "08803922", "237408032", "B2084020"];
         Assert.Equal(expected, supplierReferences);
     }
+
+    [Fact]
+    public void F1_NestedJSONQuery()
+    {
+        var sql = """
+                SELECT *
+                FROM WideWorldImporters.Application.People
+                WHERE JSON_VALUE(CustomFields, '$.Title') = @Title
+                ORDER BY PersonId
+            """;
+
+        var people = connection.Query<Person>(sql, new { Title = "Team Member" }).ToList();
+
+        Assert.Equal(13, people.Count);
+        Assert.All(people, person => Assert.Equal("Team Member", person.GetCustomFields()?.Title));
+
+        var first = people.First();
+        Assert.Equal("Kayla Woodcock", first.FullName);
+        Assert.Equal("Kayla", first.PreferredName);
+        Assert.Equal("kaylaw@wideworldimporters.com", first.EmailAddress);
+        Assert.Equal(new DateTime(2008, 4, 19), first.GetCustomFields()?.HireDate);
+    }
+
+    [Fact]
+    public void F2_JSONArrayQuery()
+    {
+        var sql = """
+                SELECT *
+                FROM WideWorldImporters.Application.People
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM OPENJSON(OtherLanguages)
+                    WHERE value = @Language
+                )
+            """;
+
+        var people = connection.Query<Person>(sql, new { Language = "Slovak" }).ToList();
+
+        Assert.Equal(2, people.Count);
+        Assert.All(people, person => Assert.Contains("Slovak", person.GetOtherLanguages()!));
+
+        var first = people.First();
+        Assert.Equal("Amy Trefl", first.FullName);
+        Assert.Equal(["Slovak", "Spanish", "Polish"], first.GetOtherLanguages());
+    }
 }
