@@ -245,24 +245,66 @@ public class Benchmarks
             ORDER BY si.StockItemID
         """;
 
-        var stockItems = connection.Query<StockItem, StockGroup, StockItem>(
+        var stockItems = new Dictionary<int, StockItem>();
+
+        connection.Query<StockItem, StockGroup, StockItem>(
             sql,
             (stockItem, stockGroup) =>
             {
-                stockItem.StockGroups.Add(stockGroup);
-                return stockItem;
+                if (!stockItems.TryGetValue(stockItem.StockItemID, out var existing))
+                {
+                    existing = stockItem;
+                    existing.StockGroups = [];
+                    stockItems.Add(stockItem.StockItemID, existing);
+                }
+
+                existing.StockGroups.Add(stockGroup);
+                return existing;
             },
             splitOn: nameof(StockGroup.StockGroupID)
         );
 
-        var result = stockItems.GroupBy(si => si.StockItemID).Select(g =>
-        {
-            var groupedStockItem = g.First();
-            groupedStockItem.StockGroups = g.Select(si => si.StockGroups.Single()).ToList();
-            return groupedStockItem;
-        }).ToList();
+        var result = stockItems.Values.ToList();
+        return result;
+    }
 
-       return result;
+    [Benchmark]
+    public List<Customer> D3_OptionalRelationship()
+    {
+        string sql = """
+            SELECT 
+        	    c.CustomerID, c.CustomerName, c.AccountOpenedDate, c.CreditLimit, 
+        	    ct.CustomerTransactionID, ct.CustomerID, ct.TransactionDate, ct.TransactionAmount
+            FROM WideWorldImporters.Sales.Customers c
+            LEFT OUTER JOIN WideWorldImporters.Sales.CustomerTransactions ct
+        	    ON c.CustomerID = ct.CustomerID
+            ORDER BY c.CustomerID
+        """;
+
+        var customers = new Dictionary<int, Customer>();
+
+        connection.Query<Customer, CustomerTransaction, Customer>(
+            sql,
+            (customer, transaction) =>
+            {
+                if (!customers.TryGetValue(customer.CustomerId, out var existing))
+                {
+                    existing = customer;
+                    customers.Add(customer.CustomerId, existing);
+                }
+
+                if (transaction != null)
+                {
+                    existing.Transactions.Add(transaction);
+                }
+
+                return existing;
+            },
+            splitOn: nameof(CustomerTransaction.CustomerTransactionID)
+        );
+
+        var result = customers.Values.ToList();
+        return result;
     }
 
     [Benchmark]
@@ -322,5 +364,33 @@ public class Benchmarks
         people.ForEach(p => p.GetOtherLanguages());
 
         return people;
+    }
+
+    [Benchmark]
+    public List<int> G1_Union()
+    {
+        var suppliers = connection.Query<int>("""
+                SELECT SupplierID FROM WideWorldImporters.Purchasing.Suppliers WHERE SupplierID < 5
+                UNION
+                SELECT SupplierID FROM WideWorldImporters.Purchasing.Suppliers WHERE SupplierID BETWEEN 5 AND 10
+                ORDER BY SupplierID
+            """
+        ).ToList();
+
+        return suppliers;
+    }
+
+    [Benchmark]
+    public List<int> G2_Intersection()
+    {
+        var suppliers = connection.Query<int>("""
+                SELECT SupplierID FROM WideWorldImporters.Purchasing.Suppliers WHERE SupplierID < 10
+                INTERSECT
+                SELECT SupplierID FROM WideWorldImporters.Purchasing.Suppliers WHERE SupplierID BETWEEN 5 AND 15
+                ORDER BY SupplierID
+            """
+        ).ToList();
+
+        return suppliers;
     }
 }
