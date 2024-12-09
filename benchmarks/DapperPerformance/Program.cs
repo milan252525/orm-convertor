@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 
-namespace Dapper.Performance;
+namespace DapperPerformance;
 
 internal class Program
 {

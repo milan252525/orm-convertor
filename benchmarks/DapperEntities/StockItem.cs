@@ -1,4 +1,4 @@
-﻿namespace Dapper.Entities;
+﻿namespace DapperEntities;
 public class StockItem
 {
     public int StockItemID { get; set; }

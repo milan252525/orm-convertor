@@ -1,4 +1,4 @@
-﻿namespace Dapper.Entities;
+﻿namespace DapperEntities;
 public record class OrderLine
 {
     public int OrderLineID { get; set; }

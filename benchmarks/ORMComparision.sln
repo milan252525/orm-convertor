@@ -10,13 +10,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{E3C22FB0-34BF-44E3-BD37-60CDF7A7717B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapper.Features", "Dapper.Features\Dapper.Features.csproj", "{28A1A724-3BB1-491C-8C40-8037E80BA56D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DapperFeatures", "DapperFeatures\DapperFeatures.csproj", "{28A1A724-3BB1-491C-8C40-8037E80BA56D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapper.Performance", "Dapper.Performance\Dapper.Performance.csproj", "{17C81BA3-FC34-44EA-A42F-C792F0B76A34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DapperPerformance", "DapperPerformance\DapperPerformance.csproj", "{17C81BA3-FC34-44EA-A42F-C792F0B76A34}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapper.Entities", "Dapper.Entities\Dapper.Entities.csproj", "{7C09A40B-1539-4CCD-84FE-D8502AA4F31E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DapperEntities", "DapperEntities\DapperEntities.csproj", "{7C09A40B-1539-4CCD-84FE-D8502AA4F31E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dapper", "Dapper", "{F01B8B6F-A5C6-4E96-BA8A-85BF8FF7A6B4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PetaPoco", "PetaPoco", "{5A26C8B8-5D62-4F20-AF0B-D6678F3CCD05}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetaPocoEntities", "PetaPocoEntities\PetaPocoEntities.csproj", "{2CF83980-22FC-4EFE-B86A-7A1BBE2E5094}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetaPocoFeatures", "PetaPocoFeatures\PetaPocoFeatures.csproj", "{67AE7661-5DF7-436E-B34F-E617ADC600E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +46,14 @@ Global
 		{7C09A40B-1539-4CCD-84FE-D8502AA4F31E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C09A40B-1539-4CCD-84FE-D8502AA4F31E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C09A40B-1539-4CCD-84FE-D8502AA4F31E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CF83980-22FC-4EFE-B86A-7A1BBE2E5094}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CF83980-22FC-4EFE-B86A-7A1BBE2E5094}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CF83980-22FC-4EFE-B86A-7A1BBE2E5094}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CF83980-22FC-4EFE-B86A-7A1BBE2E5094}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67AE7661-5DF7-436E-B34F-E617ADC600E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67AE7661-5DF7-436E-B34F-E617ADC600E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67AE7661-5DF7-436E-B34F-E617ADC600E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67AE7661-5DF7-436E-B34F-E617ADC600E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +62,8 @@ Global
 		{28A1A724-3BB1-491C-8C40-8037E80BA56D} = {F01B8B6F-A5C6-4E96-BA8A-85BF8FF7A6B4}
 		{17C81BA3-FC34-44EA-A42F-C792F0B76A34} = {F01B8B6F-A5C6-4E96-BA8A-85BF8FF7A6B4}
 		{7C09A40B-1539-4CCD-84FE-D8502AA4F31E} = {F01B8B6F-A5C6-4E96-BA8A-85BF8FF7A6B4}
+		{2CF83980-22FC-4EFE-B86A-7A1BBE2E5094} = {5A26C8B8-5D62-4F20-AF0B-D6678F3CCD05}
+		{67AE7661-5DF7-436E-B34F-E617ADC600E4} = {5A26C8B8-5D62-4F20-AF0B-D6678F3CCD05}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {520D1D73-0241-45DE-9CCB-98008FC47D3B}

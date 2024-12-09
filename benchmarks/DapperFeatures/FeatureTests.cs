@@ -1,11 +1,10 @@
-﻿namespace Dapper.Features;
-
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
 using Common;
 using Dapper;
-using Dapper.Entities;
+using DapperEntities;
+
+namespace DapperFeatures;
 
 [Collection("Dapper")]
 public class FeatureTests
@@ -529,6 +528,6 @@ public class FeatureTests
             """
         ).ToList();
 
-        Assert.Equal([ 5, 6, 7, 8, 9 ], suppliers);
+        Assert.Equal([5, 6, 7, 8, 9], suppliers);
     }
 }

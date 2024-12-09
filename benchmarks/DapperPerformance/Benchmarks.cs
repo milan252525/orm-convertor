@@ -1,11 +1,11 @@
-﻿namespace DapperTests;
-
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
 using BenchmarkDotNet.Attributes;
 using Common;
 using Dapper;
-using Dapper.Entities;
+using DapperEntities;
+
+namespace DapperPerformance;
 
 [MemoryDiagnoser]
 [ExceptionDiagnoser]

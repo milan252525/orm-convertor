@@ -1,7 +1,7 @@
-﻿namespace Common;
-
+﻿
 using Microsoft.Extensions.Configuration;
 
+namespace Common;
 public static class DatabaseConfig
 {
     private static readonly IConfigurationRoot Configuration;

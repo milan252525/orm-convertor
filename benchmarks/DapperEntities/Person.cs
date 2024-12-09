@@ -1,7 +1,7 @@
-﻿namespace Dapper.Entities;
-
+﻿
 using System.Text.Json;
 
+namespace DapperEntities;
 public class Person
 {
     public int PersonID { get; set; }

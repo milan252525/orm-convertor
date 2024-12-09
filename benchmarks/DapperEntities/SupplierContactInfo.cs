@@ -1,4 +1,4 @@
-﻿namespace Dapper.Entities;
+﻿namespace DapperEntities;
 public record class SupplierContactInfo
 {
     public int SupplierID { get; set; }
