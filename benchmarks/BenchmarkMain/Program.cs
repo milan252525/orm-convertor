@@ -1,8 +1,10 @@
 ﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using DapperPerformance;
+using PetaPocoPerformance;
 
-namespace DapperPerformance;
+namespace BenchmarkMain;
 
 internal class Program
 {
@@ -11,14 +13,17 @@ internal class Program
         var testConfig = DefaultConfig.Instance
             .AddJob(
                 Job.Default
-                    .WithWarmupCount(1)
-                    .WithIterationCount(1)
+                    .WithWarmupCount(3)
+                    .WithIterationCount(10)
             );
 
         var defaultConfig = DefaultConfig.Instance;
 
         BenchmarkSwitcher
-            .FromAssembly(typeof(Program).Assembly)
+            .FromTypes([
+                typeof(DapperBenchmark),
+                typeof(PetaPocoBenchmark),
+            ])
             .Run(args, testConfig);
     }
 }

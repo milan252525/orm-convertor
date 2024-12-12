@@ -1,4 +1,8 @@
-﻿namespace PetaPocoEntities;
+﻿using PetaPoco;
+
+namespace PetaPocoEntities;
+
+[TableName("Warehouse.StockItems")]
 public class StockItem
 {
     public int StockItemID { get; set; }

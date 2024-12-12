@@ -1,7 +1,8 @@
 ﻿using PetaPoco;
 
 namespace PetaPocoEntities;
-public record class PurchaseOrderUpdate
+
+public class PurchaseOrderUpdate
 {
     [Column("WWI Order ID")]
     public int OrderID { get; set; }

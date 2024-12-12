@@ -1,6 +1,9 @@
-﻿namespace PetaPocoEntities;
+﻿using PetaPoco;
 
-public record class CustomerTransaction
+namespace PetaPocoEntities;
+
+[TableName("Sales.CustomerTransactions")]
+public class CustomerTransaction
 {
     public int CustomerTransactionID { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace PetaPocoEntities;
 
-public record class SupplierBankAccount
+public class SupplierBankAccount
 {
     public int SupplierID { get; set; }
 

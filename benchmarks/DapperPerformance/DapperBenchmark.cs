@@ -9,9 +9,9 @@ namespace DapperPerformance;
 
 [MemoryDiagnoser]
 [ExceptionDiagnoser]
-public class Benchmarks
+public class DapperBenchmark
 {
-    private SqlConnection connection = new SqlConnection(DatabaseConfig.MSSQLConnectionString);
+    private SqlConnection connection = new(DatabaseConfig.MSSQLConnectionString);
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -201,6 +201,7 @@ public class Benchmarks
         return totalSales;
     }
 
+    [Benchmark]
     public Order D1_OneToManyRelationship()
     {
         string sql = """

@@ -1,7 +1,9 @@
-﻿
-using System.Text.Json;
+﻿using System.Text.Json;
+using PetaPoco;
 
 namespace PetaPocoEntities;
+
+[TableName("Application.People")]
 public class Person
 {
     public int PersonID { get; set; }

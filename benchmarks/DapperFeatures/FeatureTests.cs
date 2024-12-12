@@ -77,32 +77,25 @@ public class FeatureTests
             (contactInfo, bankAccount) => (contactInfo, bankAccount),
             new { SupplierID = 10 },
             splitOn: nameof(SupplierBankAccount.SupplierID)
-        ).First();
+        ).Single();
 
-        var expectedContactInfo = new SupplierContactInfo
+        Assert.Multiple(() =>
         {
-            SupplierID = 10,
-            SupplierName = "Northwind Electric Cars",
-            PhoneNumber = "(201) 555-0105",
-            FaxNumber = "(201) 555-0104",
-            WebsiteURL = "http://www.northwindelectriccars.com",
-            ValidFrom = new DateTime(2013, 1, 1, 0, 5, 0),
-            ValidTo = DateTime.MaxValue
-        };
+            Assert.Equal(10, contactInfo.SupplierID);
+            Assert.Equal("Northwind Electric Cars", contactInfo.SupplierName);
+            Assert.Equal("(201) 555-0105", contactInfo.PhoneNumber);
+            Assert.Equal("(201) 555-0104", contactInfo.FaxNumber);
+            Assert.Equal("http://www.northwindelectriccars.com", contactInfo.WebsiteURL);
+            Assert.Equal(new DateTime(2013, 1, 1, 0, 5, 0), contactInfo.ValidFrom);
+            Assert.Equal(DateTime.MaxValue, contactInfo.ValidTo);
 
-        Assert.Equal(expectedContactInfo, contactInfo);
-
-        var expectedBankAccount = new SupplierBankAccount
-        {
-            SupplierID = 10,
-            BankAccountName = "Northwind Electric Cars",
-            BankAccountBranch = "Woodgrove Bank Crandon Lakes",
-            BankAccountCode = "325447",
-            BankAccountNumber = "3258786987",
-            BankInternationalCode = "36214"
-        };
-
-        Assert.Equal(expectedBankAccount, bankAccount);
+            Assert.Equal(10, bankAccount.SupplierID);
+            Assert.Equal("Northwind Electric Cars", bankAccount.BankAccountName);
+            Assert.Equal("Woodgrove Bank Crandon Lakes", bankAccount.BankAccountBranch);
+            Assert.Equal("325447", bankAccount.BankAccountCode);
+            Assert.Equal("3258786987", bankAccount.BankAccountNumber);
+            Assert.Equal("36214", bankAccount.BankInternationalCode);
+        });
     }
 
     [Fact]
@@ -114,22 +107,24 @@ public class FeatureTests
             commandType: CommandType.StoredProcedure
         ).ToList();
 
-        Assert.Equal(66741, orders.Count);
-        Assert.True(orders.All(o => o.Quantity > 0));
-        Assert.True(orders.All(o => o.TaxRate > 0));
-        Assert.True(orders.All(o => o.UnitPrice > 0));
-
-        var expectedFirstUpdate = new PurchaseOrderUpdate()
+        Assert.Multiple(() =>
         {
-            OrderID = 1219,
-            Description = "\"The Gu\" red shirt XML tag t-shirt (White) XS",
-            Quantity = 96,
-            UnitPrice = 18.00m,
-            TaxRate = 15m,
-            TotalIncludingTax = 1987.2m
-        };
+            Assert.Equal(66741, orders.Count);
+            Assert.True(orders.All(o => o.Quantity > 0));
+            Assert.True(orders.All(o => o.TaxRate > 0));
+            Assert.True(orders.All(o => o.UnitPrice > 0));
+        });
 
-        Assert.Equal(expectedFirstUpdate, orders.First());
+        var firstOrder = orders.First();
+        Assert.Multiple(() =>
+        {
+            Assert.Equal(1219, firstOrder.OrderID);
+            Assert.Equal("\"The Gu\" red shirt XML tag t-shirt (White) XS", firstOrder.Description);
+            Assert.Equal(96, firstOrder.Quantity);
+            Assert.Equal(18.00m, firstOrder.UnitPrice);
+            Assert.Equal(15m, firstOrder.TaxRate);
+            Assert.Equal(1987.2m, firstOrder.TotalIncludingTax);
+        });
     }
 
     [Fact]
@@ -316,47 +311,41 @@ public class FeatureTests
         })
         .Single();
 
-        var expectedOrder = new Order
+        Assert.NotNull(order);
+
+        var firstOrderLine = order.OrderLines.First();
+        Assert.Multiple(() =>
         {
-            OrderID = 530,
-            CustomerID = 115,
-            SalespersonPersonID = 3,
-            PickedByPersonID = 13,
-            ContactPersonID = 1229,
-            BackorderOrderID = null,
-            OrderDate = new DateTime(2013, 1, 10),
-            ExpectedDeliveryDate = new DateTime(2013, 1, 11),
-            CustomerPurchaseOrderNumber = "19446",
-            IsUndersupplyBackordered = true,
-            Comments = null,
-            DeliveryInstructions = null,
-            InternalComments = null,
-            PickingCompletedWhen = new DateTime(2013, 1, 10, 11, 0, 0),
-            LastEditedBy = 13,
-            LastEditedWhen = new DateTime(2013, 1, 10, 11, 0, 0),
-            OrderLines = null!
-        };
+            Assert.Equal(1478, firstOrderLine.OrderLineID);
+            Assert.Equal(530, firstOrderLine.OrderID);
+            Assert.Equal(129, firstOrderLine.StockItemID);
+            Assert.Equal("Plush shark slippers (Gray) XL", firstOrderLine.Description);
+            Assert.Equal(7, firstOrderLine.PackageTypeID);
+            Assert.Equal(7, firstOrderLine.Quantity);
+            Assert.Equal(32.00m, firstOrderLine.UnitPrice);
+            Assert.Equal(15.000m, firstOrderLine.TaxRate);
+            Assert.Equal(7, firstOrderLine.PickedQuantity);
+            Assert.Equal(new DateTime(2013, 1, 10, 11, 0, 0), firstOrderLine.PickingCompletedWhen);
+            Assert.Equal(13, firstOrderLine.LastEditedBy);
+            Assert.Equal(new DateTime(2013, 1, 10, 11, 0, 0), firstOrderLine.LastEditedWhen);
 
-        var expectedFirstLine = new OrderLine
-        {
-            OrderLineID = 1478,
-            OrderID = 530,
-            StockItemID = 129,
-            Description = "Plush shark slippers (Gray) XL",
-            PackageTypeID = 7,
-            Quantity = 7,
-            UnitPrice = 32.00m,
-            TaxRate = 15.000m,
-            PickedQuantity = 7,
-            PickingCompletedWhen = new DateTime(2013, 1, 10, 11, 0, 0),
-            LastEditedBy = 13,
-            LastEditedWhen = new DateTime(2013, 1, 10, 11, 0, 0)
-        };
-
-        Assert.Equal(expectedFirstLine, order.OrderLines.First());
-
-        order.OrderLines = null!; // null to test equality without OrderLines
-        Assert.Equal(expectedOrder, order);
+            Assert.Equal(530, order.OrderID);
+            Assert.Equal(115, order.CustomerID);
+            Assert.Equal(3, order.SalespersonPersonID);
+            Assert.Equal(13, order.PickedByPersonID);
+            Assert.Equal(1229, order.ContactPersonID);
+            Assert.Null(order.BackorderOrderID);
+            Assert.Equal(new DateTime(2013, 1, 10), order.OrderDate);
+            Assert.Equal(new DateTime(2013, 1, 11), order.ExpectedDeliveryDate);
+            Assert.Equal("19446", order.CustomerPurchaseOrderNumber);
+            Assert.True(order.IsUndersupplyBackordered);
+            Assert.Null(order.Comments);
+            Assert.Null(order.DeliveryInstructions);
+            Assert.Null(order.InternalComments);
+            Assert.Equal(new DateTime(2013, 1, 10, 11, 0, 0), order.PickingCompletedWhen);
+            Assert.Equal(13, order.LastEditedBy);
+            Assert.Equal(new DateTime(2013, 1, 10, 11, 0, 0), order.LastEditedWhen);
+        });
     }
 
     [Fact]

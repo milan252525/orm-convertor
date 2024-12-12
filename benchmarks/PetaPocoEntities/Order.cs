@@ -1,5 +1,9 @@
-﻿namespace PetaPocoEntities;
-public record class Order
+﻿using PetaPoco;
+
+namespace PetaPocoEntities;
+
+[TableName("Sales.Orders")]
+public class Order
 {
     public int OrderID { get; set; }
 
@@ -33,5 +37,6 @@ public record class Order
 
     public DateTime LastEditedWhen { get; set; }
 
+    [Ignore]
     public List<OrderLine> OrderLines { get; set; } = [];
 }

@@ -1,5 +1,9 @@
-﻿namespace PetaPocoEntities;
-public record class SupplierContactInfo
+﻿using PetaPoco;
+
+namespace PetaPocoEntities;
+
+[TableName("Purchasing.Suppliers")]
+public class SupplierContactInfo
 {
     public int SupplierID { get; set; }
 
