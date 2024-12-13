@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EFCoreEntities;
 
 [Table("Orders", Schema = "Sales")]
 public class Order
 {
+    [Key]
     public int OrderID { get; set; }
 
     public int CustomerID { get; set; }

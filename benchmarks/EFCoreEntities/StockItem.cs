@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EFCoreEntities;
 
 [Table("StockItems", Schema = "Warehouse")]
 public class StockItem
 {
+    [Key]
     public int StockItemID { get; set; }
 
     public required string StockItemName { get; set; }

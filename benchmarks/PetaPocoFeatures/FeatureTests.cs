@@ -126,7 +126,6 @@ public class FeatureTests
             Assert.Equal(15m, firstOrder.TaxRate);
             Assert.Equal(1987.2m, firstOrder.TotalIncludingTax);
         });
-
     }
 
     [Fact]
@@ -372,6 +371,7 @@ public class FeatureTests
                     stockItems.Add(stockItem.StockItemID, existing);
                 }
 
+                stockGroup.StockItems.Add(existing);
                 existing.StockGroups.Add(stockGroup);
                 return existing;
             },
@@ -389,6 +389,9 @@ public class FeatureTests
         Assert.Equal(3, result[0].StockGroups.Count);
         var groupNames = result[0].StockGroups.Select(sg => sg.StockGroupName).ToList();
         Assert.Equal(["Novelty Items", "Computing Novelties", "USB Novelties"], groupNames);
+
+        Assert.Single(result[0].StockGroups[0].StockItems);
+        Assert.Equal(1, result[0].StockGroups[0].StockItems[0].StockItemID);
     }
 
     [Fact]

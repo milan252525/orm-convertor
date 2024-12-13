@@ -1,12 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EFCoreEntities;
 
 [Table("OrderLines", Schema = "Sales")]
 public class OrderLine
 {
+    [Key]
     public int OrderLineID { get; set; }
 
+    [ForeignKey(nameof(Order))]
     public int OrderID { get; set; }
 
     public int StockItemID { get; set; }
@@ -15,7 +18,7 @@ public class OrderLine
 
     public int PackageTypeID { get; set; }
 
-    public decimal Quantity { get; set; }
+    public int Quantity { get; set; }
 
     public decimal? UnitPrice { get; set; }
 
@@ -25,7 +28,7 @@ public class OrderLine
 
     public DateTime? PickingCompletedWhen { get; set; }
 
-    public decimal LastEditedBy { get; set; }
+    public int LastEditedBy { get; set; }
 
     public DateTime LastEditedWhen { get; set; }
 }

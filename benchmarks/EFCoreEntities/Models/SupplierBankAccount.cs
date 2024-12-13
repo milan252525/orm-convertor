@@ -1,4 +1,4 @@
-﻿namespace EFCoreEntities;
+﻿namespace EFCoreEntities.Models;
 
 public class SupplierBankAccount
 {

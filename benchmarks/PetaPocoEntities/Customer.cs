@@ -11,7 +11,7 @@ public class Customer
 
     public DateTime AccountOpenedDate { get; set; }
 
-    public decimal CreditLimit { get; set; }
+    public decimal? CreditLimit { get; set; }
 
     public List<CustomerTransaction> Transactions { get; set; } = [];
 }
