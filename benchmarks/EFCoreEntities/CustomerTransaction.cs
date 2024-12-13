@@ -1,5 +1,8 @@
-﻿namespace DapperEntities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
+namespace EFCoreEntities;
+
+[Table("CustomerTransactions", Schema = "Sales")]
 public class CustomerTransaction
 {
     public int CustomerTransactionID { get; set; }

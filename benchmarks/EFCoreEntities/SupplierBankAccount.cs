@@ -1,4 +1,4 @@
-﻿namespace DapperEntities;
+﻿namespace EFCoreEntities;
 
 public class SupplierBankAccount
 {

@@ -1,4 +1,8 @@
-﻿namespace DapperEntities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace EFCoreEntities;
+
+[Table("Suppliers", Schema = "Purchasing")]
 public class SupplierContactInfo
 {
     public int SupplierID { get; set; }

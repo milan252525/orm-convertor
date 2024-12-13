@@ -1,4 +1,8 @@
-﻿namespace DapperEntities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace EFCoreEntities;
+
+[Table("Orders", Schema = "Sales")]
 public class Order
 {
     public int OrderID { get; set; }
@@ -26,7 +30,7 @@ public class Order
     public string? DeliveryInstructions { get; set; }
 
     public string? InternalComments { get; set; }
-    
+
     public DateTime? PickingCompletedWhen { get; set; }
 
     public int LastEditedBy { get; set; }

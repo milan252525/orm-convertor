@@ -26,18 +26,21 @@ public class FeatureTests
             new { PurchaseOrderId = 25 }
         );
 
-        Assert.Equal(25, order.PurchaseOrderID);
-        Assert.Equal(12, order.SupplierID);
-        Assert.Equal(new DateTime(2013, 1, 5), order.OrderDate);
-        Assert.Equal(7, order.DeliveryMethodID);
-        Assert.Equal(2, order.ContactPersonID);
-        Assert.Equal(new DateTime(2013, 1, 25), order.ExpectedDeliveryDate);
-        Assert.Equal("237408032", order.SupplierReference);
-        Assert.True(order.IsOrderFinalized);
-        Assert.Null(order.Comments);
-        Assert.Null(order.InternalComments);
-        Assert.Equal(14, order.LastEditedBy);
-        Assert.Equal(new DateTime(2013, 1, 7, 7, 0, 0), order.LastEditedWhen);
+        Assert.Multiple(() =>
+        {
+            Assert.Equal(25, order.PurchaseOrderID);
+            Assert.Equal(12, order.SupplierID);
+            Assert.Equal(new DateTime(2013, 1, 5), order.OrderDate);
+            Assert.Equal(7, order.DeliveryMethodID);
+            Assert.Equal(2, order.ContactPersonID);
+            Assert.Equal(new DateTime(2013, 1, 25), order.ExpectedDeliveryDate);
+            Assert.Equal("237408032", order.SupplierReference);
+            Assert.True(order.IsOrderFinalized);
+            Assert.Null(order.Comments);
+            Assert.Null(order.InternalComments);
+            Assert.Equal(14, order.LastEditedBy);
+            Assert.Equal(new DateTime(2013, 1, 7, 7, 0, 0), order.LastEditedWhen);
+        });
     }
 
     [Fact]
@@ -49,13 +52,16 @@ public class FeatureTests
             new { SupplierID = 10 }
         );
 
-        Assert.Equal(10, contactInfo.SupplierID);
-        Assert.Equal("Northwind Electric Cars", contactInfo.SupplierName);
-        Assert.Equal("(201) 555-0105", contactInfo.PhoneNumber);
-        Assert.Equal("(201) 555-0104", contactInfo.FaxNumber);
-        Assert.Equal("http://www.northwindelectriccars.com", contactInfo.WebsiteURL);
-        Assert.Equal(new DateTime(2013, 1, 1, 0, 5, 0), contactInfo.ValidFrom);
-        Assert.Equal(DateTime.MaxValue, contactInfo.ValidTo);
+        Assert.Multiple(() =>
+        {
+            Assert.Equal(10, contactInfo.SupplierID);
+            Assert.Equal("Northwind Electric Cars", contactInfo.SupplierName);
+            Assert.Equal("(201) 555-0105", contactInfo.PhoneNumber);
+            Assert.Equal("(201) 555-0104", contactInfo.FaxNumber);
+            Assert.Equal("http://www.northwindelectriccars.com", contactInfo.WebsiteURL);
+            Assert.Equal(new DateTime(2013, 1, 1, 0, 5, 0), contactInfo.ValidFrom);
+            Assert.Equal(DateTime.MaxValue, contactInfo.ValidTo);
+        });
     }
 
     [Fact]

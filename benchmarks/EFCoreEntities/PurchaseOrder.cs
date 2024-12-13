@@ -1,5 +1,8 @@
-﻿namespace DapperEntities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
+namespace EFCoreEntities;
+
+[Table("PurchaseOrders", Schema = "Purchasing")]
 public class PurchaseOrder
 {
     public int PurchaseOrderID { get; set; }

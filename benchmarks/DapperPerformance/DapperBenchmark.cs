@@ -1,9 +1,9 @@
 ﻿using System.Data;
-using System.Data.SqlClient;
 using BenchmarkDotNet.Attributes;
 using Common;
 using Dapper;
 using DapperEntities;
+using Microsoft.Data.SqlClient;
 
 namespace DapperPerformance;
 
