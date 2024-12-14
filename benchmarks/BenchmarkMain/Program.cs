@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using DapperPerformance;
+using EFCorePerformance;
 using PetaPocoPerformance;
 
 namespace BenchmarkMain;
@@ -23,6 +24,7 @@ internal class Program
             .FromTypes([
                 typeof(DapperBenchmark),
                 typeof(PetaPocoBenchmark),
+                typeof(EFCoreBenchmarks)
             ])
             .Run(args, testConfig);
     }

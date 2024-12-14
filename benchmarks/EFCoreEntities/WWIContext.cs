@@ -18,6 +18,8 @@ public class WWIContext(DbContextOptions<WWIContext> options) : DbContext(option
 
     public DbSet<Customer> Customers { get; set; }
 
+    public DbSet<Person> People { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<PurchaseOrderUpdate>().HasNoKey();
@@ -30,5 +32,13 @@ public class WWIContext(DbContextOptions<WWIContext> options) : DbContext(option
                 l => l.HasOne(typeof(StockGroup)).WithMany().HasForeignKey("StockGroupID"),
                 r => r.HasOne(typeof(StockItem)).WithMany().HasForeignKey("StockItemID")
             );
+
+        modelBuilder.Entity<Person>()
+            .OwnsOne(p => p.CustomFields, cb =>
+            {
+                cb.ToJson();
+            });
+
+        base.OnModelCreating(modelBuilder);
     }
 }

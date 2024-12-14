@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Common;
+﻿using Common;
 using EFCoreEntities;
 using EFCoreEntities.Models;
 using Microsoft.EntityFrameworkCore;
@@ -419,5 +418,121 @@ public class FeatureTests
 
         Assert.Equal(663, result.Count);
         Assert.Equal(400, result.Where(c => c.Transactions.Count == 0).Count());
+    }
+
+    [Fact]
+    public void E1_ColumnSorting()
+    {
+        using var context = contextFactory.CreateDbContext();
+
+        var orders = context.PurchaseOrders
+            .OrderBy(po => po.ExpectedDeliveryDate)
+            .Take(1000)
+            .ToList();
+
+        Assert.Equal(1000, orders.Count);
+        Assert.Equal(new DateTime(2013, 1, 15), orders.First().ExpectedDeliveryDate);
+        Assert.Equal(new DateTime(2014, 9, 17), orders.Last().ExpectedDeliveryDate);
+        Assert.True(orders.SequenceEqual(orders.OrderBy(o => o.ExpectedDeliveryDate)));
+    }
+
+    [Fact]
+    public void E2_Distinct()
+    {
+        using var context = contextFactory.CreateDbContext();
+
+        var supplierReferences = context.PurchaseOrders
+            .Select(po => po.SupplierReference)
+            .Distinct()
+            .ToList();
+
+        Assert.Equal(7, supplierReferences.Count);
+        string[] expected = ["AA20384", "BC0280982", "ML0300202", "293092", "08803922", "237408032", "B2084020"];
+        Assert.Equal(expected, supplierReferences);
+    }
+
+    [Fact]
+    public void F1_NestedJSONQuery()
+    {
+        using var context = contextFactory.CreateDbContext();
+
+        var people = context.People
+            .Where(p => p.CustomFields!.Title == "Team Member")
+            .OrderBy(p => p.PersonID)
+            .ToList();
+
+        Assert.Equal(13, people.Count);
+        Assert.All(people, person => Assert.Equal("Team Member", person.CustomFields?.Title));
+
+        var first = people.First();
+        Assert.Equal("Kayla Woodcock", first.FullName);
+        Assert.Equal("Kayla", first.PreferredName);
+        Assert.Equal("kaylaw@wideworldimporters.com", first.EmailAddress);
+        Assert.Equal(new DateTime(2008, 4, 19), first.CustomFields?.HireDate);
+    }
+
+    [Fact]
+    public void F2_JSONArrayQuery()
+    {
+        using var context = contextFactory.CreateDbContext();
+
+        var people = context.People
+            .Where(p => p.OtherLanguages!.Contains("Slovak"))
+            .OrderBy(p => p.PersonID)
+            .ToList();
+
+        Assert.Equal(2, people.Count);
+        Assert.All(people, person => Assert.Contains("Slovak", person.OtherLanguages!));
+
+        var first = people.First();
+        Assert.Equal("Amy Trefl", first.FullName);
+        Assert.Equal(["Slovak", "Spanish", "Polish"], first.OtherLanguages);
+    }
+
+    [Fact]
+    public void G1_Union()
+    {
+        using var context = contextFactory.CreateDbContext();
+
+        var first = context.Suppliers
+            .Where(s => s.SupplierID < 5)
+            .Select(s => s.SupplierID)
+            .ToList();
+
+        var last = context.Suppliers
+            .Where(s => s.SupplierID >= 5 && s.SupplierID <= 10)
+            .Select(s => s.SupplierID)
+            .ToList();
+
+        var suppliers = first
+            .Union(last)
+            .OrderBy(s => s)
+            .ToList();
+
+        Assert.Equal(10, suppliers.Count);
+        Assert.Equal(Enumerable.Range(1, 10), suppliers);
+    }
+
+    [Fact]
+    public void G2_Intersection()
+    {
+        using var context = contextFactory.CreateDbContext();
+
+        var first = context.Suppliers
+            .Where(s => s.SupplierID < 10)
+            .Select(s => s.SupplierID)
+            .ToList();
+
+        var last = context.Suppliers
+            .Where(s => s.SupplierID >= 5 && s.SupplierID <= 15)
+            .Select(s => s.SupplierID)
+            .ToList();
+
+        var suppliers = first
+            .Intersect(last)
+            .OrderBy(s => s)
+            .ToList();
+
+        Assert.Equal([5, 6, 7, 8, 9], suppliers);
     }
 }
