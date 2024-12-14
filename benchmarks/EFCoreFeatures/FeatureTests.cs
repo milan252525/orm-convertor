@@ -273,7 +273,6 @@ public class FeatureTests
         string text = "C++";
 
         var orderLines = context.OrderLines
-            //.Where(ol => EF.Functions.Like(ol.Description, $"%{text}%"))
             .Where(ol => ol.Description.Contains(text))
             .ToList();
 
@@ -388,9 +387,9 @@ public class FeatureTests
         using var context = contextFactory.CreateDbContext();
 
         var stockItems = context.StockItems
-        .Include(si => si.StockGroups)
-        .OrderBy(si => si.StockItemID)
-        .ToList();
+            .Include(si => si.StockGroups)
+            .OrderBy(si => si.StockItemID)
+            .ToList();
 
         Assert.Equal(227, stockItems.Count);
 
