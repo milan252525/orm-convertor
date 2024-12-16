@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DapperPerformance\DapperPerformance.csproj" />
+    <ProjectReference Include="..\EF6Performance\EF6Performance.csproj" />
     <ProjectReference Include="..\EFCorePerformance\EFCorePerformance.csproj" />
     <ProjectReference Include="..\PetaPocoPerformance\PetaPocoPerformance.csproj" />
   </ItemGroup>

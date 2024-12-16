@@ -25,13 +25,13 @@ namespace EF6Entities
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<StockItem>()
-                .HasMany(s => s.StockGroups)
+                .HasMany(si => si.StockGroups)
                 .WithMany(sg => sg.StockItems)
                 .Map(m =>
                 {
                     m.ToTable("StockItemStockGroups", "Warehouse");
-                    m.MapLeftKey("StockItemID");
-                    m.MapRightKey("StockGroupID");
+                    m.MapLeftKey("StockItemId");
+                    m.MapRightKey("StockGroupId");
                 });
 
             base.OnModelCreating(modelBuilder);

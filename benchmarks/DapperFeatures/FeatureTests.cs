@@ -163,18 +163,21 @@ public class FeatureTests
 
         var actualOrderLine = orderLines.First(ol => ol.OrderLineID == 85261);
 
-        Assert.Equal(expectedFirstOrderLine.OrderLineID, actualOrderLine.OrderLineID);
-        Assert.Equal(expectedFirstOrderLine.OrderID, actualOrderLine.OrderID);
-        Assert.Equal(expectedFirstOrderLine.StockItemID, actualOrderLine.StockItemID);
-        Assert.Equal(expectedFirstOrderLine.Description, actualOrderLine.Description);
-        Assert.Equal(expectedFirstOrderLine.PackageTypeID, actualOrderLine.PackageTypeID);
-        Assert.Equal(expectedFirstOrderLine.Quantity, actualOrderLine.Quantity);
-        Assert.Equal(expectedFirstOrderLine.UnitPrice, actualOrderLine.UnitPrice);
-        Assert.Equal(expectedFirstOrderLine.TaxRate, actualOrderLine.TaxRate);
-        Assert.Equal(expectedFirstOrderLine.PickedQuantity, actualOrderLine.PickedQuantity);
-        Assert.Equal(expectedFirstOrderLine.PickingCompletedWhen, actualOrderLine.PickingCompletedWhen);
-        Assert.Equal(expectedFirstOrderLine.LastEditedBy, actualOrderLine.LastEditedBy);
-        Assert.Equal(expectedFirstOrderLine.LastEditedWhen, actualOrderLine.LastEditedWhen);
+        Assert.Multiple(() =>
+        {
+            Assert.Equal(expectedFirstOrderLine.OrderLineID, actualOrderLine.OrderLineID);
+            Assert.Equal(expectedFirstOrderLine.OrderID, actualOrderLine.OrderID);
+            Assert.Equal(expectedFirstOrderLine.StockItemID, actualOrderLine.StockItemID);
+            Assert.Equal(expectedFirstOrderLine.Description, actualOrderLine.Description);
+            Assert.Equal(expectedFirstOrderLine.PackageTypeID, actualOrderLine.PackageTypeID);
+            Assert.Equal(expectedFirstOrderLine.Quantity, actualOrderLine.Quantity);
+            Assert.Equal(expectedFirstOrderLine.UnitPrice, actualOrderLine.UnitPrice);
+            Assert.Equal(expectedFirstOrderLine.TaxRate, actualOrderLine.TaxRate);
+            Assert.Equal(expectedFirstOrderLine.PickedQuantity, actualOrderLine.PickedQuantity);
+            Assert.Equal(expectedFirstOrderLine.PickingCompletedWhen, actualOrderLine.PickingCompletedWhen);
+            Assert.Equal(expectedFirstOrderLine.LastEditedBy, actualOrderLine.LastEditedBy);
+            Assert.Equal(expectedFirstOrderLine.LastEditedWhen, actualOrderLine.LastEditedWhen);
+        });
     }
 
     [Fact]

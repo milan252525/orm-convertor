@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using DapperPerformance;
+using EF6Performance;
 using EFCorePerformance;
 using PetaPocoPerformance;
 
@@ -24,7 +25,8 @@ internal class Program
             .FromTypes([
                 typeof(DapperBenchmark),
                 typeof(PetaPocoBenchmark),
-                typeof(EFCoreBenchmarks)
+                typeof(EFCoreBenchmarks),
+                typeof(EF6Benchmarks)
             ])
             .Run(args, testConfig);
     }

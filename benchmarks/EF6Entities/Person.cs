@@ -1,5 +1,6 @@
 ﻿
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 
 namespace EF6Entities;
 
@@ -10,8 +11,18 @@ public class Person
     public required string FullName { get; set; }
     public required string PreferredName { get; set; }
     public string? EmailAddress { get; set; }
-    public CustomFields? CustomFields { get; set; }
-    public List<string>? OtherLanguages { get; set; }
+    public string? CustomFields { get; set; }
+    public string? OtherLanguages { get; set; }
+
+    public CustomFields? GetCustomFields()
+    {
+        return string.IsNullOrEmpty(CustomFields) ? null : JsonSerializer.Deserialize<CustomFields>(CustomFields);
+    }
+
+    public List<string>? GetOtherLanguages()
+    {
+        return string.IsNullOrEmpty(OtherLanguages) ? null : JsonSerializer.Deserialize<List<string>>(OtherLanguages);
+    }
 }
 
 public class CustomFields
@@ -20,4 +31,3 @@ public class CustomFields
     public DateTime? HireDate { get; set; }
     public string? Title { get; set; }
 }
-

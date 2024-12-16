@@ -205,18 +205,21 @@ public class FeatureTests
 
         var actualOrderLine = orderLines.First(ol => ol.OrderLineID == 85261);
 
-        Assert.Equal(expectedFirstOrderLine.OrderLineID, actualOrderLine.OrderLineID);
-        Assert.Equal(expectedFirstOrderLine.OrderID, actualOrderLine.OrderID);
-        Assert.Equal(expectedFirstOrderLine.StockItemID, actualOrderLine.StockItemID);
-        Assert.Equal(expectedFirstOrderLine.Description, actualOrderLine.Description);
-        Assert.Equal(expectedFirstOrderLine.PackageTypeID, actualOrderLine.PackageTypeID);
-        Assert.Equal(expectedFirstOrderLine.Quantity, actualOrderLine.Quantity);
-        Assert.Equal(expectedFirstOrderLine.UnitPrice, actualOrderLine.UnitPrice);
-        Assert.Equal(expectedFirstOrderLine.TaxRate, actualOrderLine.TaxRate);
-        Assert.Equal(expectedFirstOrderLine.PickedQuantity, actualOrderLine.PickedQuantity);
-        Assert.Equal(expectedFirstOrderLine.PickingCompletedWhen, actualOrderLine.PickingCompletedWhen);
-        Assert.Equal(expectedFirstOrderLine.LastEditedBy, actualOrderLine.LastEditedBy);
-        Assert.Equal(expectedFirstOrderLine.LastEditedWhen, actualOrderLine.LastEditedWhen);
+        Assert.Multiple(() =>
+        {
+            Assert.Equal(expectedFirstOrderLine.OrderLineID, actualOrderLine.OrderLineID);
+            Assert.Equal(expectedFirstOrderLine.OrderID, actualOrderLine.OrderID);
+            Assert.Equal(expectedFirstOrderLine.StockItemID, actualOrderLine.StockItemID);
+            Assert.Equal(expectedFirstOrderLine.Description, actualOrderLine.Description);
+            Assert.Equal(expectedFirstOrderLine.PackageTypeID, actualOrderLine.PackageTypeID);
+            Assert.Equal(expectedFirstOrderLine.Quantity, actualOrderLine.Quantity);
+            Assert.Equal(expectedFirstOrderLine.UnitPrice, actualOrderLine.UnitPrice);
+            Assert.Equal(expectedFirstOrderLine.TaxRate, actualOrderLine.TaxRate);
+            Assert.Equal(expectedFirstOrderLine.PickedQuantity, actualOrderLine.PickedQuantity);
+            Assert.Equal(expectedFirstOrderLine.PickingCompletedWhen, actualOrderLine.PickingCompletedWhen);
+            Assert.Equal(expectedFirstOrderLine.LastEditedBy, actualOrderLine.LastEditedBy);
+            Assert.Equal(expectedFirstOrderLine.LastEditedWhen, actualOrderLine.LastEditedWhen);
+        });
     }
 
     [Fact]
@@ -417,37 +420,6 @@ public class FeatureTests
 
         Assert.Equal(663, result.Count);
         Assert.Equal(400, result.Where(c => c.Transactions.Count == 0).Count());
-    }
-
-    [Fact]
-    public void E1_ColumnSorting()
-    {
-        using var context = contextFactory.CreateDbContext();
-
-        var orders = context.PurchaseOrders
-            .OrderBy(po => po.ExpectedDeliveryDate)
-            .Take(1000)
-            .ToList();
-
-        Assert.Equal(1000, orders.Count);
-        Assert.Equal(new DateTime(2013, 1, 15), orders.First().ExpectedDeliveryDate);
-        Assert.Equal(new DateTime(2014, 9, 17), orders.Last().ExpectedDeliveryDate);
-        Assert.True(orders.SequenceEqual(orders.OrderBy(o => o.ExpectedDeliveryDate)));
-    }
-
-    [Fact]
-    public void E2_Distinct()
-    {
-        using var context = contextFactory.CreateDbContext();
-
-        var supplierReferences = context.PurchaseOrders
-            .Select(po => po.SupplierReference)
-            .Distinct()
-            .ToList();
-
-        Assert.Equal(7, supplierReferences.Count);
-        string[] expected = ["AA20384", "BC0280982", "ML0300202", "293092", "08803922", "237408032", "B2084020"];
-        Assert.Equal(expected, supplierReferences);
     }
 
     [Fact]

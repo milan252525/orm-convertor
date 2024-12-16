@@ -17,5 +17,5 @@ public class StockItem
 
     public string? Size { get; set; }
 
-    public List<StockGroup> StockGroups { get; set; } = [];
+     public ICollection<StockGroup> StockGroups { get; set; } = new HashSet<StockGroup>();
 }

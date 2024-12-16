@@ -11,5 +11,5 @@ public class StockGroup
 
     public required string StockGroupName { get; set; }
 
-    public List<StockItem> StockItems { get; set; } = [];
+    public ICollection<StockItem> StockItems { get; set; } = new HashSet<StockItem>();
 }

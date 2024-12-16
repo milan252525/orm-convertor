@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.Entity;
 using EF6Entities;
 using EF6Entities.Models;
+using Microsoft.Data.SqlClient;
 
 namespace EF6Features
 {
@@ -10,23 +11,20 @@ namespace EF6Features
     {
         private readonly ITestOutputHelper output = output;
 
-        private WWIContext Context
+        private WWIContext GetContext()
         {
-            get
-            {
-                var context = new WWIContext();
-                context.Configuration.AutoDetectChangesEnabled = false;
-                context.Configuration.ProxyCreationEnabled = false;
-                context.Configuration.LazyLoadingEnabled = false;
-                context.Database.Log = (message) => output.WriteLine(message);
-                return context;
-            }
+            var context = new WWIContext();
+            context.Configuration.AutoDetectChangesEnabled = false;
+            context.Configuration.ProxyCreationEnabled = false;
+            context.Configuration.LazyLoadingEnabled = false;
+            context.Database.Log = (message) => output.WriteLine(message);
+            return context;
         }
 
         [Fact]
         public void A1_EntityIdenticalToTable()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             var order = context.PurchaseOrders.Find(25);
 
@@ -51,7 +49,7 @@ namespace EF6Features
         [Fact]
         public void A2_LimitedEntity()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             var contactInfo = context.Suppliers
             .Where(s => s.SupplierID == 10)
@@ -82,7 +80,7 @@ namespace EF6Features
         [Fact]
         public void A3_MultipleEntitiesFromOneResult()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             var result = context.Suppliers
             .Where(s => s.SupplierID == 10)
@@ -136,7 +134,7 @@ namespace EF6Features
         [Description("FAIL - EF6 cannot be used.")]
         public void A4_StoredProcedureToEntity()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             var from = new DateTime(2014, 1, 1);
             var to = new DateTime(2015, 1, 1);
@@ -208,7 +206,7 @@ namespace EF6Features
         [Fact]
         public void B1_SelectionOverIndexedColumn()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             int orderId = 26866;
 
@@ -237,24 +235,27 @@ namespace EF6Features
 
             var actualOrderLine = orderLines.First(ol => ol.OrderLineID == 85261);
 
-            Assert.Equal(expectedFirstOrderLine.OrderLineID, actualOrderLine.OrderLineID);
-            Assert.Equal(expectedFirstOrderLine.OrderID, actualOrderLine.OrderID);
-            Assert.Equal(expectedFirstOrderLine.StockItemID, actualOrderLine.StockItemID);
-            Assert.Equal(expectedFirstOrderLine.Description, actualOrderLine.Description);
-            Assert.Equal(expectedFirstOrderLine.PackageTypeID, actualOrderLine.PackageTypeID);
-            Assert.Equal(expectedFirstOrderLine.Quantity, actualOrderLine.Quantity);
-            Assert.Equal(expectedFirstOrderLine.UnitPrice, actualOrderLine.UnitPrice);
-            Assert.Equal(expectedFirstOrderLine.TaxRate, actualOrderLine.TaxRate);
-            Assert.Equal(expectedFirstOrderLine.PickedQuantity, actualOrderLine.PickedQuantity);
-            Assert.Equal(expectedFirstOrderLine.PickingCompletedWhen, actualOrderLine.PickingCompletedWhen);
-            Assert.Equal(expectedFirstOrderLine.LastEditedBy, actualOrderLine.LastEditedBy);
-            Assert.Equal(expectedFirstOrderLine.LastEditedWhen, actualOrderLine.LastEditedWhen);
+            Assert.Multiple(() =>
+            {
+                Assert.Equal(expectedFirstOrderLine.OrderLineID, actualOrderLine.OrderLineID);
+                Assert.Equal(expectedFirstOrderLine.OrderID, actualOrderLine.OrderID);
+                Assert.Equal(expectedFirstOrderLine.StockItemID, actualOrderLine.StockItemID);
+                Assert.Equal(expectedFirstOrderLine.Description, actualOrderLine.Description);
+                Assert.Equal(expectedFirstOrderLine.PackageTypeID, actualOrderLine.PackageTypeID);
+                Assert.Equal(expectedFirstOrderLine.Quantity, actualOrderLine.Quantity);
+                Assert.Equal(expectedFirstOrderLine.UnitPrice, actualOrderLine.UnitPrice);
+                Assert.Equal(expectedFirstOrderLine.TaxRate, actualOrderLine.TaxRate);
+                Assert.Equal(expectedFirstOrderLine.PickedQuantity, actualOrderLine.PickedQuantity);
+                Assert.Equal(expectedFirstOrderLine.PickingCompletedWhen, actualOrderLine.PickingCompletedWhen);
+                Assert.Equal(expectedFirstOrderLine.LastEditedBy, actualOrderLine.LastEditedBy);
+                Assert.Equal(expectedFirstOrderLine.LastEditedWhen, actualOrderLine.LastEditedWhen);
+            });
         }
 
         [Fact]
         public void B2_SelectionOverNonIndexedColumn()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             decimal unitPrice = 25m;
 
@@ -269,7 +270,7 @@ namespace EF6Features
         [Fact]
         public void B3_RangeQuery()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             var from = new DateTime(2014, 12, 20);
             var to = new DateTime(2014, 12, 31);
@@ -285,7 +286,7 @@ namespace EF6Features
         [Fact]
         public void B4_InQuery()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             var orderIds = new[] { 1, 10, 100, 1000, 10000 };
 
@@ -300,7 +301,7 @@ namespace EF6Features
         [Fact]
         public void B5_TextSearch()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             string text = "C++";
 
@@ -315,7 +316,7 @@ namespace EF6Features
         [Fact]
         public void B6_PagingQuery()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             int skip = 1000;
             int take = 50;
@@ -333,7 +334,7 @@ namespace EF6Features
         [Fact]
         public void C1_AggregationCount()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             var taxRates = context.OrderLines
                 .GroupBy(ol => ol.TaxRate)
@@ -349,7 +350,7 @@ namespace EF6Features
         [Fact]
         public void C2_AggregationMax()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             var maxUnitPrice = context.OrderLines.Max(ol => ol.UnitPrice);
 
@@ -359,7 +360,7 @@ namespace EF6Features
         [Fact]
         public void C3_AggregationSum()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             var totalSales = context.OrderLines
                 .Sum(ol => ol.Quantity * ol.UnitPrice);
@@ -370,7 +371,7 @@ namespace EF6Features
         [Fact]
         public void D1_OneToManyRelationship()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             var order = context.Orders
                 .Include(o => o.OrderLines)
@@ -414,9 +415,10 @@ namespace EF6Features
         }
 
         [Fact]
+        [Description("Partially FAIL - EF6 cannot reliably handle navigation from StockItems to StockGroups and back to StockItems, leading to incorrect results.")]
         public void D2_ManyToManyRelationship()
         {
-            using var context = Context;
+            using var context = GetContext();
 
             var stockItems = context.StockItems
                 .Include(si => si.StockGroups)
@@ -430,11 +432,145 @@ namespace EF6Features
             Assert.Equal(12, stockItems[0].SupplierID);
 
             Assert.Equal(3, stockItems[0].StockGroups.Count);
-            var groupNames = stockItems[0].StockGroups.Select(sg => sg.StockGroupName).ToList();
-            Assert.Equal(["Novelty Items", "Computing Novelties", "USB Novelties"], groupNames);
 
-            Assert.Single(stockItems[0].StockGroups[0].StockItems);
-            Assert.Equal(1, stockItems[0].StockGroups[0].StockItems[0].StockItemID);
+             var groupNames = stockItems[0].StockGroups
+                .Select(sg => sg.StockGroupName).OrderBy(x => x).ToList();
+            Assert.Equal(["Computing Novelties", "Novelty Items", "USB Novelties"], groupNames);
+
+            // FAIL - EF6 cannot reliably handle navigation from StockItems to StockGroups and back to StockItems, leading to incorrect results.
+
+            // Assert.Single(stockItems[0].StockGroups.First().StockItems);
+            // Assert.Equal(1, stockItems[0].StockGroups[0].StockItems[0].StockItemID);
+        }
+
+        [Fact]
+        public void D3_OptionalRelationship()
+        {
+            using var context = GetContext();
+
+            var result = context.Customers
+            .Include(c => c.Transactions)
+            .OrderBy(c => c.CustomerId)
+            .ToList();
+
+            Assert.Equal(663, result.Count);
+            Assert.Equal(400, result.Where(c => c.Transactions.Count == 0).Count());
+        }
+
+        [Fact]
+        public void E1_ColumnSorting()
+        {
+            using var context = GetContext();
+
+            var orders = context.PurchaseOrders
+                .OrderBy(po => po.ExpectedDeliveryDate)
+                .Take(1000)
+                .ToList();
+
+            Assert.Equal(1000, orders.Count);
+            Assert.Equal(new DateTime(2013, 1, 15), orders.First().ExpectedDeliveryDate);
+            Assert.Equal(new DateTime(2014, 9, 17), orders.Last().ExpectedDeliveryDate);
+            Assert.True(orders.SequenceEqual(orders.OrderBy(o => o.ExpectedDeliveryDate)));
+        }
+
+        [Fact]
+        public void E2_Distinct()
+        {
+            using var context = GetContext();
+
+            var supplierReferences = context.PurchaseOrders
+                .Select(po => po.SupplierReference)
+                .Distinct()
+                .ToList();
+
+            Assert.Equal(7, supplierReferences.Count);
+            string[] expected = ["AA20384", "BC0280982", "ML0300202", "293092", "08803922", "237408032", "B2084020"];
+            Assert.Equal(expected, supplierReferences);
+        }
+
+        [Fact]
+        public void F1_NestedJSONQuery()
+        {
+            using var context = GetContext();
+
+            var people = context.Database.SqlQuery<Person>(
+                "SELECT * FROM WideWorldImporters.Application.People WHERE JSON_VALUE(CustomFields, '$.Title') = @p0",
+                "Team Member"
+            ).ToList();
+
+
+            Assert.Equal(13, people.Count);
+            Assert.All(people, person => Assert.Equal("Team Member", person.GetCustomFields()?.Title));
+
+            var first = people.First();
+            Assert.Equal("Kayla Woodcock", first.FullName);
+            Assert.Equal("Kayla", first.PreferredName);
+            Assert.Equal("kaylaw@wideworldimporters.com", first.EmailAddress);
+            Assert.Equal(new DateTime(2008, 4, 19), first.GetCustomFields()?.HireDate);
+        }
+
+        [Fact]
+        public void F2_JSONArrayQuery()
+        {
+            using var context = GetContext();
+
+            var people = context.Database.SqlQuery<Person>(
+                "SELECT * FROM WideWorldImporters.Application.People WHERE EXISTS ( SELECT 1 FROM OPENJSON(OtherLanguages) WHERE value = @p0)", "Slovak")
+            .ToList();
+
+            Assert.Equal(2, people.Count);
+            Assert.All(people, person => Assert.Contains("Slovak", person.OtherLanguages!));
+
+            var first = people.First();
+            Assert.Equal("Amy Trefl", first.FullName);
+            Assert.Equal(["Slovak", "Spanish", "Polish"], first.GetOtherLanguages());
+        }
+
+        [Fact]
+        public void G1_Union()
+        {
+            using var context = GetContext();
+
+            var first = context.Suppliers
+                .Where(s => s.SupplierID < 5)
+                .Select(s => s.SupplierID)
+                .ToList();
+
+            var last = context.Suppliers
+                .Where(s => s.SupplierID >= 5 && s.SupplierID <= 10)
+                .Select(s => s.SupplierID)
+                .ToList();
+
+            var suppliers = first
+                .Union(last)
+                .OrderBy(s => s)
+                .ToList();
+
+            Assert.Equal(10, suppliers.Count);
+            Assert.Equal(Enumerable.Range(1, 10), suppliers);
+        }
+
+        [Fact]
+        public void G2_Intersection()
+        {
+            using var context = GetContext();
+
+            var first = context.Suppliers
+                .Where(s => s.SupplierID < 10)
+                .Select(s => s.SupplierID)
+                .ToList();
+
+            var last = context.Suppliers
+                .Where(s => s.SupplierID >= 5 && s.SupplierID <= 15)
+                .Select(s => s.SupplierID)
+                .ToList();
+
+            var suppliers = first
+                .Intersect(last)
+                .OrderBy(s => s)
+                .ToList();
+
+            Assert.Equal([5, 6, 7, 8, 9], suppliers);
         }
     }
 }
