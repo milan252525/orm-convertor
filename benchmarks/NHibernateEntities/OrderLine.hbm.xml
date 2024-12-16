@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernateEntities">
+    <class name="NHibernateEntities.OrderLine, NHibernateEntities" table="OrderLines" schema="Sales">
+        <id name="OrderLineID" column="OrderLineID" type="int">
+            <generator class="identity" />
+        </id>
+        <property name="OrderID" not-null="true" />
+        <property name="StockItemID" not-null="true" />
+        <property name="Description" not-null="true" />
+        <property name="PackageTypeID" not-null="true" />
+        <property name="Quantity" not-null="true" />
+        <property name="UnitPrice" not-null="false" />
+        <property name="TaxRate" not-null="true" />
+        <property name="PickedQuantity" not-null="true" />
+        <property name="PickingCompletedWhen" not-null="false" />
+        <property name="LastEditedBy" not-null="true" />
+        <property name="LastEditedWhen" not-null="true" />
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernateEntities">
+    <class name="NHibernateEntities.PurchaseOrder, NHibernateEntities" table="PurchaseOrders" schema="Purchasing">
+        <id name="PurchaseOrderID" column="PurchaseOrderID" type="int">
+            <generator class="identity" />
+        </id>
+        <property name="SupplierID" not-null="true" />
+        <property name="OrderDate" not-null="true" />
+        <property name="DeliveryMethodID" not-null="true" />
+        <property name="ContactPersonID" not-null="true" />
+        <property name="ExpectedDeliveryDate" not-null="false" />
+        <property name="SupplierReference" not-null="false" />
+        <property name="IsOrderFinalized" not-null="true" />
+        <property name="Comments" not-null="false" />
+        <property name="InternalComments" not-null="false" />
+        <property name="LastEditedBy" not-null="true" />
+        <property name="LastEditedWhen" not-null="true" />
+    </class>
+</hibernate-mapping>

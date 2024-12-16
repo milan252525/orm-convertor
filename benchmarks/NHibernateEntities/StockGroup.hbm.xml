@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernateEntities">
+    <class name="NHibernateEntities.StockGroup, NHibernateEntities" table="StockGroups" schema="Warehouse">
+        <id name="StockGroupID" column="StockGroupID" type="int">
+            <generator class="identity" />
+        </id>
+        <property name="StockGroupName" not-null="true" />
+        <bag name="StockItems" schema="Warehouse" table="StockItemStockGroups" inverse="true" cascade="none">
+            <key column="StockGroupID" />
+            <many-to-many class="StockItem" column="StockItemID" />
+        </bag>
+    </class>
+</hibernate-mapping>

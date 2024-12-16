@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+    <sql-query name="GetOrderUpdates">
+        <return-scalar column="WWI Order ID" type="int" />
+        <return-scalar column="Description" type="string" />
+        <return-scalar column="Quantity" type="int" />
+        <return-scalar column="Unit Price" type="decimal" />
+        <return-scalar column="Tax Rate" type="decimal" />
+        <return-scalar column="Total Including Tax" type="decimal" />
+        EXEC WideWorldImporters.Integration.GetOrderUpdates
+        @LastCutoff = :from,
+        @NewCutoff = :to
+    </sql-query>
+</hibernate-mapping>

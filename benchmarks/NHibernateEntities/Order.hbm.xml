@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernateEntities">
+    <class name="NHibernateEntities.Order, NHibernateEntities" table="Orders" schema="Sales">
+        <id name="OrderID" column="OrderID" type="int">
+            <generator class="identity" />
+        </id>
+        <property name="CustomerID" not-null="true" />
+        <property name="SalespersonPersonID" not-null="true" />
+        <property name="PickedByPersonID" not-null="false" />
+        <property name="ContactPersonID" not-null="true" />
+        <property name="BackorderOrderID" not-null="false" />
+        <property name="OrderDate" not-null="true" />
+        <property name="ExpectedDeliveryDate" not-null="true" />
+        <property name="CustomerPurchaseOrderNumber" not-null="false" />
+        <property name="IsUndersupplyBackordered" not-null="true" />
+        <property name="Comments" not-null="false" />
+        <property name="DeliveryInstructions" not-null="false" />
+        <property name="InternalComments" not-null="false" />
+        <property name="PickingCompletedWhen" not-null="false" />
+        <property name="LastEditedBy" not-null="true" />
+        <property name="LastEditedWhen" not-null="true" />
+        <bag name="OrderLines" inverse="true" cascade="all-delete-orphan">
+            <key column="OrderID" />
+            <one-to-many class="OrderLine" />
+        </bag>
+    </class>
+</hibernate-mapping>

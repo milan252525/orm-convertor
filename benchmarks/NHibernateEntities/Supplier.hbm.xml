@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernateEntities">
+    <class name="NHibernateEntities.Supplier, NHibernateEntities" table="Suppliers" schema="Purchasing">
+        <id name="SupplierID" column="SupplierID" type="int">
+            <generator class="identity" />
+        </id>
+        <property name="SupplierName" not-null="true" />
+        <property name="SupplierCategoryID" not-null="true" />
+        <property name="PrimaryContactPersonID" not-null="true" />
+        <property name="AlternateContactPersonID" not-null="true" />
+        <property name="DeliveryMethodID" not-null="true" />
+        <property name="DeliveryCityID" not-null="true" />
+        <property name="PostalCityID" not-null="true" />
+        <property name="SupplierReference" not-null="false" />
+        <property name="BankAccountName" not-null="false" />
+        <property name="BankAccountBranch" not-null="false" />
+        <property name="BankAccountCode" not-null="false" />
+        <property name="BankAccountNumber" not-null="false" />
+        <property name="BankInternationalCode" not-null="false" />
+        <property name="PaymentDays" not-null="true" />
+        <property name="InternalComments" not-null="false" />
+        <property name="PhoneNumber" not-null="true" />
+        <property name="FaxNumber" not-null="true" />
+        <property name="WebsiteURL" not-null="true" />
+        <property name="DeliveryAddressLine1" not-null="true" />
+        <property name="DeliveryAddressLine2" not-null="false" />
+        <property name="DeliveryPostalCode" not-null="true" />
+        <property name="DeliveryLocation" not-null="false" />
+        <property name="PostalAddressLine1" not-null="true" />
+        <property name="PostalAddressLine2" not-null="false" />
+        <property name="PostalPostalCode" not-null="true" />
+        <property name="LastEditedBy" not-null="true" />
+        <property name="ValidFrom" not-null="true" />
+        <property name="ValidTo" not-null="true" />
+    </class>
+</hibernate-mapping>

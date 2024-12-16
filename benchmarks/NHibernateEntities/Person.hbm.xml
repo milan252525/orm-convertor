@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernateEntities">
+    <class name="NHibernateEntities.Person, NHibernateEntities" table="People" schema="Application">
+        <id name="PersonID" column="PersonID" type="int">
+            <generator class="identity" />
+        </id>
+        <property name="FullName" not-null="true" />
+        <property name="PreferredName" not-null="true" />
+        <property name="EmailAddress" not-null="false" />
+        <property name="CustomFields" column="CustomFields" type="string" not-null="false" />
+        <property name="OtherLanguages" column="OtherLanguages" type="string" not-null="false" />
+    </class>
+</hibernate-mapping>

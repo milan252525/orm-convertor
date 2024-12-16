@@ -423,6 +423,37 @@ public class FeatureTests
     }
 
     [Fact]
+    public void E1_ColumnSorting()
+    {
+        using var context = contextFactory.CreateDbContext();
+
+        var orders = context.PurchaseOrders
+            .OrderBy(po => po.ExpectedDeliveryDate)
+            .Take(1000)
+            .ToList();
+
+        Assert.Equal(1000, orders.Count);
+        Assert.Equal(new DateTime(2013, 1, 15), orders.First().ExpectedDeliveryDate);
+        Assert.Equal(new DateTime(2014, 9, 17), orders.Last().ExpectedDeliveryDate);
+        Assert.True(orders.SequenceEqual(orders.OrderBy(o => o.ExpectedDeliveryDate)));
+    }
+
+    [Fact]
+    public void E2_Distinct()
+    {
+        using var context = contextFactory.CreateDbContext();
+
+        var supplierReferences = context.PurchaseOrders
+            .Select(po => po.SupplierReference)
+            .Distinct()
+            .ToList();
+
+        Assert.Equal(7, supplierReferences.Count);
+        string[] expected = ["AA20384", "BC0280982", "ML0300202", "293092", "08803922", "237408032", "B2084020"];
+        Assert.Equal(expected, supplierReferences);
+    }
+
+    [Fact]
     public void F1_NestedJSONQuery()
     {
         using var context = contextFactory.CreateDbContext();

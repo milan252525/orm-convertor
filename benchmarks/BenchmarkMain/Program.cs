@@ -4,6 +4,7 @@ using BenchmarkDotNet.Running;
 using DapperPerformance;
 using EF6Performance;
 using EFCorePerformance;
+using NHibernatePerformance;
 using PetaPocoPerformance;
 
 namespace BenchmarkMain;
@@ -26,7 +27,8 @@ internal class Program
                 typeof(DapperBenchmark),
                 typeof(PetaPocoBenchmark),
                 typeof(EFCoreBenchmarks),
-                typeof(EF6Benchmarks)
+                typeof(EF6Benchmarks),
+                typeof(NHibernateBenchmarks)
             ])
             .Run(args, testConfig);
     }

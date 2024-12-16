@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Customer.hbm.xml" />
+    <None Remove="CustomerTransaction.hbm.xml" />
+    <None Remove="Order.hbm.xml" />
+    <None Remove="OrderLine.hbm.xml" />
+    <None Remove="Person.hbm.xml" />
+    <None Remove="PurchaseOrder.hbm.xml" />
+    <None Remove="PurchaseOrderUpdate.hbm.xml" />
+    <None Remove="StockGroup.hbm.xml" />
+    <None Remove="StockItem.hbm.xml" />
+    <None Remove="Supplier.hbm.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Customer.hbm.xml" />
+    <EmbeddedResource Include="CustomerTransaction.hbm.xml" />
+    <EmbeddedResource Include="Order.hbm.xml" />
+    <EmbeddedResource Include="OrderLine.hbm.xml" />
+    <EmbeddedResource Include="Person.hbm.xml" />
+    <EmbeddedResource Include="PurchaseOrder.hbm.xml">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PurchaseOrderUpdate.hbm.xml" />
+    <EmbeddedResource Include="StockGroup.hbm.xml" />
+    <EmbeddedResource Include="StockItem.hbm.xml" />
+    <EmbeddedResource Include="Supplier.hbm.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NHibernate" Version="5.5.2" />
+  </ItemGroup>
+
+</Project>

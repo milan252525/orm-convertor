@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernateEntities">
+    <class name="NHibernateEntities.CustomerTransaction, NHibernateEntities" table="CustomerTransactions" schema="Sales">
+        <id name="CustomerTransactionID" column="CustomerTransactionID" type="int">
+            <generator class="identity" />
+        </id>
+        <property name="CustomerID" not-null="true" />
+        <property name="TransactionDate" not-null="true" />
+        <property name="TransactionAmount" not-null="true" />
+    </class>
+</hibernate-mapping>
