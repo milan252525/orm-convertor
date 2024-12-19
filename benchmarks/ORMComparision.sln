@@ -42,15 +42,23 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EF6Entities", "EF6Entities\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EF6Features", "EF6Features\EF6Features.csproj", "{DB303399-A9A6-4AF5-8AE9-39D1014F62EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EF6Performance", "EF6Performance\EF6Performance.csproj", "{2BD632A6-9302-40B0-8260-C0B7168B60A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EF6Performance", "EF6Performance\EF6Performance.csproj", "{2BD632A6-9302-40B0-8260-C0B7168B60A7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NHibernate", "NHibernate", "{18E43DC9-97FE-49B6-BF6E-A67085092964}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernateEntities", "NHibernateEntities\NHibernateEntities.csproj", "{AD6FF88A-17E0-47D0-A0CD-4EC8139D0B74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHibernateEntities", "NHibernateEntities\NHibernateEntities.csproj", "{AD6FF88A-17E0-47D0-A0CD-4EC8139D0B74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernateFeatures", "NHibernateFeatures\NHibernateFeatures.csproj", "{C9430042-68EA-413F-8A72-A0C7E9B8D7D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHibernateFeatures", "NHibernateFeatures\NHibernateFeatures.csproj", "{C9430042-68EA-413F-8A72-A0C7E9B8D7D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernatePerformance", "NHibernatePerformance\NHibernatePerformance.csproj", "{376B62AF-14D7-4C40-BEA8-03D3C838DA65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHibernatePerformance", "NHibernatePerformance\NHibernatePerformance.csproj", "{376B62AF-14D7-4C40-BEA8-03D3C838DA65}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "linq2db", "linq2db", "{C90C54BB-640A-4170-891A-BD13219D1EEF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "linq2dbEntities", "Linq2DBEntities\linq2dbEntities.csproj", "{1DF2FE27-A8D3-4CBA-973B-964036FF7136}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "linq2dbFeatures", "linq2dbFeatures\linq2dbFeatures.csproj", "{B82A4C96-407D-4235-BED8-FF4592DBB8B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "linq2dbPerformance", "linq2dbPerformance\linq2dbPerformance.csproj", "{F43BFCDC-DEAD-4AC1-BDFD-B111DB8866A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -126,6 +134,18 @@ Global
 		{376B62AF-14D7-4C40-BEA8-03D3C838DA65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{376B62AF-14D7-4C40-BEA8-03D3C838DA65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{376B62AF-14D7-4C40-BEA8-03D3C838DA65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DF2FE27-A8D3-4CBA-973B-964036FF7136}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DF2FE27-A8D3-4CBA-973B-964036FF7136}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DF2FE27-A8D3-4CBA-973B-964036FF7136}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DF2FE27-A8D3-4CBA-973B-964036FF7136}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B82A4C96-407D-4235-BED8-FF4592DBB8B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B82A4C96-407D-4235-BED8-FF4592DBB8B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B82A4C96-407D-4235-BED8-FF4592DBB8B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B82A4C96-407D-4235-BED8-FF4592DBB8B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F43BFCDC-DEAD-4AC1-BDFD-B111DB8866A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F43BFCDC-DEAD-4AC1-BDFD-B111DB8866A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F43BFCDC-DEAD-4AC1-BDFD-B111DB8866A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F43BFCDC-DEAD-4AC1-BDFD-B111DB8866A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -146,6 +166,9 @@ Global
 		{AD6FF88A-17E0-47D0-A0CD-4EC8139D0B74} = {18E43DC9-97FE-49B6-BF6E-A67085092964}
 		{C9430042-68EA-413F-8A72-A0C7E9B8D7D2} = {18E43DC9-97FE-49B6-BF6E-A67085092964}
 		{376B62AF-14D7-4C40-BEA8-03D3C838DA65} = {18E43DC9-97FE-49B6-BF6E-A67085092964}
+		{1DF2FE27-A8D3-4CBA-973B-964036FF7136} = {C90C54BB-640A-4170-891A-BD13219D1EEF}
+		{B82A4C96-407D-4235-BED8-FF4592DBB8B0} = {C90C54BB-640A-4170-891A-BD13219D1EEF}
+		{F43BFCDC-DEAD-4AC1-BDFD-B111DB8866A6} = {C90C54BB-640A-4170-891A-BD13219D1EEF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {520D1D73-0241-45DE-9CCB-98008FC47D3B}

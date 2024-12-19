@@ -254,16 +254,21 @@ namespace EFCorePerformance
         }
 
         [Benchmark]
-        public List<StockItem> D2_ManyToManyRelationship()
+        public (List<StockItem> stockItems, List<StockGroup> stockGroups) D2_ManyToManyRelationship()
         {
             using var context = contextFactory.CreateDbContext();
 
             var stockItems = context.StockItems
-            .Include(si => si.StockGroups)
-            .OrderBy(si => si.StockItemID)
-            .ToList();
+                .Include(si => si.StockGroups)
+                .OrderBy(si => si.StockItemID)
+                .ToList();
 
-            return stockItems;
+            var stockGroups = context.StockGroups
+                .Include(sg => sg.StockItems)
+                .OrderBy(si => si.StockGroupID)
+                .ToList();
+
+            return (stockItems, stockGroups);
         }
 
         [Benchmark]

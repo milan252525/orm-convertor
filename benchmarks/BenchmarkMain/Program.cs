@@ -4,6 +4,7 @@ using BenchmarkDotNet.Running;
 using DapperPerformance;
 using EF6Performance;
 using EFCorePerformance;
+using Linq2dbPerformance;
 using NHibernatePerformance;
 using PetaPocoPerformance;
 
@@ -26,6 +27,7 @@ internal class Program
             .FromTypes([
                 typeof(DapperBenchmark),
                 typeof(PetaPocoBenchmark),
+                typeof(Linq2dbBenchmarks),
                 typeof(EFCoreBenchmarks),
                 typeof(EF6Benchmarks),
                 typeof(NHibernateBenchmarks)

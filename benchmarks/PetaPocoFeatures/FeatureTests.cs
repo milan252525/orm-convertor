@@ -353,48 +353,94 @@ public class FeatureTests
     [Fact]
     public void D2_ManyToManyRelationship()
     {
-        var sql = Sql.Builder
+        var sqlItems = Sql.Builder
             .Select("si.*, sg.*")
             .From("Warehouse.StockItems si")
-            .InnerJoin("Warehouse.StockItemStockGroups sisg")
+            .LeftJoin("Warehouse.StockItemStockGroups sisg")
             .On("si.StockItemID = sisg.StockItemID")
-            .InnerJoin("Warehouse.StockGroups sg")
+            .LeftJoin("Warehouse.StockGroups sg")
             .On("sisg.StockGroupID = sg.StockGroupID")
             .OrderBy("si.StockItemID");
 
-        var stockItems = new Dictionary<int, StockItem>();
+        var stockItemsById = new Dictionary<int, StockItem>();
 
         db.Fetch<StockItem, StockGroup, StockItem>(
             (stockItem, stockGroup) =>
             {
-                if (!stockItems.TryGetValue(stockItem.StockItemID, out var existing))
+                if (stockItemsById.TryGetValue(stockItem.StockItemID, out var existing))
                 {
-                    existing = stockItem;
-                    existing.StockGroups = [];
-                    stockItems.Add(stockItem.StockItemID, existing);
+                    existing.StockGroups.Add(stockGroup);
+                    return existing;
                 }
 
-                stockGroup.StockItems.Add(existing);
-                existing.StockGroups.Add(stockGroup);
-                return existing;
+                stockItem.StockGroups.Add(stockGroup);
+                stockItemsById.Add(stockItem.StockItemID, stockItem);
+                return stockItem;
             },
-            sql
+            sqlItems
         );
 
-        var result = stockItems.Values.ToList();
+        var stockItems = stockItemsById.Values.ToList();
 
-        Assert.Equal(227, result.Count);
+        var sqlGroups = Sql.Builder
+            .Select("sg.*, si.*")
+            .From("Warehouse.StockGroups sg")
+            .LeftJoin("Warehouse.StockItemStockGroups sisg")
+            .On("sg.StockGroupID = sisg.StockGroupID")
+            .LeftJoin("Warehouse.StockItems si")
+            .On("sisg.StockItemID = si.StockItemID")
+            .OrderBy("sg.StockGroupID");
 
-        Assert.Equal(1, result[0].StockItemID);
-        Assert.Equal("USB missile launcher (Green)", result[0].StockItemName);
-        Assert.Equal(12, result[0].SupplierID);
+        var stockGroupsById = new Dictionary<int, StockGroup>();
 
-        Assert.Equal(3, result[0].StockGroups.Count);
-        var groupNames = result[0].StockGroups.Select(sg => sg.StockGroupName).ToList();
-        Assert.Equal(["Novelty Items", "Computing Novelties", "USB Novelties"], groupNames);
+        db.Fetch<StockGroup, StockItem, StockGroup>(
+            (stockGroup, stockItem) =>
+            {
+                if (stockGroupsById.TryGetValue(stockGroup.StockGroupID, out var existing))
+                {
+                    existing.StockItems.Add(stockItem);
+                    return existing;
+                }
 
-        Assert.Single(result[0].StockGroups[0].StockItems);
-        Assert.Equal(1, result[0].StockGroups[0].StockItems[0].StockItemID);
+                stockGroup.StockItems.Add(stockItem);
+                stockGroupsById.Add(stockGroup.StockGroupID, stockGroup);
+                return stockGroup;
+            },
+            sqlGroups
+        );
+
+        var stockGroups = stockGroupsById.Values.ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.Equal(227, stockItems.Count);
+            Assert.Equal(10, stockGroups.Count);
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.Equal(1, stockItems[0].StockItemID);
+            Assert.Equal("USB missile launcher (Green)", stockItems[0].StockItemName);
+            Assert.Equal(12, stockItems[0].SupplierID);
+
+            Assert.Equal(3, stockItems[0].StockGroups.Count);
+            var groupNames = stockItems[0].StockGroups.Select(sg => sg.StockGroupName).Order().ToList();
+            Assert.Equal(["Computing Novelties", "Novelty Items", "USB Novelties"], groupNames);
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.Equal(1, stockGroups[0].StockGroupID);
+            Assert.Equal("Novelty Items", stockGroups[0].StockGroupName);
+            Assert.Equal(91, stockGroups[0].StockItems.Count);
+        });
+
+        var group1ItemIds = stockItems
+            .Where(si => si.StockGroups.Any(sg => sg.StockGroupID == 1))
+            .Select(si => si.StockItemID)
+            .ToList();
+
+        Assert.Equal(group1ItemIds, stockGroups[0].StockItems.Select(sisg => sisg.StockItemID).Order().ToList());
     }
 
     [Fact]

@@ -231,38 +231,67 @@ namespace PetaPocoPerformance
         }
 
         [Benchmark]
-        public List<StockItem> D2_ManyToManyRelationship()
+        public (List<StockItem> stockItems, List<StockGroup> stockGroups) D2_ManyToManyRelationship()
         {
-            var sql = Sql.Builder
-                .Select("si.*, sg.*")
-                .From("Warehouse.StockItems si")
-                .InnerJoin("Warehouse.StockItemStockGroups sisg")
-                .On("si.StockItemID = sisg.StockItemID")
-                .InnerJoin("Warehouse.StockGroups sg")
-                .On("sisg.StockGroupID = sg.StockGroupID")
-                .OrderBy("si.StockItemID");
+            var sqlItems = Sql.Builder
+            .Select("si.*, sg.*")
+            .From("Warehouse.StockItems si")
+            .LeftJoin("Warehouse.StockItemStockGroups sisg")
+            .On("si.StockItemID = sisg.StockItemID")
+            .LeftJoin("Warehouse.StockGroups sg")
+            .On("sisg.StockGroupID = sg.StockGroupID")
+            .OrderBy("si.StockItemID");
 
-            var stockItems = new Dictionary<int, StockItem>();
+            var stockItemsById = new Dictionary<int, StockItem>();
 
             db.Fetch<StockItem, StockGroup, StockItem>(
                 (stockItem, stockGroup) =>
                 {
-                    if (!stockItems.TryGetValue(stockItem.StockItemID, out var existing))
+                    if (stockItemsById.TryGetValue(stockItem.StockItemID, out var existing))
                     {
-                        existing = stockItem;
-                        existing.StockGroups = [];
-                        stockItems.Add(stockItem.StockItemID, existing);
+                        existing.StockGroups.Add(stockGroup);
+                        return existing;
                     }
 
-                    existing.StockGroups.Add(stockGroup);
-                    return existing;
+                    stockItem.StockGroups.Add(stockGroup);
+                    stockItemsById.Add(stockItem.StockItemID, stockItem);
+                    return stockItem;
                 },
-                sql
+                sqlItems
             );
 
-            var result = stockItems.Values.ToList();
+            var stockItems = stockItemsById.Values.ToList();
 
-            return result;
+            var sqlGroups = Sql.Builder
+                .Select("sg.*, si.*")
+                .From("Warehouse.StockGroups sg")
+                .LeftJoin("Warehouse.StockItemStockGroups sisg")
+                .On("sg.StockGroupID = sisg.StockGroupID")
+                .LeftJoin("Warehouse.StockItems si")
+                .On("sisg.StockItemID = si.StockItemID")
+                .OrderBy("sg.StockGroupID");
+
+            var stockGroupsById = new Dictionary<int, StockGroup>();
+
+            db.Fetch<StockGroup, StockItem, StockGroup>(
+                (stockGroup, stockItem) =>
+                {
+                    if (stockGroupsById.TryGetValue(stockGroup.StockGroupID, out var existing))
+                    {
+                        existing.StockItems.Add(stockItem);
+                        return existing;
+                    }
+
+                    stockGroup.StockItems.Add(stockItem);
+                    stockGroupsById.Add(stockGroup.StockGroupID, stockGroup);
+                    return stockGroup;
+                },
+                sqlGroups
+            );
+
+            var stockGroups = stockGroupsById.Values.ToList();
+
+            return (stockItems, stockGroups);
         }
 
         [Benchmark]

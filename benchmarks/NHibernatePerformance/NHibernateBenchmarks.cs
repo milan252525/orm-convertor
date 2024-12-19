@@ -262,8 +262,7 @@ namespace NHibernatePerformance
         }
 
         [Benchmark]
-        [Description("Partially FAIL - NHibernate cannot reliably handle navigation from StockItems to StockGroups and back to StockItems, leading to incorrect results.")]
-        public List<StockItem> D2_ManyToManyRelationship()
+        public (List<StockItem> stockItems, List<StockGroup> stockGroups) D2_ManyToManyRelationship()
         {
             using var session = sessionFactory.OpenSession();
 
@@ -272,7 +271,12 @@ namespace NHibernatePerformance
                 .OrderBy(si => si.StockItemID)
                 .ToList();
 
-            return stockItems;
+            var stockGroups = session.Query<StockGroup>()
+                .Fetch(sg => sg.StockItems)
+                .OrderBy(sg => sg.StockGroupID)
+                .ToList();
+
+            return (stockItems, stockGroups);
         }
 
         [Benchmark]

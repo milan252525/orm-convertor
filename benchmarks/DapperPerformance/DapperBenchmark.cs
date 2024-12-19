@@ -234,39 +234,71 @@ public class DapperBenchmark
     }
 
     [Benchmark]
-    public List<StockItem> D2_ManyToManyRelationship()
+    public (List<StockItem> stockItems, List<StockGroup> stockGroups) D2_ManyToManyRelationship()
     {
-        string sql = """
+        string sqlItems = """
             SELECT si.*, sg.*
             FROM WideWorldImporters.Warehouse.StockItems si
-            INNER JOIN WideWorldImporters.Warehouse.StockItemStockGroups sisg
+            LEFT JOIN WideWorldImporters.Warehouse.StockItemStockGroups sisg
                 ON si.StockItemID = sisg.StockItemID
-            INNER JOIN WideWorldImporters.Warehouse.StockGroups sg
+            LEFT JOIN WideWorldImporters.Warehouse.StockGroups sg
                 ON sisg.StockGroupID = sg.StockGroupID
             ORDER BY si.StockItemID
         """;
 
-        var stockItems = new Dictionary<int, StockItem>();
+        var stockItemsById = new Dictionary<int, StockItem>();
 
         connection.Query<StockItem, StockGroup, StockItem>(
-            sql,
+            sqlItems,
             (stockItem, stockGroup) =>
             {
-                if (!stockItems.TryGetValue(stockItem.StockItemID, out var existing))
+                if (stockItemsById.TryGetValue(stockItem.StockItemID, out var existing))
                 {
-                    existing = stockItem;
-                    existing.StockGroups = [];
-                    stockItems.Add(stockItem.StockItemID, existing);
+                    existing.StockGroups.Add(stockGroup);
+                    return existing;
                 }
 
-                existing.StockGroups.Add(stockGroup);
-                return existing;
+                stockItem.StockGroups.Add(stockGroup);
+                stockItemsById.Add(stockItem.StockItemID, stockItem);
+                return stockItem;
             },
             splitOn: nameof(StockGroup.StockGroupID)
         );
 
-        var result = stockItems.Values.ToList();
-        return result;
+        var stockItems = stockItemsById.Values.ToList();
+
+        string sqlGroups = """
+            SELECT sg.*, si.*
+            FROM WideWorldImporters.Warehouse.StockGroups sg
+            LEFT JOIN WideWorldImporters.Warehouse.StockItemStockGroups sisg
+                ON sg.StockGroupID = sisg.StockGroupID
+            LEFT JOIN WideWorldImporters.Warehouse.StockItems si
+                ON sisg.StockItemID = si.StockItemID
+            ORDER BY sg.StockGroupID
+        """;
+
+        var stockGroupsById = new Dictionary<int, StockGroup>();
+
+        connection.Query<StockGroup, StockItem, StockGroup>(
+            sqlGroups,
+            (stockGroup, stockItem) =>
+            {
+                if (stockGroupsById.TryGetValue(stockGroup.StockGroupID, out var existing))
+                {
+                    existing.StockItems.Add(stockItem);
+                    return existing;
+                }
+
+                stockGroup.StockItems.Add(stockItem);
+                stockGroupsById.Add(stockGroup.StockGroupID, stockGroup);
+                return stockGroup;
+            },
+            splitOn: nameof(StockItem.StockItemID)
+        );
+
+        var stockGroups = stockGroupsById.Values.ToList();
+
+        return (stockItems, stockGroups);
     }
 
     [Benchmark]

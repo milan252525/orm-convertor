@@ -1,32 +1,34 @@
-﻿using System.ComponentModel;
-using System.Data;
-using System.Data.Entity;
-using EF6Entities;
-using EF6Entities.Models;
+﻿using Common;
+using linq2dbEntities;
+using linq2dbEntities.Models;
+using LinqToDB;
+using LinqToDB.Data;
 
-namespace EF6Features
+namespace linq2dbFeatures
 {
-    [Collection("EF6")]
-    public class FeatureTests(ITestOutputHelper output)
+    [Collection("linq2db")]
+    public class FeatureTests
     {
-        private readonly ITestOutputHelper output = output;
-
-        private WWIContext GetContext()
+        private WWIDbConnection GetConnection()
         {
-            var context = new WWIContext();
-            context.Configuration.AutoDetectChangesEnabled = false;
-            context.Configuration.ProxyCreationEnabled = false;
-            context.Configuration.LazyLoadingEnabled = false;
-            context.Database.Log = (message) => output.WriteLine(message);
-            return context;
+            var options = new DataOptions()
+                .UseSqlServer(DatabaseConfig.MSSQLConnectionString);
+
+            return new WWIDbConnection(options);
+        }
+
+        public FeatureTests(ITestOutputHelper output)
+        {
+            DataConnection.TurnTraceSwitchOn();
+            DataConnection.WriteTraceLine = (message, category, level) => { output.WriteLine($"[{level}] {category} {message}"); };
         }
 
         [Fact]
         public void A1_EntityIdenticalToTable()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var order = context.PurchaseOrders.Find(25);
+            var order = db.PurchaseOrders.FirstOrDefault(x => x.PurchaseOrderID == 25);
 
             Assert.NotNull(order);
             Assert.Multiple(() =>
@@ -49,9 +51,9 @@ namespace EF6Features
         [Fact]
         public void A2_LimitedEntity()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var contactInfo = context.Suppliers
+            var contactInfo = db.Suppliers
             .Where(s => s.SupplierID == 10)
             .Select(s => new SupplierContactInfo
             {
@@ -80,9 +82,9 @@ namespace EF6Features
         [Fact]
         public void A3_MultipleEntitiesFromOneResult()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var result = context.Suppliers
+            var result = db.Suppliers
             .Where(s => s.SupplierID == 10)
             .Select(s => new
             {
@@ -131,56 +133,18 @@ namespace EF6Features
         }
 
         [Fact]
-        [Description("FAIL - EF6 cannot be used.")]
         public void A4_StoredProcedureToEntity()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
             var from = new DateTime(2014, 1, 1);
             var to = new DateTime(2015, 1, 1);
 
-            var connection = context.Database.Connection;
-            if (connection.State != ConnectionState.Open)
-            {
-                connection.Open();
-            }
-
-            using var command = connection.CreateCommand();
-
-            command.CommandText = "WideWorldImporters.Integration.GetOrderUpdates";
-            command.CommandType = CommandType.StoredProcedure;
-
-            var paramLastCutoff = command.CreateParameter();
-            paramLastCutoff.ParameterName = "@LastCutoff";
-            paramLastCutoff.Value = from;
-            command.Parameters.Add(paramLastCutoff);
-
-            var paramNewCutoff = command.CreateParameter();
-            paramNewCutoff.ParameterName = "@NewCutoff";
-            paramNewCutoff.Value = to;
-            command.Parameters.Add(paramNewCutoff);
-
-            var orders = new List<PurchaseOrderUpdate>();
-
-            // EF6 cannot properly execute stored procedures,
-            // especially in our case where the SP returns columns with spaces in their names.
-            // There is no workaround for this, except modifying the procedure, which we don't want to do.
-            // So we use ADO.NET to execute the stored procedure and map the results to our entity.
-            using var reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                var order = new PurchaseOrderUpdate
-                {
-                    OrderID = reader["WWI Order ID"] != DBNull.Value ? Convert.ToInt32(reader["WWI Order ID"]) : 0,
-                    Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
-                    Quantity = reader["Quantity"] != DBNull.Value ? Convert.ToInt32(reader["Quantity"]) : 0,
-                    UnitPrice = reader["Unit Price"] != DBNull.Value ? Convert.ToDecimal(reader["Unit Price"]) : 0m,
-                    TaxRate = reader["Tax Rate"] != DBNull.Value ? Convert.ToDecimal(reader["Tax Rate"]) : 0m,
-                    TotalIncludingTax = reader["Total Including Tax"] != DBNull.Value ? Convert.ToDecimal(reader["Total Including Tax"]) : 0m
-                };
-
-                orders.Add(order);
-            }
+            var orders = db.QueryProc<PurchaseOrderUpdate>(
+                    "WideWorldImporters.Integration.GetOrderUpdates",
+                    new DataParameter("LastCutoff", from),
+                    new DataParameter("NewCutoff", to)
+                ).ToList();
 
             Assert.Multiple(() =>
             {
@@ -205,11 +169,11 @@ namespace EF6Features
         [Fact]
         public void B1_SelectionOverIndexedColumn()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
             int orderId = 26866;
 
-            var orderLines = context.OrderLines
+            var orderLines = db.OrderLines
                 .Where(ol => ol.OrderID == orderId)
                 .ToList();
 
@@ -254,11 +218,11 @@ namespace EF6Features
         [Fact]
         public void B2_SelectionOverNonIndexedColumn()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
             decimal unitPrice = 25m;
 
-            var orderLines = context.OrderLines
+            var orderLines = db.OrderLines
                 .Where(ol => ol.UnitPrice == unitPrice)
                 .ToList();
 
@@ -269,12 +233,12 @@ namespace EF6Features
         [Fact]
         public void B3_RangeQuery()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
             var from = new DateTime(2014, 12, 20);
             var to = new DateTime(2014, 12, 31);
 
-            var orderLines = context.OrderLines
+            var orderLines = db.OrderLines
                 .Where(ol => ol.PickingCompletedWhen >= from && ol.PickingCompletedWhen <= to)
                 .ToList();
 
@@ -285,11 +249,11 @@ namespace EF6Features
         [Fact]
         public void B4_InQuery()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
             var orderIds = new[] { 1, 10, 100, 1000, 10000 };
 
-            var orderLines = context.OrderLines
+            var orderLines = db.OrderLines
                 .Where(ol => orderIds.Contains(ol.OrderID))
                 .ToList();
 
@@ -300,11 +264,11 @@ namespace EF6Features
         [Fact]
         public void B5_TextSearch()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
             string text = "C++";
 
-            var orderLines = context.OrderLines
+            var orderLines = db.OrderLines
                 .Where(ol => ol.Description.Contains(text))
                 .ToList();
 
@@ -315,12 +279,12 @@ namespace EF6Features
         [Fact]
         public void B6_PagingQuery()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
             int skip = 1000;
             int take = 50;
 
-            var orderLines = context.OrderLines
+            var orderLines = db.OrderLines
                 .OrderBy(ol => ol.OrderLineID)
                 .Skip(skip)
                 .Take(take)
@@ -333,9 +297,9 @@ namespace EF6Features
         [Fact]
         public void C1_AggregationCount()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var taxRates = context.OrderLines
+            var taxRates = db.OrderLines
                 .GroupBy(ol => ol.TaxRate)
                 .Select(g => new { TaxRate = g.Key, Count = g.Count() })
                 .OrderByDescending(x => x.Count)
@@ -349,9 +313,9 @@ namespace EF6Features
         [Fact]
         public void C2_AggregationMax()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var maxUnitPrice = context.OrderLines.Max(ol => ol.UnitPrice);
+            var maxUnitPrice = db.OrderLines.Max(ol => ol.UnitPrice);
 
             Assert.Equal(1899m, maxUnitPrice);
         }
@@ -359,9 +323,9 @@ namespace EF6Features
         [Fact]
         public void C3_AggregationSum()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var totalSales = context.OrderLines
+            var totalSales = db.OrderLines
                 .Sum(ol => ol.Quantity * ol.UnitPrice);
 
             Assert.Equal(177634276.4m, totalSales);
@@ -370,10 +334,10 @@ namespace EF6Features
         [Fact]
         public void D1_OneToManyRelationship()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var order = context.Orders
-                .Include(o => o.OrderLines)
+            var order = db.Orders
+                .LoadWith(o => o.OrderLines)
                 .Single(o => o.OrderID == 530);
 
             Assert.NotNull(order);
@@ -416,15 +380,17 @@ namespace EF6Features
         [Fact]
         public void D2_ManyToManyRelationship()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var stockItems = context.StockItems
-                .Include(si => si.StockGroups)
+            var stockItems = db.StockItems
+                .LoadWith(si => si.StockGroups)
+                .ThenLoad(sisg => sisg.StockGroup)
                 .OrderBy(si => si.StockItemID)
                 .ToList();
 
-            var stockGroups = context.StockGroups
-                .Include(sg => sg.StockItems)
+            var stockGroups = db.StockGroups 
+                .LoadWith(sg => sg.StockItems)
+                .ThenLoad(sisg => sisg.StockItem)
                 .OrderBy(si => si.StockGroupID)
                 .ToList();
 
@@ -433,7 +399,7 @@ namespace EF6Features
                 Assert.Equal(227, stockItems.Count);
                 Assert.Equal(10, stockGroups.Count);
             });
-
+            
             Assert.Multiple(() =>
             {
                 Assert.Equal(1, stockItems[0].StockItemID);
@@ -441,7 +407,7 @@ namespace EF6Features
                 Assert.Equal(12, stockItems[0].SupplierID);
 
                 Assert.Equal(3, stockItems[0].StockGroups.Count);
-                var groupNames = stockItems[0].StockGroups.Select(sg => sg.StockGroupName).Order().ToList();
+                var groupNames = stockItems[0].StockGroups.Select(sisg => sisg.StockGroup.StockGroupName).Order().ToList();
                 Assert.Equal(["Computing Novelties", "Novelty Items", "USB Novelties"], groupNames);
             });
 
@@ -453,7 +419,7 @@ namespace EF6Features
             });
 
             var group1ItemIds = stockItems
-                .Where(si => si.StockGroups.Any(sg => sg.StockGroupID == 1))
+                .Where(si => si.StockGroups.Any(sisg => sisg.StockGroup.StockGroupID == 1))
                 .Select(si => si.StockItemID)
                 .ToList();
 
@@ -463,10 +429,10 @@ namespace EF6Features
         [Fact]
         public void D3_OptionalRelationship()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var result = context.Customers
-            .Include(c => c.Transactions)
+            var result = db.Customers
+            .LoadWith(c => c.Transactions)
             .OrderBy(c => c.CustomerId)
             .ToList();
 
@@ -477,9 +443,9 @@ namespace EF6Features
         [Fact]
         public void E1_ColumnSorting()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var orders = context.PurchaseOrders
+            var orders = db.PurchaseOrders
                 .OrderBy(po => po.ExpectedDeliveryDate)
                 .Take(1000)
                 .ToList();
@@ -493,9 +459,9 @@ namespace EF6Features
         [Fact]
         public void E2_Distinct()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var supplierReferences = context.PurchaseOrders
+            var supplierReferences = db.PurchaseOrders
                 .Select(po => po.SupplierReference)
                 .Distinct()
                 .ToList();
@@ -508,51 +474,52 @@ namespace EF6Features
         [Fact]
         public void F1_NestedJSONQuery()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var people = context.Database.SqlQuery<Person>(
-                "SELECT * FROM WideWorldImporters.Application.People WHERE JSON_VALUE(CustomFields, '$.Title') = @p0",
-                "Team Member"
+            var people = db.Query<Person>(
+                "SELECT * FROM WideWorldImporters.Application.People WHERE JSON_VALUE(CustomFields, '$.Title') = @Title",
+                new DataParameter("Title", "Team Member")
             ).ToList();
 
             Assert.Equal(13, people.Count);
-            Assert.All(people, person => Assert.Equal("Team Member", person.GetCustomFields()?.Title));
+            Assert.All(people, person => Assert.Equal("Team Member", person.CustomFields?.Title));
 
             var first = people.First();
             Assert.Equal("Kayla Woodcock", first.FullName);
             Assert.Equal("Kayla", first.PreferredName);
             Assert.Equal("kaylaw@wideworldimporters.com", first.EmailAddress);
-            Assert.Equal(new DateTime(2008, 4, 19), first.GetCustomFields()?.HireDate);
+            Assert.Equal(new DateTime(2008, 4, 19), first.CustomFields?.HireDate);
         }
 
         [Fact]
         public void F2_JSONArrayQuery()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var people = context.Database.SqlQuery<Person>(
-                "SELECT * FROM WideWorldImporters.Application.People WHERE EXISTS ( SELECT 1 FROM OPENJSON(OtherLanguages) WHERE value = @p0)", "Slovak")
-            .ToList();
+            var people = db.Query<Person>(
+                "SELECT * FROM WideWorldImporters.Application.People WHERE EXISTS ( SELECT 1 FROM OPENJSON(OtherLanguages) WHERE value = @Language)",
+                new DataParameter("Language", "Slovak")
+            ).ToList();
 
             Assert.Equal(2, people.Count);
             Assert.All(people, person => Assert.Contains("Slovak", person.OtherLanguages!));
 
             var first = people.First();
             Assert.Equal("Amy Trefl", first.FullName);
-            Assert.Equal(["Slovak", "Spanish", "Polish"], first.GetOtherLanguages());
+            Assert.Equal(["Slovak", "Spanish", "Polish"], first.OtherLanguages);
         }
 
         [Fact]
         public void G1_Union()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var first = context.Suppliers
+            var first = db.Suppliers
                 .Where(s => s.SupplierID < 5)
                 .Select(s => s.SupplierID)
                 .ToList();
 
-            var last = context.Suppliers
+            var last = db.Suppliers
                 .Where(s => s.SupplierID >= 5 && s.SupplierID <= 10)
                 .Select(s => s.SupplierID)
                 .ToList();
@@ -569,14 +536,14 @@ namespace EF6Features
         [Fact]
         public void G2_Intersection()
         {
-            using var context = GetContext();
+            using var db = GetConnection();
 
-            var first = context.Suppliers
+            var first = db.Suppliers
                 .Where(s => s.SupplierID < 10)
                 .Select(s => s.SupplierID)
                 .ToList();
 
-            var last = context.Suppliers
+            var last = db.Suppliers
                 .Where(s => s.SupplierID >= 5 && s.SupplierID <= 15)
                 .Select(s => s.SupplierID)
                 .ToList();

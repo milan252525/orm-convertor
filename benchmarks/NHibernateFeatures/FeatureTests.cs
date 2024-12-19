@@ -390,7 +390,6 @@ namespace NHibernateFeatures
         }
 
         [Fact]
-        [Description("Partially FAIL - NHibernate cannot reliably handle navigation from StockItems to StockGroups and back to StockItems, leading to incorrect results.")]
         public void D2_ManyToManyRelationship()
         {
             using var session = sessionFactory.OpenSession();
@@ -400,19 +399,41 @@ namespace NHibernateFeatures
                 .OrderBy(si => si.StockItemID)
                 .ToList();
 
-            Assert.Equal(227, stockItems.Count);
+            var stockGroups = session.Query<StockGroup>()
+                .Fetch(sg => sg.StockItems)
+                .OrderBy(sg => sg.StockGroupID)
+                .ToList();
 
-            Assert.Equal(1, stockItems[0].StockItemID);
-            Assert.Equal("USB missile launcher (Green)", stockItems[0].StockItemName);
-            Assert.Equal(12, stockItems[0].SupplierID);
+            Assert.Multiple(() =>
+            {
+                Assert.Equal(227, stockItems.Count);
+                Assert.Equal(10, stockGroups.Count);
+            });
 
-            Assert.Equal(3, stockItems[0].StockGroups.Count);
-            var groupNames = stockItems[0].StockGroups.Select(sg => sg.StockGroupName).ToList();
-            Assert.Equal(["Novelty Items", "Computing Novelties", "USB Novelties"], groupNames);
+            Assert.Multiple(() =>
+            {
+                Assert.Equal(1, stockItems[0].StockItemID);
+                Assert.Equal("USB missile launcher (Green)", stockItems[0].StockItemName);
+                Assert.Equal(12, stockItems[0].SupplierID);
 
-            // FAIL - NHibernate cannot reliably handle navigation from StockItems to StockGroups and back to StockItems, leading to incorrect results.
-            //Assert.Single(stockItems[0].StockGroups[0].StockItems);
-            //Assert.Equal(1, stockItems[0].StockGroups[0].StockItems[0].StockItemID);
+                Assert.Equal(3, stockItems[0].StockGroups.Count);
+                var groupNames = stockItems[0].StockGroups.Select(sg => sg.StockGroupName).Order().ToList();
+                Assert.Equal(["Computing Novelties", "Novelty Items", "USB Novelties"], groupNames);
+            });
+
+            Assert.Multiple(() =>
+            {
+                Assert.Equal(1, stockGroups[0].StockGroupID);
+                Assert.Equal("Novelty Items", stockGroups[0].StockGroupName);
+                Assert.Equal(91, stockGroups[0].StockItems.Count);
+            });
+
+            var group1ItemIds = stockItems
+                .Where(si => si.StockGroups.Any(sg => sg.StockGroupID == 1))
+                .Select(si => si.StockItemID)
+                .ToList();
+
+            Assert.Equal(group1ItemIds, stockGroups[0].StockItems.Select(sisg => sisg.StockItemID).Order().ToList());
         }
 
         [Fact]
