@@ -472,10 +472,10 @@ public class FeatureTests
             sql,
             (customer, transaction) =>
             {
-                if (!customers.TryGetValue(customer.CustomerId, out var existing))
+                if (!customers.TryGetValue(customer.CustomerID, out var existing))
                 {
                     existing = customer;
-                    customers.Add(customer.CustomerId, existing);
+                    customers.Add(customer.CustomerID, existing);
                 }
 
                 if (transaction != null)

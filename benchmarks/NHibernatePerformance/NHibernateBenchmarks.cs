@@ -286,7 +286,7 @@ namespace NHibernatePerformance
 
             var result = session.Query<Customer>()
             .Fetch(c => c.Transactions)
-            .OrderBy(c => c.CustomerId)
+            .OrderBy(c => c.CustomerID)
             .ToList();
 
             return result;

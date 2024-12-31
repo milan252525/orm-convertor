@@ -1,0 +1,24 @@
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace RepoDBEntities;
+
+public class PurchaseOrderUpdate
+{
+    [Column("WWI Order ID")]
+    public int OrderID { get; set; }
+
+    [Column("Description")]
+    public string? Description { get; set; }
+
+    [Column("Quantity")]
+    public int Quantity { get; set; }
+
+    [Column("Unit Price")]
+    public decimal UnitPrice { get; set; }
+
+    [Column("Tax Rate")]
+    public decimal TaxRate { get; set; }
+
+    [Column("Total Including Tax")]
+    public decimal TotalIncludingTax { get; set; }
+}

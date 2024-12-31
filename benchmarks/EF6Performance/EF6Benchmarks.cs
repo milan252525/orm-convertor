@@ -303,7 +303,7 @@ namespace EF6Performance
 
             var result = context.Customers
             .Include(c => c.Transactions)
-            .OrderBy(c => c.CustomerId)
+            .OrderBy(c => c.CustomerID)
             .ToList();
 
             return result;

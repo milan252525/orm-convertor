@@ -265,7 +265,7 @@ namespace Linq2dbPerformance
 
             var result = db.Customers
             .LoadWith(c => c.Transactions)
-            .OrderBy(c => c.CustomerId)
+            .OrderBy(c => c.CustomerID)
             .ToList();
 
             return result;

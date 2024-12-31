@@ -438,7 +438,7 @@ public class FeatureTests
 
         var result = context.Customers
         .Include(c => c.Transactions)
-        .OrderBy(c => c.CustomerId)
+        .OrderBy(c => c.CustomerID)
         .ToList();
 
         Assert.Equal(663, result.Count);

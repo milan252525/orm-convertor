@@ -39,7 +39,7 @@ public static class DBMapping
         builder.Entity<Customer>()
             .HasSchemaName("Sales")
             .HasTableName("Customers")
-            .Association(c => c.Transactions, c => c.CustomerId, ct => ct.CustomerID, canBeNull: true);
+            .Association(c => c.Transactions, c => c.CustomerID, ct => ct.CustomerID, canBeNull: true);
 
         builder.Entity<CustomerTransaction>()
             .HasSchemaName("Sales")

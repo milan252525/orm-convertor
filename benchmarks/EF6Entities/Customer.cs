@@ -7,7 +7,7 @@ namespace EF6Entities;
 public class Customer
 {
     [Key]
-    public int CustomerId { get; set; }
+    public int CustomerID { get; set; }
 
     public required string CustomerName { get; set; }
 

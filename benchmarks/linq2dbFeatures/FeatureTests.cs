@@ -433,7 +433,7 @@ namespace linq2dbFeatures
 
             var result = db.Customers
             .LoadWith(c => c.Transactions)
-            .OrderBy(c => c.CustomerId)
+            .OrderBy(c => c.CustomerID)
             .ToList();
 
             Assert.Equal(663, result.Count);

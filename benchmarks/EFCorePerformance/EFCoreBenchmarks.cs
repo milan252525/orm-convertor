@@ -278,7 +278,7 @@ namespace EFCorePerformance
 
             var result = context.Customers
             .Include(c => c.Transactions)
-            .OrderBy(c => c.CustomerId)
+            .OrderBy(c => c.CustomerID)
             .ToList();
 
             return result;

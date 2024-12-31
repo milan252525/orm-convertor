@@ -2,7 +2,7 @@
 
 public class Customer
 {
-    public virtual int CustomerId { get; set; }
+    public virtual int CustomerID { get; set; }
 
     public virtual required string CustomerName { get; set; }
 
