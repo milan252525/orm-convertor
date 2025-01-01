@@ -18,6 +18,7 @@
     <ProjectReference Include="..\linq2dbPerformance\linq2dbPerformance.csproj" />
     <ProjectReference Include="..\NHibernatePerformance\NHibernatePerformance.csproj" />
     <ProjectReference Include="..\PetaPocoPerformance\PetaPocoPerformance.csproj" />
+    <ProjectReference Include="..\RepoDBPerformance\RepoDBPerformance.csproj" />
   </ItemGroup>
 
 </Project>

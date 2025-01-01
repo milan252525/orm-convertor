@@ -7,6 +7,7 @@ using EFCorePerformance;
 using Linq2dbPerformance;
 using NHibernatePerformance;
 using PetaPocoPerformance;
+using RepoDBPerformance;
 
 namespace BenchmarkMain;
 
@@ -28,6 +29,7 @@ internal class Program
                 typeof(DapperBenchmark),
                 typeof(PetaPocoBenchmark),
                 typeof(Linq2dbBenchmarks),
+                typeof(RepoDBBenchmark),
                 typeof(EFCoreBenchmarks),
                 typeof(EF6Benchmarks),
                 typeof(NHibernateBenchmarks)

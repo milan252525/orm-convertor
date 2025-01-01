@@ -11,7 +11,7 @@ namespace RepoDBFeatures
     [Collection("PetaPoco")]
     public class FeatureTests
     {
-        private readonly SqlConnection connection = new SqlConnection(DatabaseConfig.MSSQLConnectionString);
+        private readonly SqlConnection connection = new(DatabaseConfig.MSSQLConnectionString);
 
         static FeatureTests()
         {
@@ -350,6 +350,122 @@ namespace RepoDBFeatures
         [Fact]
         public void D2_ManyToManyRelationship()
         {
+            // RepoDB has no support for relationships or joins whatsoever
+
+            string sqlItems = """
+                SELECT si.StockItemID,
+                       si.StockItemName,
+                       si.SupplierID,
+                       sg.StockGroupID,
+                       sg.StockGroupName
+                FROM WideWorldImporters.Warehouse.StockItems si
+                LEFT JOIN WideWorldImporters.Warehouse.StockItemStockGroups sisg
+                    ON si.StockItemID = sisg.StockItemID
+                LEFT JOIN WideWorldImporters.Warehouse.StockGroups sg
+                    ON sisg.StockGroupID = sg.StockGroupID
+                ORDER BY si.StockItemID
+            """;
+
+            var rawItems = connection.ExecuteQuery<dynamic>(sqlItems).ToList();
+            var stockItemsById = new Dictionary<int, StockItem>();
+
+            foreach (var row in rawItems)
+            {
+                if (!stockItemsById.TryGetValue(row.StockItemID, out StockItem stockItem))
+                {
+                    stockItem = new StockItem
+                    {
+                        StockItemID = row.StockItemID,
+                        StockItemName = row.StockItemName,
+                        SupplierID = row.SupplierID
+                    };
+                    stockItemsById.Add(stockItem.StockItemID, stockItem);
+                }
+
+                if (row.StockGroupID != null)
+                {
+                    stockItem.StockGroups.Add(new StockGroup
+                    {
+                        StockGroupID = row.StockGroupID,
+                        StockGroupName = row.StockGroupName
+                    });
+                }
+            }
+
+            var stockItems = stockItemsById.Values.ToList();
+
+            string sqlGroups = """
+                SELECT sg.StockGroupID,
+                       sg.StockGroupName,
+                       si.StockItemID,
+                       si.StockItemName,
+                       si.SupplierID
+                FROM WideWorldImporters.Warehouse.StockGroups sg
+                LEFT JOIN WideWorldImporters.Warehouse.StockItemStockGroups sisg
+                    ON sg.StockGroupID = sisg.StockGroupID
+                LEFT JOIN WideWorldImporters.Warehouse.StockItems si
+                    ON sisg.StockItemID = si.StockItemID
+                ORDER BY sg.StockGroupID
+            """;
+
+            var rawGroups = connection.ExecuteQuery<dynamic>(sqlGroups).ToList();
+            var stockGroupsById = new Dictionary<int, StockGroup>();
+
+            foreach (var row in rawGroups)
+            {
+                if (!stockGroupsById.TryGetValue(row.StockGroupID, out StockGroup stockGroup))
+                {
+                    stockGroup = new StockGroup
+                    {
+                        StockGroupID = row.StockGroupID,
+                        StockGroupName = row.StockGroupName
+                    };
+                    stockGroupsById.Add(stockGroup.StockGroupID, stockGroup);
+                }
+
+                if (row.StockItemID != null)
+                {
+                    stockGroup.StockItems.Add(new StockItem
+                    {
+                        StockItemID = row.StockItemID,
+                        StockItemName = row.StockItemName,
+                        SupplierID = row.SupplierID
+                    });
+                }
+            }
+
+            var stockGroups = stockGroupsById.Values.ToList();
+
+            Assert.Multiple(() =>
+            {
+                Assert.Equal(227, stockItems.Count);
+                Assert.Equal(10, stockGroups.Count);
+            });
+
+            Assert.Multiple(() =>
+            {
+                Assert.Equal(1, stockItems[0].StockItemID);
+                Assert.Equal("USB missile launcher (Green)", stockItems[0].StockItemName);
+                Assert.Equal(12, stockItems[0].SupplierID);
+
+                Assert.Equal(3, stockItems[0].StockGroups.Count);
+                var groupNames = stockItems[0].StockGroups.Select(sg => sg.StockGroupName).Order().ToList();
+                Assert.Equal(["Computing Novelties", "Novelty Items", "USB Novelties"], groupNames);
+            });
+
+            Assert.Multiple(() =>
+            {
+                Assert.Equal(1, stockGroups[0].StockGroupID);
+                Assert.Equal("Novelty Items", stockGroups[0].StockGroupName);
+                Assert.Equal(91, stockGroups[0].StockItems.Count);
+            });
+
+            var group1ItemIds = stockItems
+                .Where(si => si.StockGroups.Any(sg => sg.StockGroupID == 1))
+                .Select(si => si.StockItemID)
+                .ToList();
+
+            Assert.Equal(group1ItemIds, stockGroups[0].StockItems.Select(sisg => sisg.StockItemID).Order().ToList());
         }
 
         [Fact]
