@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>DapperPerformance.DapperBenchmark-20250101-112616</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.22631.4602/23H2/2023Update/SunValley3)
+AMD Ryzen 5 5600H with Radeon Graphics, 1 CPU, 12 logical and 6 physical cores
+.NET SDK 9.0.101
+  [Host]     : .NET 8.0.11 (8.0.1124.51707), X64 RyuJIT AVX2
+  DefaultJob : .NET 8.0.11 (8.0.1124.51707), X64 RyuJIT AVX2
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>Method                    </th><th>Mean  </th><th>Error</th><th>StdDev</th><th>Median</th><th>Gen0</th><th>Exceptions</th><th>Gen1</th><th>Gen2</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>A1_EntityIdenticalToTable</td><td>725.9 &mu;s</td><td>6.99 &mu;s</td><td>6.20 &mu;s</td><td>725.4 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>6.24 KB</td>
+</tr><tr><td>A2_LimitedEntity</td><td>699.7 &mu;s</td><td>8.22 &mu;s</td><td>6.87 &mu;s</td><td>700.1 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>4.74 KB</td>
+</tr><tr><td>A3_MultipleEntitiesFromOneResult</td><td>720.4 &mu;s</td><td>6.87 &mu;s</td><td>6.09 &mu;s</td><td>721.0 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>7.28 KB</td>
+</tr><tr><td>A4_StoredProcedureToEntity</td><td>523,674.1 &mu;s</td><td>9,488.80 &mu;s</td><td>8,875.83 &mu;s</td><td>524,124.9 &mu;s</td><td>2000.0000</td><td>-</td><td>1000.0000</td><td>-</td><td>24294.84 KB</td>
+</tr><tr><td>B1_SelectionOverIndexedColumn</td><td>731.4 &mu;s</td><td>10.21 &mu;s</td><td>9.55 &mu;s</td><td>730.2 &mu;s</td><td>0.9766</td><td>-</td><td>-</td><td>-</td><td>8.63 KB</td>
+</tr><tr><td>B2_SelectionOverNonIndexedColumn</td><td>45,245.6 &mu;s</td><td>750.27 &mu;s</td><td>701.81 &mu;s</td><td>45,324.4 &mu;s</td><td>833.3333</td><td>-</td><td>500.0000</td><td>250.0000</td><td>7112.75 KB</td>
+</tr><tr><td>B3_RangeQuery</td><td>30,484.1 &mu;s</td><td>266.92 &mu;s</td><td>236.62 &mu;s</td><td>30,500.6 &mu;s</td><td>93.7500</td><td>-</td><td>31.2500</td><td>-</td><td>989.93 KB</td>
+</tr><tr><td>B4_InQuery</td><td>835.3 &mu;s</td><td>14.83 &mu;s</td><td>13.87 &mu;s</td><td>836.5 &mu;s</td><td>1.9531</td><td>-</td><td>-</td><td>-</td><td>16.92 KB</td>
+</tr><tr><td>B5_TextSearch</td><td>748,551.8 &mu;s</td><td>5,469.15 &mu;s</td><td>5,115.85 &mu;s</td><td>747,347.8 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>1169.29 KB</td>
+</tr><tr><td>B6_PagingQuery</td><td>1,287.1 &mu;s</td><td>20.84 &mu;s</td><td>18.47 &mu;s</td><td>1,284.6 &mu;s</td><td>3.9063</td><td>-</td><td>-</td><td>-</td><td>32.59 KB</td>
+</tr><tr><td>C1_AggregationCount</td><td>34,841.7 &mu;s</td><td>323.58 &mu;s</td><td>302.67 &mu;s</td><td>34,948.1 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>2.75 KB</td>
+</tr><tr><td>C2_AggregationMax</td><td>1,217.6 &mu;s</td><td>21.69 &mu;s</td><td>20.29 &mu;s</td><td>1,220.3 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>1.97 KB</td>
+</tr><tr><td>C3_AggregationSum</td><td>87,542.3 &mu;s</td><td>1,550.32 &mu;s</td><td>1,723.18 &mu;s</td><td>86,925.3 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>2.09 KB</td>
+</tr><tr><td>D1_OneToManyRelationship</td><td>764.4 &mu;s</td><td>14.99 &mu;s</td><td>12.52 &mu;s</td><td>761.2 &mu;s</td><td>1.9531</td><td>-</td><td>-</td><td>-</td><td>16.46 KB</td>
+</tr><tr><td>D2_ManyToManyRelationship</td><td>20,651.9 &mu;s</td><td>409.48 &mu;s</td><td>600.21 &mu;s</td><td>20,782.1 &mu;s</td><td>31.2500</td><td>-</td><td>-</td><td>-</td><td>446.27 KB</td>
+</tr><tr><td>D3_OptionalRelationship</td><td>182,586.2 &mu;s</td><td>2,458.47 &mu;s</td><td>2,179.37 &mu;s</td><td>181,763.9 &mu;s</td><td>5000.0000</td><td>-</td><td>2000.0000</td><td>1000.0000</td><td>40924.88 KB</td>
+</tr><tr><td>E1_ColumnSorting</td><td>6,032.1 &mu;s</td><td>275.12 &mu;s</td><td>798.18 &mu;s</td><td>5,917.0 &mu;s</td><td>39.0625</td><td>-</td><td>7.8125</td><td>-</td><td>349.4 KB</td>
+</tr><tr><td>E2_Distinct</td><td>2,249.7 &mu;s</td><td>42.20 &mu;s</td><td>114.10 &mu;s</td><td>2,203.5 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>2.42 KB</td>
+</tr><tr><td>F1_NestedJSONQuery</td><td>1,489.6 &mu;s</td><td>14.98 &mu;s</td><td>12.51 &mu;s</td><td>1,486.5 &mu;s</td><td>1.9531</td><td>-</td><td>-</td><td>-</td><td>25.94 KB</td>
+</tr><tr><td>F2_JSONArrayQuery</td><td>1,691.9 &mu;s</td><td>16.80 &mu;s</td><td>15.72 &mu;s</td><td>1,691.0 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>10.27 KB</td>
+</tr><tr><td>G1_Union</td><td>699.1 &mu;s</td><td>13.38 &mu;s</td><td>12.51 &mu;s</td><td>700.5 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>2.39 KB</td>
+</tr><tr><td>G2_Intersection</td><td>709.9 &mu;s</td><td>13.78 &mu;s</td><td>12.89 &mu;s</td><td>712.3 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>2.17 KB</td>
+</tr></tbody></table>
+</body>
+</html>

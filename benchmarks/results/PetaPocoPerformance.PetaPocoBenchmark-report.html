@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>PetaPocoPerformance.PetaPocoBenchmark-20250101-113521</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.22631.4602/23H2/2023Update/SunValley3)
+AMD Ryzen 5 5600H with Radeon Graphics, 1 CPU, 12 logical and 6 physical cores
+.NET SDK 9.0.101
+  [Host]     : .NET 8.0.11 (8.0.1124.51707), X64 RyuJIT AVX2
+  DefaultJob : .NET 8.0.11 (8.0.1124.51707), X64 RyuJIT AVX2
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>Method                    </th><th>Mean  </th><th>Error</th><th>StdDev</th><th>Gen0</th><th>Exceptions</th><th>Gen1</th><th>Gen2</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>A1_EntityIdenticalToTable</td><td>707.0 &mu;s</td><td>8.56 &mu;s</td><td>7.15 &mu;s</td><td>0.9766</td><td>-</td><td>-</td><td>-</td><td>7.99 KB</td>
+</tr><tr><td>A2_LimitedEntity</td><td>699.8 &mu;s</td><td>10.62 &mu;s</td><td>9.94 &mu;s</td><td>0.9766</td><td>-</td><td>-</td><td>-</td><td>9.64 KB</td>
+</tr><tr><td>A3_MultipleEntitiesFromOneResult</td><td>711.7 &mu;s</td><td>12.27 &mu;s</td><td>11.48 &mu;s</td><td>0.9766</td><td>-</td><td>-</td><td>-</td><td>13.03 KB</td>
+</tr><tr><td>A4_StoredProcedureToEntity</td><td>505,504.8 &mu;s</td><td>8,774.44 &mu;s</td><td>8,207.62 &mu;s</td><td>1000.0000</td><td>-</td><td>-</td><td>-</td><td>16490.15 KB</td>
+</tr><tr><td>B1_SelectionOverIndexedColumn</td><td>727.3 &mu;s</td><td>9.20 &mu;s</td><td>8.15 &mu;s</td><td>0.9766</td><td>-</td><td>-</td><td>-</td><td>14.3 KB</td>
+</tr><tr><td>B2_SelectionOverNonIndexedColumn</td><td>40,896.6 &mu;s</td><td>637.97 &mu;s</td><td>596.75 &mu;s</td><td>416.6667</td><td>-</td><td>333.3333</td><td>83.3333</td><td>3308.08 KB</td>
+</tr><tr><td>B3_RangeQuery</td><td>29,962.5 &mu;s</td><td>188.27 &mu;s</td><td>176.10 &mu;s</td><td>31.2500</td><td>-</td><td>-</td><td>-</td><td>468.38 KB</td>
+</tr><tr><td>B4_InQuery</td><td>835.4 &mu;s</td><td>13.71 &mu;s</td><td>12.83 &mu;s</td><td>1.9531</td><td>-</td><td>-</td><td>-</td><td>20.34 KB</td>
+</tr><tr><td>B5_TextSearch</td><td>748,477.1 &mu;s</td><td>4,285.18 &mu;s</td><td>4,008.36 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>587.24 KB</td>
+</tr><tr><td>B6_PagingQuery</td><td>1,298.1 &mu;s</td><td>19.47 &mu;s</td><td>18.22 &mu;s</td><td>1.9531</td><td>-</td><td>-</td><td>-</td><td>25.06 KB</td>
+</tr><tr><td>C1_AggregationCount</td><td>35,138.1 &mu;s</td><td>318.53 &mu;s</td><td>297.95 &mu;s</td><td>-</td><td>0.1333</td><td>-</td><td>-</td><td>8.79 KB</td>
+</tr><tr><td>C2_AggregationMax</td><td>1,218.0 &mu;s</td><td>24.25 &mu;s</td><td>27.92 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>4.19 KB</td>
+</tr><tr><td>C3_AggregationSum</td><td>86,614.7 &mu;s</td><td>673.82 &mu;s</td><td>597.32 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>4.41 KB</td>
+</tr><tr><td>D1_OneToManyRelationship</td><td>795.5 &mu;s</td><td>15.54 &mu;s</td><td>29.20 &mu;s</td><td>1.9531</td><td>-</td><td>-</td><td>-</td><td>17.94 KB</td>
+</tr><tr><td>D2_ManyToManyRelationship</td><td>20,075.9 &mu;s</td><td>397.29 &mu;s</td><td>472.95 &mu;s</td><td>93.7500</td><td>-</td><td>62.5000</td><td>-</td><td>818.88 KB</td>
+</tr><tr><td>D3_OptionalRelationship</td><td>186,133.8 &mu;s</td><td>3,665.33 &mu;s</td><td>7,569.54 &mu;s</td><td>2000.0000</td><td>-</td><td>2000.0000</td><td>-</td><td>24909.68 KB</td>
+</tr><tr><td>E1_ColumnSorting</td><td>4,823.1 &mu;s</td><td>95.55 &mu;s</td><td>89.37 &mu;s</td><td>15.6250</td><td>-</td><td>-</td><td>-</td><td>156.96 KB</td>
+</tr><tr><td>E2_Distinct</td><td>2,267.9 &mu;s</td><td>44.61 &mu;s</td><td>56.42 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>4.78 KB</td>
+</tr><tr><td>F1_NestedJSONQuery</td><td>1,517.1 &mu;s</td><td>22.62 &mu;s</td><td>21.16 &mu;s</td><td>3.9063</td><td>-</td><td>-</td><td>-</td><td>45.25 KB</td>
+</tr><tr><td>F2_JSONArrayQuery</td><td>1,792.7 &mu;s</td><td>35.59 &mu;s</td><td>33.29 &mu;s</td><td>1.9531</td><td>-</td><td>-</td><td>-</td><td>18.12 KB</td>
+</tr><tr><td>G1_Union</td><td>719.9 &mu;s</td><td>7.05 &mu;s</td><td>6.25 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>3.45 KB</td>
+</tr><tr><td>G2_Intersection</td><td>727.7 &mu;s</td><td>9.21 &mu;s</td><td>8.61 &mu;s</td><td>-</td><td>-</td><td>-</td><td>-</td><td>3.25 KB</td>
+</tr></tbody></table>
+</body>
+</html>
