@@ -1,0 +1,71 @@
+\chapter{Experimental comparison}
+
+We will perform an experimental comparison of selected ORM frameworks. In the form of unit tests, we will compare query capabilities across all 7 frameworks.
+
+For each framework, we will create a set of unit tests performing pre-selected queries. Through these we will determine if the framework is capable of performing the query. 
+
+
+
+We will only test read queries. They will provide us with enough information and metrics to compare the ORMs. Other non-read operations can be the subject of future work.
+
+\section{Setup}
+% database, docker, test project, .net
+
+
+\section{Dataset}
+% https://learn.microsoft.com/en-us/sql/samples/wide-world-importers-what-is?view=sql-server-ver16
+To adequately test performance, we need a sufficiently large data set.
+
+\section{Rules/assumptions} % TODO better name
+Preferably, we would like to use LINQ or any other available query language over raw SQL. 
+
+
+
+For mapping database tables to entities, we will try using different methods to show the variety. 
+As we have already seen, there are different approaches like attributes, fluent mapping by code or configuration files. 
+
+
+\section{Selected queries}
+Our goal is to test the query capabilities as broadly as possible. We want to create queries that use different conditions, result modifications, aggregations, relationships between tables, etc.
+
+\subsection{A - Entity projection}
+This group will test how well ORM can handle projecting table columns onto a user-defined entity or entities. 
+
+\subsubsection*{A1 Entity identical to a table}
+The test will retrieve a table row and map it to an entity with properties identical to table columns. 
+Table \texttt{Purchasing.PurchaseOrders} will be queried and one item retrieved based on its ID.
+
+\subsubsection*{A2 Limited entity}
+The resulting entity will have less properties than table columns. Only the data we really need should be transferred. 
+Table \texttt{Purchasing.Suppliers} will be queried and only columns related to supplier's contact info will be retrieved.
+
+\subsubsection*{A3 Multiple entities from one table}
+One table will be queried and the result will be divided into two different entities. 
+Table \texttt{Purchasing.Suppliers} will be used again, from which we will retrieve contact information and bank account information into two separate entities. 
+
+
+\subsubsection*{A4 Stored procedure result into entity}
+This query will execute a stored procedure, limited by parameters, and load the result into entity.
+The executed stored procedure will be \texttt{Integration.GetOrderUpdates} with parameters LastCutoff and NewCutoff. 
+We will limit the cut-off to a one-year range from 2014 to 2015. 66741 order updates should be returned.
+
+This stored procedure returns columns with spaces in their names, for example, ``WWI Order ID``. As properties in the C\# language cannot contain spaces, it will be interesting to see how and if different frameworks can handle this.
+
+% \paragraph{} % TODO ASK - jak tady vrátit tenhle text zpět 
+\subsubsection*{Summary}
+Queries \textbf{A1}, \textbf{A2}, and \textbf{A3} will fetch one row based on its ID. The measured time and memory allocation will then show the overhead of the ORM framework when mapping data to the resulting entities. Query \textbf{A4} returns a large number of results, so it is a first query that shows us the performance with high-volume data.
+
+\subsection{B - Selection}
+Probably the most common query operation is limiting results based on a condition. This set of queries will query table \texttt{Sales.OrderLines} with varied conditions.
+
+\subsubsection*{B1 Selection over indexed column}
+
+\subsubsection*{B2 Selection over non-indexed column}
+
+\subsubsection*{B3 Range query}
+
+\subsubsection*{B4 In query}
+
+\subsubsection*{B5 Text search}
+
+\subsubsection*{B6 Paging (skip and take)}
