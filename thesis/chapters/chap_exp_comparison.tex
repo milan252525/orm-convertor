@@ -139,3 +139,133 @@ SELECT * FROM Sales.OrderLines
 ORDER BY OrderLineID 
 OFFSET 1000 ROWS FETCH NEXT 50 ROWS ONLY
 \end{lstlisting}
+
+\subsection{C - Aggregation}
+
+\subsubsection*{C1 Count}
+
+\begin{lstlisting}[language=SQL]
+SELECT TaxRate, COUNT(TaxRate) as Count 
+FROM Sales.OrderLines 
+GROUP BY TaxRate 
+ORDER BY Count DESC
+\end{lstlisting}
+
+\subsubsection*{C2 Max}
+
+\begin{lstlisting}[language=SQL]
+SELECT MAX(UnitPrice) FROM Sales.OrderLines
+\end{lstlisting}
+
+\subsubsection*{C3 Sum}
+
+\begin{lstlisting}[language=SQL]
+SELECT SUM(Quantity * UnitPrice) FROM Sales.OrderLines
+\end{lstlisting}
+
+\subsection{D - Relations}
+
+\subsubsection*{D1 One to many}
+
+\begin{lstlisting}[language=SQL]
+SELECT o.*, ol.* FROM Sales.Orders o
+LEFT JOIN Sales.OrderLines ol ON ol.OrderID = o.OrderID
+WHERE o.OrderID = 530
+\end{lstlisting}
+
+\subsubsection*{D2 Many to many}
+
+This test will consist of two queries. We want to test accessing the relationship from both sides. The first query will fetch stock items with their stock groups. And the other one stock groups with their stock items.
+\begin{lstlisting}[language=SQL]
+SELECT si.*, sg.* FROM Warehouse.StockItems si
+LEFT JOIN Warehouse.StockItemStockGroups sisg
+    ON si.StockItemID = sisg.StockItemID
+LEFT JOIN Warehouse.StockGroups sg
+    ON sisg.StockGroupID = sg.StockGroupID
+ORDER BY si.StockItemID
+\end{lstlisting}
+\begin{lstlisting}[language=SQL]
+ SELECT sg.*, si.* FROM Warehouse.StockGroups sg
+ LEFT JOIN Warehouse.StockItemStockGroups sisg
+     ON sg.StockGroupID = sisg.StockGroupID
+ LEFT JOIN Warehouse.StockItems si
+     ON sisg.StockItemID = si.StockItemID
+ ORDER BY sg.StockGroupID
+\end{lstlisting}
+The queries utilise left join, so we will get all stock items, even if they belong to no stock groups. And vice versa for the other query.
+
+\subsubsection*{D3 One to many with optional relation}
+
+\begin{lstlisting}[language=SQL]
+SELECT 
+    c.CustomerID, c.CustomerName, c.AccountOpenedDate, c.CreditLimit, 
+    ct.CustomerTransactionID, ct.CustomerID, ct.TransactionDate, ct.TransactionAmount
+FROM WideWorldImporters.Sales.Customers c
+LEFT OUTER JOIN WideWorldImporters.Sales.CustomerTransactions ct
+    ON c.CustomerID = ct.CustomerID
+ORDER BY c.CustomerID
+\end{lstlisting}
+
+\subsection{E - Result modification}
+
+\subsubsection*{E1 Column sorting}
+
+\begin{lstlisting}[language=SQL]
+SELECT TOP (1000) * FROM Purchasing.PurchaseOrders 
+ORDER BY ExpectedDeliveryDate ASC
+\end{lstlisting}
+
+\subsubsection*{E2 Distinct results}
+
+\begin{lstlisting}[language=SQL]
+SELECT DISTINCT SupplierReference 
+FROM Purchasing.PurchaseOrders
+\end{lstlisting}
+
+\subsection{F - Querying JSON}
+Microsoft SQL server supports storing and querying JSON data\cite{mssqljson}. It is worth testing if our selected ORMs support constructing queries into the stored JSON.
+
+During the static comparison, we found that none of the selected ORMs supports XML or any other data format. SO we will not be testing for those.
+
+\subsubsection*{F1 Nested JSON query}
+
+\begin{lstlisting}[language=SQL]
+SELECT * FROM Application.People
+WHERE JSON_VALUE(CustomFields, '$.Title') = 'Team Member'
+ORDER BY PersonId
+\end{lstlisting}
+
+\subsubsection*{F2 JSON array query}
+
+\begin{lstlisting}[language=SQL]
+SELECT * FROM Application.People
+WHERE EXISTS (
+    SELECT 1
+    FROM OPENJSON(OtherLanguages)
+    WHERE value = 'Slovak'
+)
+\end{lstlisting}
+
+\subsection{G - Set operations}
+
+\subsubsection*{G1 Intersection}
+
+\begin{lstlisting}[language=SQL]
+SELECT SupplierID FROM Purchasing.Suppliers 
+    WHERE SupplierID < 5
+UNION
+SELECT SupplierID FROM Purchasing.Suppliers 
+    WHERE SupplierID BETWEEN 5 AND 10
+ORDER BY SupplierID
+\end{lstlisting}
+
+\subsubsection*{G2 Union}
+
+\begin{lstlisting}[language=SQL]
+SELECT SupplierID FROM Purchasing.Suppliers 
+    WHERE SupplierID < 10
+INTERSECT
+SELECT SupplierID FROM Purchasing.Suppliers 
+    WHERE SupplierID BETWEEN 5 AND 15
+ORDER BY SupplierID
+\end{lstlisting}
