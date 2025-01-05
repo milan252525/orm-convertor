@@ -70,7 +70,7 @@ WHERE SupplierID = 10
 \end{lstlisting}
 
 \subsubsection*{A4 Stored procedure result into entity}
-This query will execute a stored procedure, limited by parameters, and load the result into entity.
+This query will execute a stored procedure, limited by parameters, and load the result into an entity.
 The executed stored procedure will be \texttt{Integration.GetOrderUpdates} with parameters LastCutoff and NewCutoff. 
 We will limit the cut-off to a one-year range from 2014 to 2015. 66741 order updates should be returned.
 
@@ -123,7 +123,7 @@ WHERE OrderID IN (1, 10, 100, 1000, 10000)
 \end{lstlisting}
 
 \subsubsection*{B5 Text search}
-This query will test a text search, looking for any order lines with description containing the word ``C++``.  The column does not have a full text search or any similar index.
+This query will test a text search, looking for any order lines with description containing the word ``C++``.  The column does not have a full text search or any other index.
 
 \begin{lstlisting}[language=SQL]
 SELECT * FROM Sales.OrderLines 
@@ -141,8 +141,10 @@ OFFSET 1000 ROWS FETCH NEXT 50 ROWS ONLY
 \end{lstlisting}
 
 \subsection{C - Aggregation}
+Aggregation functions are often used when performing calculations on data. We will test a select few.
 
 \subsubsection*{C1 Count}
+Count is very useful when we need to know the number of records that correspond to a specific condition. We will combine it with \texttt{GROUP BY} clause to retrieve distinct tax rates and the number of their occurrence.
 
 \begin{lstlisting}[language=SQL]
 SELECT TaxRate, COUNT(TaxRate) as Count 
@@ -152,18 +154,23 @@ ORDER BY Count DESC
 \end{lstlisting}
 
 \subsubsection*{C2 Max}
+Maximum and minimum are also commonly used. We will attempt to retrieve the maximum unit price for all order lines.
 
 \begin{lstlisting}[language=SQL]
 SELECT MAX(UnitPrice) FROM Sales.OrderLines
 \end{lstlisting}
 
 \subsubsection*{C3 Sum}
-
+Aggregation functions also allow performing operations. In this test, we will combine the \texttt{SUM} function with a multiplication inside. The result will be the total price across all order lines.
 \begin{lstlisting}[language=SQL]
 SELECT SUM(Quantity * UnitPrice) FROM Sales.OrderLines
 \end{lstlisting}
 
 \subsection{D - Relations}
+An important feature of ORM should be mapping relations. Our domain entities are often connected, representing relations in real life.
+However, as we found out in our previous analysis, not all the selected frameworks support mapping relations. 
+
+Our test data contain no one to one relation. There should be a small difference between mapping one to one and one to many. We will cover the other types in sufficient detail.
 
 \subsubsection*{D1 One to many}
 
