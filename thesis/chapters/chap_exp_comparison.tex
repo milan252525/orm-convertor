@@ -19,15 +19,17 @@ The database contains four schemas: Application, Purchasing, Sales, Warehouse. F
 
 \section{Setup}
 % database, docker, test project, .net
-Why we chose MSSSQL
+TODO Why we chose MSSSQL
 
 \section{Rules/assumptions} % TODO better name
-Preferably, we would like to use LINQ or any other available query language over raw SQL. 
-
-
+As for query language, we will opt to use LINQ or any other available query language over raw SQL. 
 
 For mapping database tables to entities, we will try using different methods to show the variety. 
 As we have already seen, there are different approaches like attributes, fluent mapping by code or configuration files. 
+
+If ORM supports caching entities, we will disable it so that our benchmarks are not affected. 
+Another feature that could affect our results is change tracking. 
+For example, EF Core tracks changes made to an entity, so that it can later perform an update. All our tests will only execute read operations, so change tracking would unnecessarily increase measured time or allocated memory.
 
 
 \section{Selected queries}
@@ -172,7 +174,16 @@ However, as we found out in our previous analysis, not all the selected framewor
 
 Our test data contain no one to one relation. There should be a small difference between mapping one to one and one to many. We will cover the other types in sufficient detail.
 
+Some ORMs support lazy loading. That means loading entities in a relation only after accessing the corresponding collection. That would result in more queries being sent and a potential slowdown.
+We will prevent this by setting the loading strategy to eager when possible.
+
 \subsubsection*{D1 One to many}
+In one to many relation we have one parent and multiple children. A parent entity should have a collection containing its children. Optionally, a child entity can have a reference to its parent.
+In this test, we will use the relation between order and its order lines. We will fetch one specific order along with all its lines.
+
+We need to verify all child entities were returned and the parent collection filled. 
+
+
 
 \begin{lstlisting}[language=SQL]
 SELECT o.*, ol.* FROM Sales.Orders o
@@ -181,8 +192,11 @@ WHERE o.OrderID = 530
 \end{lstlisting}
 
 \subsubsection*{D2 Many to many}
+In many to many relation, both sides can be connected with multiple entities of the same type. Therefore, it will be represented by a collection on both sides. The collection can contain the entity directly, which makes it easier for developers to work with. If necessary, it can contain entities that represent the join table for this relationship.
 
 This test will consist of two queries. We want to test accessing the relationship from both sides. The first query will fetch stock items with their stock groups. And the other one stock groups with their stock items.
+The relationship is represented by a join table \texttt{Warehouse.StockItemStockGroups}. If possible, we will try to map this relation without a join entity in our tests.
+
 \begin{lstlisting}[language=SQL]
 SELECT si.*, sg.* FROM Warehouse.StockItems si
 LEFT JOIN Warehouse.StockItemStockGroups sisg
@@ -202,20 +216,22 @@ ORDER BY si.StockItemID
 The queries utilise left join, so we will get all stock items, even if they belong to no stock groups. And vice versa for the other query.
 
 \subsubsection*{D3 One to many with optional relation}
+In the D1 test case, the one to many relation was not optional. Each order has at least one order line. In the D2 test case, each item belonged to at least one category as well.
+This test case will utilize an optional one to many relation between a customer and a transaction. 
 
 \begin{lstlisting}[language=SQL]
-SELECT 
-    c.CustomerID, c.CustomerName, c.AccountOpenedDate, c.CreditLimit, 
-    ct.CustomerTransactionID, ct.CustomerID, ct.TransactionDate, ct.TransactionAmount
-FROM WideWorldImporters.Sales.Customers c
-LEFT OUTER JOIN WideWorldImporters.Sales.CustomerTransactions ct
+SELECT c.*, ct.* FROM Sales.Customers c
+LEFT JOIN Sales.CustomerTransactions ct
     ON c.CustomerID = ct.CustomerID
 ORDER BY c.CustomerID
 \end{lstlisting}
 
 \subsection{E - Result modification}
+This category will test modifying the result set. We will test sorting by a column and filtering distinct result values.
 
 \subsubsection*{E1 Column sorting}
+Although we have used sorting to order the results of some previous tests to get deterministic results, this test will focus solely on sorting.
+We will sort all purchase orders by their expected delivery date and retrieve only the first one thousand.
 
 \begin{lstlisting}[language=SQL]
 SELECT TOP (1000) * FROM Purchasing.PurchaseOrders 
@@ -223,6 +239,7 @@ ORDER BY ExpectedDeliveryDate ASC
 \end{lstlisting}
 
 \subsubsection*{E2 Distinct results}
+To test fetching only unique values, we will request all supplier references from purchase orders.
 
 \begin{lstlisting}[language=SQL]
 SELECT DISTINCT SupplierReference 
@@ -230,11 +247,15 @@ FROM Purchasing.PurchaseOrders
 \end{lstlisting}
 
 \subsection{F - Querying JSON}
-Microsoft SQL server supports storing and querying JSON data\cite{mssqljson}. It is worth testing if our selected ORMs support constructing queries into the stored JSON.
+Microsoft SQL Server supports storing and querying JSON data\cite{mssqljson}. It is worth testing if our selected ORMs support constructing queries into the stored JSON.
+Table \texttt{Application.People} contains text columns storing JSON values.
 
-During the static comparison, we found that none of the selected ORMs supports XML or any other data format. SO we will not be testing for those.
+During the static comparison, we found that none of the selected ORMs supports XML or any other data format. So we will not be testing for those.
 
-\subsubsection*{F1 Nested JSON query}
+\subsubsection*{F1 JSON object query}
+
+Column \texttt{CustomFields} contains a JSON with many different values. In this test we will focus on property \texttt{Title}. We will query all people with a title set to ``Team Member``.
+We will accomplish that using the \texttt{JSON\_VALUE} SQL function.
 
 \begin{lstlisting}[language=SQL]
 SELECT * FROM Application.People
@@ -243,6 +264,8 @@ ORDER BY PersonId
 \end{lstlisting}
 
 \subsubsection*{F2 JSON array query}
+
+The first case covered querying a JSON object. This one will test querying inside a JSON array. Column \texttt{OtherLanguages} contains a JSON array containing language names.
 
 \begin{lstlisting}[language=SQL]
 SELECT * FROM Application.People
@@ -255,7 +278,11 @@ WHERE EXISTS (
 
 \subsection{G - Set operations}
 
-\subsubsection*{G1 Intersection}
+In the last group we will test common set operations. Those are useful when having to combine two sets of data.
+
+\subsubsection*{G1 Union}
+
+Union will combine results from both queries. In this test, we will combine results from two different intervals of IDs and ensure that they are all present in the result.
 
 \begin{lstlisting}[language=SQL]
 SELECT SupplierID FROM Purchasing.Suppliers 
@@ -266,7 +293,9 @@ SELECT SupplierID FROM Purchasing.Suppliers
 ORDER BY SupplierID
 \end{lstlisting}
 
-\subsubsection*{G2 Union}
+\subsubsection*{G2 Intersection}
+
+Intersection will include results that appear in both of the queries. We will try combining supplier IDs in two overlapping intervals and assert that only the overlap is included. 
 
 \begin{lstlisting}[language=SQL]
 SELECT SupplierID FROM Purchasing.Suppliers 
@@ -276,3 +305,14 @@ SELECT SupplierID FROM Purchasing.Suppliers
     WHERE SupplierID BETWEEN 5 AND 15
 ORDER BY SupplierID
 \end{lstlisting}
+
+\section{Summary of the selected queries}
+We tried to pick as broad a selection of features as possible. 
+We certainly did not cover all of them, but our set should be representative enough to give us a fair idea of how different ORMs perform. 
+
+The tests perform queries across different tables and fetch different amounts of data. 
+Measured time and memory allocation will not allow us to make any assumptions when comparing different test cases for the same ORM.
+But we will be able to compare identical test cases across different ORMs.
+
+We can expect to see a difference in time performance between micro frameworks made to be efficient and feature-rich macro frameworks.
+The micro frameworks utilize raw SQL and have very little overhead. When using a macro framework, the LINQ query has to be compiled into SQL. Rich mapping capabilities may also cause significant slowdown. And extra features may even cause higher memory consumption.
