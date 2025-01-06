@@ -2,7 +2,6 @@
 using System.Data;
 using System.Data.Entity;
 using BenchmarkDotNet.Attributes;
-using Common;
 using EF6Entities;
 using EF6Entities.Models;
 

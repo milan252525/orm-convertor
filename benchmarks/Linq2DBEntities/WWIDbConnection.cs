@@ -1,9 +1,7 @@
 ﻿using System.Text.Json;
-using System.Text.Json.Serialization;
 using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.Mapping;
-using static LinqToDB.DataProvider.SqlServer.SqlFn;
 
 namespace linq2dbEntities;
 

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace EF6Entities;
+﻿namespace EF6Entities;
 
 public class PurchaseOrderUpdate
 {

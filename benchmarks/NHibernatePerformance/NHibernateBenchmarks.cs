@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using Common;
 using NHibernate;
 using NHibernate.Cfg;

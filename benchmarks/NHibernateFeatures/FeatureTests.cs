@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Common;
+﻿using Common;
 using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Dialect;
@@ -517,7 +516,7 @@ namespace NHibernateFeatures
                 .List<Person>();
 
             Assert.Equal(2, people.Count);
-            Assert.All(people, person => Assert.Contains("Slovak", person.OtherLanguages!));
+            Assert.All(people, person => Assert.Contains("Slovak", person.GetOtherLanguages()!));
 
             var first = people.First();
             Assert.Equal("Amy Trefl", first.FullName);
