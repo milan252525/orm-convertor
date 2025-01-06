@@ -482,7 +482,7 @@ namespace NHibernateFeatures
         }
 
         [Fact]
-        public void F1_NestedJSONQuery()
+        public void F1_JSONObjectQuery()
         {
             using var session = sessionFactory.OpenSession();
 

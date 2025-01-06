@@ -516,7 +516,7 @@ namespace RepoDBFeatures
         }
 
         [Fact]
-        public void F1_NestedJSONQuery()
+        public void F1_JSONObjectQuery()
         {
             var sql = """
                 SELECT *

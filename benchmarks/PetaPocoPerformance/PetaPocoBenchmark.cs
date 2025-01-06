@@ -358,7 +358,7 @@ namespace PetaPocoPerformance
         }
 
         [Benchmark]
-        public List<Person> F1_NestedJSONQuery()
+        public List<Person> F1_JSONObjectQuery()
         {
             var sql = Sql.Builder
                 .Select("*")

@@ -311,7 +311,7 @@ namespace EFCorePerformance
         }
 
         [Benchmark]
-        public List<Person> F1_NestedJSONQuery()
+        public List<Person> F1_JSONObjectQuery()
         {
             using var context = contextFactory.CreateDbContext();
 

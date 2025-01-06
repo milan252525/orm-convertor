@@ -319,7 +319,7 @@ namespace NHibernatePerformance
         }
 
         [Benchmark]
-        public IList<Person> F1_NestedJSONQuery()
+        public IList<Person> F1_JSONObjectQuery()
         {
             using var session = sessionFactory.OpenSession();
 

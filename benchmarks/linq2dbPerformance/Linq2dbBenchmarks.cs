@@ -298,7 +298,7 @@ namespace Linq2dbPerformance
         }
 
         [Benchmark]
-        public List<Person> F1_NestedJSONQuery()
+        public List<Person> F1_JSONObjectQuery()
         {
             using var db = GetConnection();
 

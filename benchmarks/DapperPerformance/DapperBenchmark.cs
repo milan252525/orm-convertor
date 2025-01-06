@@ -361,7 +361,7 @@ public class DapperBenchmark
     }
 
     [Benchmark]
-    public List<Person> F1_NestedJSONQuery()
+    public List<Person> F1_JSONObjectQuery()
     {
         var sql = """
                 SELECT *

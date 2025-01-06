@@ -513,7 +513,7 @@ public class FeatureTests
     }
 
     [Fact]
-    public void F1_NestedJSONQuery()
+    public void F1_JSONObjectQuery()
     {
         var sql = Sql.Builder
             .Select("*")
