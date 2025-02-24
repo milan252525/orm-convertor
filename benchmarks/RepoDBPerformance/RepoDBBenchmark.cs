@@ -418,5 +418,19 @@ namespace RepoDBPerformance
 
             return suppliers;
         }
+
+        [Benchmark]
+        public string H1_Metadata()
+        {
+            var datatype = connection.ExecuteQuery<string>("""
+                SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
+                    WHERE TABLE_SCHEMA = 'Purchasing'
+                    AND TABLE_NAME = 'Suppliers'
+                    AND COLUMN_NAME = 'SupplierReference'
+            """
+            ).Single();
+
+            return datatype;
+        }
     }
 }

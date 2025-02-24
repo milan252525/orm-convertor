@@ -412,5 +412,18 @@ namespace PetaPocoPerformance
 
             return suppliers;
         }
+
+        [Benchmark]
+        public string H1_Metadata()
+        {
+            var sql = Sql.Builder
+                .Select("DATA_TYPE")
+                .From("INFORMATION_SCHEMA.COLUMNS")
+                .Where("TABLE_SCHEMA = 'Purchasing' AND TABLE_NAME = 'Suppliers' AND COLUMN_NAME = 'SupplierReference'");
+
+            var datatype = db.Single<string>(sql);
+
+            return datatype;
+        }
     }
 }

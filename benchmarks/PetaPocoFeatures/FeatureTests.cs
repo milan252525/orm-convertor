@@ -580,4 +580,17 @@ public class FeatureTests
 
         Assert.Equal([5, 6, 7, 8, 9], suppliers);
     }
+
+    [Fact]
+    public void H1_Metadata()
+    {
+        var sql = Sql.Builder
+            .Select("DATA_TYPE")
+            .From("INFORMATION_SCHEMA.COLUMNS")
+            .Where("TABLE_SCHEMA = 'Purchasing' AND TABLE_NAME = 'Suppliers' AND COLUMN_NAME = 'SupplierReference'");
+
+        var datatype = db.Single<string>(sql);
+
+        Assert.Equal("nvarchar", datatype);
+    }
 }

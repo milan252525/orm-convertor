@@ -555,5 +555,22 @@ namespace linq2dbFeatures
 
             Assert.Equal([5, 6, 7, 8, 9], suppliers);
         }
+
+        [Fact]
+        public void H1_Metadata()
+        {
+            using var db = GetConnection();
+
+            var datatype = db.Query<string>(
+                """
+                    SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_SCHEMA = 'Purchasing'
+                        AND TABLE_NAME = 'Suppliers'
+                        AND COLUMN_NAME = 'SupplierReference'
+                """
+            ).Single();
+
+            Assert.Equal("nvarchar", datatype);
+        }
     }
 }

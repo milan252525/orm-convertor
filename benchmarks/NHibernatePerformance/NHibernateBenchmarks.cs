@@ -393,5 +393,23 @@ namespace NHibernatePerformance
 
             return suppliers;
         }
+
+        [Benchmark]
+        public string H1_Metadata()
+        {
+            using var session = sessionFactory.OpenSession();
+
+            var datatype = session.CreateSQLQuery(
+                """
+                    SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_SCHEMA = 'Purchasing'
+                        AND TABLE_NAME = 'Suppliers'
+                        AND COLUMN_NAME = 'SupplierReference'
+                """
+            )
+            .UniqueResult<string>();
+
+            return datatype;
+        }
     }
 }

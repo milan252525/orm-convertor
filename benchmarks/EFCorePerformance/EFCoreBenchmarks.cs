@@ -381,5 +381,22 @@ namespace EFCorePerformance
 
             return suppliers;
         }
+
+        [Benchmark]
+        public string H1_Metadata()
+        {
+            using var context = contextFactory.CreateDbContext();
+
+            var datatype = context.Database.SqlQueryRaw<string>(
+                """
+                    SELECT DATA_TYPE AS Value FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_SCHEMA = 'Purchasing'
+                        AND TABLE_NAME = 'Suppliers'
+                        AND COLUMN_NAME = 'SupplierReference'
+                """
+            ).Single();
+
+            return datatype;
+        }
     }
 }

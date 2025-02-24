@@ -368,5 +368,22 @@ namespace Linq2dbPerformance
 
             return suppliers;
         }
+
+        [Benchmark]
+        public string H1_Metadata()
+        {
+            using var db = GetConnection();
+
+            var datatype = db.Query<string>(
+                """
+                    SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_SCHEMA = 'Purchasing'
+                        AND TABLE_NAME = 'Suppliers'
+                        AND COLUMN_NAME = 'SupplierReference'
+                """
+            ).Single();
+
+            return datatype;
+        }
     }
 }
