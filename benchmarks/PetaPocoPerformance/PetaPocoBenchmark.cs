@@ -234,13 +234,13 @@ namespace PetaPocoPerformance
         public (List<StockItem> stockItems, List<StockGroup> stockGroups) D2_ManyToManyRelationship()
         {
             var sqlItems = Sql.Builder
-            .Select("si.*, sg.*")
-            .From("Warehouse.StockItems si")
-            .LeftJoin("Warehouse.StockItemStockGroups sisg")
-            .On("si.StockItemID = sisg.StockItemID")
-            .LeftJoin("Warehouse.StockGroups sg")
-            .On("sisg.StockGroupID = sg.StockGroupID")
-            .OrderBy("si.StockItemID");
+                .Select("si.StockItemID, si.StockItemName, si.SupplierID, si.Brand, si.Size, sg.StockGroupID, sg.StockGroupName")
+                .From("Warehouse.StockItems si")
+                .LeftJoin("Warehouse.StockItemStockGroups sisg")
+                .On("si.StockItemID = sisg.StockItemID")
+                .LeftJoin("Warehouse.StockGroups sg")
+                .On("sisg.StockGroupID = sg.StockGroupID")
+                .OrderBy("si.StockItemID");
 
             var stockItemsById = new Dictionary<int, StockItem>();
 
@@ -263,7 +263,7 @@ namespace PetaPocoPerformance
             var stockItems = stockItemsById.Values.ToList();
 
             var sqlGroups = Sql.Builder
-                .Select("sg.*, si.*")
+                .Select("sg.StockGroupID, sg.StockGroupName, si.StockItemID, si.StockItemName, si.SupplierID, si.Brand, si.Size")
                 .From("Warehouse.StockGroups sg")
                 .LeftJoin("Warehouse.StockItemStockGroups sisg")
                 .On("sg.StockGroupID = sisg.StockGroupID")
@@ -364,7 +364,7 @@ namespace PetaPocoPerformance
                 .Select("*")
                 .From("Application.People")
                 .Where("JSON_VALUE(CustomFields, '$.Title') = @0", "Team Member")
-                .OrderBy("PersonId");
+                .OrderBy("PersonID");
 
             var people = db.Fetch<Person>(sql);
 
@@ -378,7 +378,7 @@ namespace PetaPocoPerformance
                 .Select("*")
                 .From("Application.People")
                 .Where("EXISTS (SELECT 1 FROM OPENJSON(OtherLanguages) WHERE value = @0)", "Slovak")
-                .OrderBy("PersonId");
+                .OrderBy("PersonID");
 
             var people = db.Fetch<Person>(sql);
 

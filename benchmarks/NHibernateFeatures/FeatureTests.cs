@@ -485,13 +485,16 @@ namespace NHibernateFeatures
         {
             using var session = sessionFactory.OpenSession();
 
-            var people = session.CreateSQLQuery(
-                "SELECT PersonID, FullName, PreferredName, EmailAddress, CustomFields, OtherLanguages FROM WideWorldImporters.Application.People WHERE JSON_VALUE(CustomFields, '$.Title') = :title"
-                )
+            var sql = """
+                SELECT PersonID, FullName, PreferredName, EmailAddress, CustomFields, OtherLanguages 
+                FROM WideWorldImporters.Application.People 
+                WHERE JSON_VALUE(CustomFields, '$.Title') = :title
+            """;
+
+            var people = session.CreateSQLQuery(sql)
                 .SetParameter("title", "Team Member")
                 .SetResultTransformer(Transformers.AliasToBean<Person>())
                 .List<Person>();
-
 
             Assert.Equal(13, people.Count);
             Assert.All(people, person => Assert.Equal("Team Member", person.GetCustomFields()?.Title));
@@ -508,9 +511,16 @@ namespace NHibernateFeatures
         {
             using var session = sessionFactory.OpenSession();
 
-            var people = session.CreateSQLQuery(
-                "SELECT PersonID, FullName, PreferredName, EmailAddress, CustomFields, OtherLanguages FROM WideWorldImporters.Application.People WHERE EXISTS ( SELECT 1 FROM OPENJSON(OtherLanguages) WHERE value = :lang)"
+            var sql = """
+                SELECT PersonID, FullName, PreferredName, EmailAddress, CustomFields, OtherLanguages 
+                FROM WideWorldImporters.Application.People 
+                WHERE EXISTS (
+                    SELECT 1 FROM OPENJSON(OtherLanguages) 
+                    WHERE value = :lang
                 )
+            """;
+
+            var people = session.CreateSQLQuery(sql)
                 .SetParameter("lang", "Slovak")
                 .SetResultTransformer(Transformers.AliasToBean<Person>())
                 .List<Person>();

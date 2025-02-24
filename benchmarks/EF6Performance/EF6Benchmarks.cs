@@ -339,8 +339,15 @@ namespace EF6Performance
         {
             using var context = GetContext();
 
+            var sql = """
+                SELECT PersonID, FullName, PreferredName, EmailAddress, CustomFields, OtherLanguages
+                FROM WideWorldImporters.Application.People
+                WHERE JSON_VALUE(CustomFields, '$.Title') = @p0
+                ORDER BY PersonID
+            """;
+
             var people = context.Database.SqlQuery<Person>(
-                "SELECT * FROM WideWorldImporters.Application.People WHERE JSON_VALUE(CustomFields, '$.Title') = @p0",
+                sql,
                 "Team Member"
             ).ToList();
 
@@ -352,8 +359,20 @@ namespace EF6Performance
         {
             using var context = GetContext();
 
+            var sql = """
+                SELECT PersonID, FullName, PreferredName, EmailAddress, CustomFields, OtherLanguages
+                FROM WideWorldImporters.Application.People
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM OPENJSON(OtherLanguages)
+                    WHERE value = @p0
+                )
+            """;
+
             var people = context.Database.SqlQuery<Person>(
-                "SELECT * FROM WideWorldImporters.Application.People WHERE EXISTS ( SELECT 1 FROM OPENJSON(OtherLanguages) WHERE value = @p0)", "Slovak")
+                sql,
+                "Slovak"
+            )
             .ToList();
 
             return people;

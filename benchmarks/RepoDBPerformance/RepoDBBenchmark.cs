@@ -232,10 +232,12 @@ namespace RepoDBPerformance
 
             string sqlItems = """
                 SELECT si.StockItemID,
-                       si.StockItemName,
-                       si.SupplierID,
-                       sg.StockGroupID,
-                       sg.StockGroupName
+                    si.StockItemName,
+                    si.SupplierID,
+                    si.Brand, 
+                    si.Size,
+                    sg.StockGroupID,
+                    sg.StockGroupName
                 FROM WideWorldImporters.Warehouse.StockItems si
                 LEFT JOIN WideWorldImporters.Warehouse.StockItemStockGroups sisg
                     ON si.StockItemID = sisg.StockItemID
@@ -274,10 +276,12 @@ namespace RepoDBPerformance
 
             string sqlGroups = """
                 SELECT sg.StockGroupID,
-                       sg.StockGroupName,
-                       si.StockItemID,
-                       si.StockItemName,
-                       si.SupplierID
+                    sg.StockGroupName,
+                    si.StockItemID,
+                    si.StockItemName,
+                    si.SupplierID,
+                    si.Brand, 
+                    si.Size
                 FROM WideWorldImporters.Warehouse.StockGroups sg
                 LEFT JOIN WideWorldImporters.Warehouse.StockItemStockGroups sisg
                     ON sg.StockGroupID = sisg.StockGroupID
@@ -362,10 +366,10 @@ namespace RepoDBPerformance
         public List<Person> F1_JSONObjectQuery()
         {
             var sql = """
-                SELECT *
+                SELECT PersonID, FullName, PreferredName, EmailAddress, CustomFields, OtherLanguages
                 FROM WideWorldImporters.Application.People
                 WHERE JSON_VALUE(CustomFields, '$.Title') = @Title
-                ORDER BY PersonId
+                ORDER BY PersonID
             """;
 
             var people = connection.ExecuteQuery<Person>(sql, new { Title = "Team Member" }).ToList();
@@ -377,7 +381,7 @@ namespace RepoDBPerformance
         public List<Person> F2_JSONArrayQuery()
         {
             var sql = """
-                SELECT *
+                SELECT PersonID, FullName, PreferredName, EmailAddress, CustomFields, OtherLanguages
                 FROM WideWorldImporters.Application.People
                 WHERE EXISTS (
                     SELECT 1

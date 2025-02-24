@@ -476,8 +476,15 @@ namespace linq2dbFeatures
         {
             using var db = GetConnection();
 
+            var sql = """
+                SELECT PersonID, FullName, PreferredName, EmailAddress, CustomFields, OtherLanguages
+                FROM WideWorldImporters.Application.People
+                WHERE JSON_VALUE(CustomFields, '$.Title') = @Title
+                ORDER BY PersonID
+            """;
+
             var people = db.Query<Person>(
-                "SELECT * FROM WideWorldImporters.Application.People WHERE JSON_VALUE(CustomFields, '$.Title') = @Title",
+                sql,
                 new DataParameter("Title", "Team Member")
             ).ToList();
 
@@ -496,8 +503,18 @@ namespace linq2dbFeatures
         {
             using var db = GetConnection();
 
+            var sql = """
+                SELECT PersonID, FullName, PreferredName, EmailAddress, CustomFields, OtherLanguages
+                FROM WideWorldImporters.Application.People
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM OPENJSON(OtherLanguages)
+                    WHERE value = @Language
+                )
+            """;
+
             var people = db.Query<Person>(
-                "SELECT * FROM WideWorldImporters.Application.People WHERE EXISTS ( SELECT 1 FROM OPENJSON(OtherLanguages) WHERE value = @Language)",
+                sql,
                 new DataParameter("Language", "Slovak")
             ).ToList();
 

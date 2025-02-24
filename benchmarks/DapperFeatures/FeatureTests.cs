@@ -360,7 +360,14 @@ public class FeatureTests
     public void D2_ManyToManyRelationship()
     {
         string sqlItems = """
-            SELECT si.*, sg.*
+            SELECT 
+                si.StockItemID, 
+                si.StockItemName, 
+                si.SupplierID, 
+                si.Brand, 
+                si.Size,
+                sg.StockGroupID, 
+                sg.StockGroupName
             FROM WideWorldImporters.Warehouse.StockItems si
             LEFT JOIN WideWorldImporters.Warehouse.StockItemStockGroups sisg
                 ON si.StockItemID = sisg.StockItemID
@@ -391,7 +398,14 @@ public class FeatureTests
         var stockItems = stockItemsById.Values.ToList();
 
         string sqlGroups = """
-            SELECT sg.*, si.*
+            SELECT
+                sg.StockGroupID, 
+                sg.StockGroupName, 
+                si.StockItemID, 
+                si.StockItemName, 
+                si.SupplierID, 
+                si.Brand, 
+                si.Size
             FROM WideWorldImporters.Warehouse.StockGroups sg
             LEFT JOIN WideWorldImporters.Warehouse.StockItemStockGroups sisg
                 ON sg.StockGroupID = sisg.StockGroupID
@@ -523,11 +537,11 @@ public class FeatureTests
     public void F1_JSONObjectQuery()
     {
         var sql = """
-                SELECT *
-                FROM WideWorldImporters.Application.People
-                WHERE JSON_VALUE(CustomFields, '$.Title') = @Title
-                ORDER BY PersonId
-            """;
+            SELECT PersonID, FullName, PreferredName, EmailAddress, CustomFields, OtherLanguages
+            FROM WideWorldImporters.Application.People
+            WHERE JSON_VALUE(CustomFields, '$.Title') = @Title
+            ORDER BY PersonID
+        """;
 
         var people = connection.Query<Person>(sql, new { Title = "Team Member" }).ToList();
 
@@ -545,14 +559,14 @@ public class FeatureTests
     public void F2_JSONArrayQuery()
     {
         var sql = """
-                SELECT *
-                FROM WideWorldImporters.Application.People
-                WHERE EXISTS (
-                    SELECT 1
-                    FROM OPENJSON(OtherLanguages)
-                    WHERE value = @Language
-                )
-            """;
+            SELECT PersonID, FullName, PreferredName, EmailAddress, CustomFields, OtherLanguages
+            FROM WideWorldImporters.Application.People
+            WHERE EXISTS (
+                SELECT 1
+                FROM OPENJSON(OtherLanguages)
+                WHERE value = @Language
+            )
+        """;
 
         var people = connection.Query<Person>(sql, new { Language = "Slovak" }).ToList();
 
