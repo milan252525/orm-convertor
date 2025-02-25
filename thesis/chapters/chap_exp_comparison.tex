@@ -19,7 +19,7 @@ The database contains four schemas: Application, Purchasing, Sales, Warehouse. F
 
 \section{Setup}
 % database, docker, test project, .net
-TODO Why we chose MSSSQL
+TODO Why we chose MSSQL
 
 \section{Rules/assumptions} % TODO better name
 As for query language, we will opt to use LINQ or any other available query language over raw SQL. 
@@ -32,7 +32,7 @@ Another feature that could affect our results is change tracking.
 For example, EF Core tracks changes made to an entity, so that it can later perform an update. All our tests will only execute read operations, so change tracking would unnecessarily increase measured time or allocated memory.
 
 
-\section{Selected queries}
+\section{Selected queries}\label{sec:selected_queries}
 Our goal is to test the query capabilities as broadly as possible. We want to create queries that use different conditions, result modifications, aggregations, relationships between tables, etc.
 
 Each query type will contain an example of what the query should look like in raw SQL. The example can be used to directly query the test database to preview results. The example might be simplified for this text. Unit tests might use a different query language where available.
@@ -40,7 +40,7 @@ Each query type will contain an example of what the query should look like in ra
 \subsection{A - Entity projection}
 This group will test how well ORM can handle projecting table columns onto a user-defined entity or entities.
 
-\subsubsection*{A1 Entity identical to a table}
+\subsubsection*{A1 Entity identical to a table} \label{query:a1}
 The test will retrieve a table row and map it to an entity with properties identical to table columns. 
 Table \texttt{Purchasing.PurchaseOrders} will be queried and one item retrieved based on its ID.
 
@@ -306,6 +306,18 @@ SELECT SupplierID FROM Purchasing.Suppliers
 ORDER BY SupplierID
 \end{lstlisting}
 
+\subsection{H - Querying metadata}
+In the last section, we will briefly test the ORM framework's ability to query information about the database itself. While not commonly used in applications, such data can be required in specific cases.
+\subsubsection*{H1 Column data type}
+The final query will attempt to retrieve the data type of a table column. All information about the database schema is available through \texttt{INFORMATION\_SCHEMA.COLUMNS} table. The selected column has \texttt{NVARCHAR} type. The table contains more information like nullability, maximum length, etc. But for demonstration purposes, this query should be sufficient.
+
+\begin{lstlisting}[language=SQL]
+SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
+WHERE TABLE_SCHEMA = 'Purchasing'
+    AND TABLE_NAME = 'Suppliers'
+    AND COLUMN_NAME = 'SupplierReference'
+\end{lstlisting}
+
 \section{Summary of the selected queries}
 We tried to pick as broad a selection of features as possible. 
 We certainly did not cover all of them, but our set should be representative enough to give us a fair idea of how different ORMs perform. 
@@ -316,3 +328,111 @@ But we will be able to compare identical test cases across different ORMs.
 
 We can expect to see a difference in time performance between micro frameworks made to be efficient and feature-rich macro frameworks.
 The micro frameworks utilize raw SQL and have very little overhead. When using a macro framework, the LINQ query has to be compiled into SQL. Rich mapping capabilities may also cause significant slowdown. And extra features may even cause higher memory consumption.
+
+\section{Implementation}
+The comparison was implemented in the form of a Visual Studio solution, containing a project folder for each framework. Each project folder contains three projects - entities, feature tests, and performance benchmark. 
+
+
+\usetikzlibrary{positioning, arrows}
+\begin{center}
+\begin{tikzpicture}[
+    node distance=1cm and 2cm,
+    every node/.style={draw, minimum width=1cm, minimum height=1cm, align=center},
+    every path/.style={->, >=stealth},
+    faded/.style={draw=gray, fill=gray!20},
+    faded_arrow/.style={->, >=stealth, draw=gray}
+]
+
+  \node (E) {Entities};
+  \node (C) [right=of E, faded] {Common};
+  \node (FT) [below left=of E] {Feature tests};
+  \node (PB) [below right=of E] {Performance benchmark};
+
+  \draw[thick, ->, >=stealth] (FT) -- (E);
+  \draw[thick, ->, >=stealth] (PB) -- (E);
+  \draw[faded_arrow] (FT) -- (C);
+  \draw[faded_arrow] (PB) -- (C);
+
+\end{tikzpicture}
+\end{center}
+
+Common project is also included. It contains a single class handling loading the database connection string from a configuration file. There is no dependency between feature tests and performance tests. It could be argued that the code for queries could be extracted to a separate class to avoid duplication. But we have kept it duplicated to isolate unit tests from performance benchmarks. This structure is repeated for each of the seven frameworks we are examining. There is again no dependency between the different frameworks for isolation purposes.
+
+\subsection{Entities}
+Set of classes either mirroring a database table or containing a necessary subset of properties. The columns mapped always depend on the test they are being used in. The entities are POCOs (plain old CLR objects). The term is derived from POJO (plain old Java objects). \cite{Fowler2003POJO} It refers to classes that don't inherit from any base class or interface. And they are not tied to any specific framework.
+
+Below is an example of a POCO class for a purchase order. Visibility modifiers and some properties were omitted for readability. 
+
+% TODO Move explanation about what entities are to earlier section/introduction
+
+\begin{lstlisting}[language=CSharp]
+class PurchaseOrder
+{
+    int PurchaseOrderID { get; set; }
+    int SupplierID { get; set; }
+    DateTime OrderDate { get; set; }
+    DateTime? ExpectedDeliveryDate { get; set; }
+    string? Comments { get; set; }
+}
+\end{lstlisting}
+
+Some frameworks like Dapper do not need any entity mapping and simply require the properties to match selected query columns. The purchase order entity could be used to load results of a query, but the query has to return columns with matching names, data types, and nullability.
+
+More complex frameworks that do not just perform read queries need to know how to map an entity to a database table. The corresponding table might not even exist and is generated based on the entity. Such use case is central to domain-driven development\cite{FowlerDDD}.
+
+Entity mapping might be done in multiple ways. The simplest form is no mapping. The framework would then guess table and column names, data types, nullability, etc. from the way an entity is named and declared. Clearly, that lacks details like numeric precision, constraints, and indices.
+Those details could be specified by property and class attributes. That makes them tied to an entity, which could be a problem if we want to isolate the domain model from database access. 
+Mapping through code or a configuration file allows separation and can be more expressive and powerful.
+
+To showcase different approaches to mapping, we have tried to select a different method for each framework test. Mapping is usually compiled on application startup or first query and then cached. So performance should not be affected by a choice of mapping. Dapper does not use any mapping (as it does not support any). PetaPoco and RepoDB use attributes to declare table schema and name, and in some cases column names, the rest is inferred. For those two, mapping abilities are quite limited. LINQ to DB utilizes mapping by code through builder pattern. NHibernate has its proprietary mapping through files in XML format. Both versions of Entity Framework use attribute mapping combined with mapping through code. Their attribute mapping is much more powerful than those of PetaPoco and RepoDB, but in more complex cases, mapping by code has to be supplied.
+
+First listing below shows attribute mapping in EF Core, where attributes are placed directly above classes and properties. In the second one, part of an XML mapping file for the same entity is shown. The verbosity of the mapping is noticeable.
+
+\begin{lstlisting}[language=CSharp,basicstyle=\ttfamily\footnotesize]
+[Table("PurchaseOrders", Schema = "Purchasing")]
+class PurchaseOrder
+{
+    [Key]
+    int PurchaseOrderID { get; set; }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=xml,basicstyle=\ttfamily\footnotesize]
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernateEntities">
+    <class name="NHibernateEntities.PurchaseOrder, NHibernateEntities" table="PurchaseOrders" schema="Purchasing">
+        <id name="PurchaseOrderID" column="PurchaseOrderID" type="int">
+            <generator class="identity" />
+        </id>
+        <property name="SupplierID" not-null="true" />
+        <property name="OrderDate" not-null="true" />
+        ...
+    </class>
+</hibernate-mapping>
+\end{lstlisting}
+
+\subsection{Feature tests}
+
+For each query defined in \autoref{sec:selected_queries}, a unit test in the form of an isolated method was implemented. Connection and other configuration are created outside of the test in a setup part. The method executes the query and correct results are asserted. Assertion checks the amount of results and their order. Each property is tested to contain correct data to ensure mapping was done correctly.
+
+The example below shows Query A1 (\autoref{query:a1}) implemented for Dapper. A single purchase order is retrieved based on its ID, and its properties are checked for correct values. 
+\begin{lstlisting}[language=CSharp]
+[Fact]
+public void A1_EntityIdenticalToTable()
+{
+    var order = connection.QuerySingle<PurchaseOrder>(
+        "SELECT * FROM WideWorldImporters.Purchasing.PurchaseOrders WHERE PurchaseOrderId = @PurchaseOrderId",
+        new { PurchaseOrderId = 25 }
+    );
+
+    Assert.Multiple(() =>
+    {
+        Assert.Equal(25, order.PurchaseOrderID);
+        Assert.Equal(12, order.SupplierID);
+        Assert.Equal(new DateTime(2013, 1, 5), order.OrderDate);
+        ...
+    });
+}
+\end{lstlisting}
+
+\subsection{Performance benchmarks}
