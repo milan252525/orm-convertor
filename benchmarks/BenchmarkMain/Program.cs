@@ -1,4 +1,6 @@
 ﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using DapperPerformance;
@@ -15,14 +17,23 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        var testConfig = DefaultConfig.Instance
-            .AddJob(
-                Job.Default
-                    .WithWarmupCount(3)
-                    .WithIterationCount(10)
-            );
+        var config = DefaultConfig.Instance;
 
-        var defaultConfig = DefaultConfig.Instance;
+        if (false) // TESTING
+        {
+            config = config.AddJob(
+                Job.Default
+                    .WithWarmupCount(1)
+                    .WithIterationCount(3)
+                    .WithEvaluateOverhead(false)
+            );
+        }
+
+        config = config
+            .AddExporter(CsvMeasurementsExporter.Default)
+            .AddExporter(RPlotExporter.Default)
+            .WithOption(ConfigOptions.JoinSummary, true)
+            .AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByMethod);
 
         BenchmarkSwitcher
             .FromTypes([
@@ -34,6 +45,6 @@ internal class Program
                 typeof(EF6Benchmarks),
                 typeof(NHibernateBenchmarks)
             ])
-            .Run(args, testConfig);
+            .Run(args, config);
     }
 }
