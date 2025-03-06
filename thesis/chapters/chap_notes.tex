@@ -1,0 +1,59 @@
+\chapter{Temporary section for notes}
+
+\section{Abstraction}
+\begin{verbatim}
+- entity
+	- name
+	- properties[]
+		- name
+		- data type
+		- is nullable?
+		- is primary key?
+		- constraints[] (maxlength, range, ...)
+	- relationships[]
+		- multiplicity
+		- target entity
+		- navigation property
+	- inheritance?
+- mapping
+	- entity
+	- mapped properties[]
+		- property name
+		- column name
+		- database data type
+		- other details[]
+	- relationship mapping[]
+		- type
+		- target entity
+		- navigation property
+		- join table?
+- query
+	- source (context,session)
+	- result variable
+		- data type
+		- name
+	- select[] (can have complex transformations in linq)
+		- columns
+		- type
+		- name
+	- where[]
+		- expression
+	- joins[]
+		- join type
+		- source entity
+		- target entity
+		- on condition
+	- order by[]
+	- group by[]
+	- having[]
+	- pagination
+		- skip
+		- take
+	- parameters
+		- name
+		- type
+		- value
+	- execution
+		- operator (ToList, First, Single)
+		- default if empty?
+\end{verbatim}

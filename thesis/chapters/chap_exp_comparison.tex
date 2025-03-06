@@ -436,3 +436,134 @@ public void A1_EntityIdenticalToTable()
 \end{lstlisting}
 
 \subsection{Performance benchmarks}
+Feature tests can assert the correctness of returned results and overall functionality. But their execution time can greatly vary. There can be some overhead, coming from test initialization or assertions. The system the benchmarks are running on can also impact results.
+
+To solve these problems we have used BenchmarkDotNet library\cite{BenchmarkDotNet}. It allows writing benchmark methods very similar to unit tests. In fact, they are completely identical to unit tests, the only differences are missing assertions and a different method attribute. It allows us to ``transform methods into benchmarks, track their performance, and share reproducible measurement experiments`` \cite{BenchmarkDotNet}. Work with the library was quite easy, it is very configurable and easy to run. 
+
+
+
+It runs benchmark for each method multiple times. It starts with a few iterations which will not be included in the results. The first few ensure just-in-time compilation has taken effect, then multiple iterations without actually running the method code are started to compile overhead. The overhead is removed from the results, ensuring reliability. 
+
+
+According to BenchmarkDotNet documentation\cite{BenchmarkDotNetHow} a single benchmark run consists of the following stages.
+\begin{itemize}
+    \item OverheadJitting - Measures benchmarking infrastructure compilation.
+    \item WorkloadJitting - Measures benchmark method compilation.
+    \item WorkloadPilot - Selects best iteration count based on heuristics.
+    \item WorkloadWarmup - Runs several iterations before measuring to ensure factors like CPU caching or branch prediction are optimized.
+    \item WorkloadActual - Actual measurements
+    \item WorkloadResult - Result calculated from the actual run without the overhead.
+\end{itemize}
+
+TODO location of results
+
+\section{Results}
+
+\subsection{Features}
+
+\subsection{Performance}
+The final benchmark run was executed on a PC with the highest performance power plan while being constantly plugged in. Screen saving was turned off. The only applications running were those essential to the benchmark (database in Docker container and Visual Studio project). No other work was being done. Data further present are a result of that run and are available as an attachment.
+
+The exact PC and runtime specifications are available below. This information is obtained from the benchmark run log. 
+\begin{lstlisting}
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.22631.4890/23H2/2023Update/SunValley3)
+AMD Ryzen 5 5600H with Radeon Graphics, 1 CPU, 12 logical and 6 physical cores
+.NET SDK 9.0.101
+  [Host]     : .NET 8.0.11 (8.0.1124.51707), X64 RyuJIT AVX2
+  DefaultJob : .NET 8.0.11 (8.0.1124.51707), X64 RyuJIT AVX2
+\end{lstlisting}
+
+\begin{center}
+    \captionof{table}{A1\_EntityIdenticalToTable}
+    \sisetup{table-format=4.1, separate-uncertainty}
+    \begin{tabular}{l S S S S S}
+        \hline
+        ORM & {Mean (\si{\micro\second})} & {Allocated (KB)} & {Gen0} & {Gen1} & {Gen2} \\
+        \hline
+        Dapper    & 750.2  & 6.24  & 0.0    & 0.0    & 0.0    \\
+        PetaPoco  & 721.8  & 7.99  & 0.9766 & 0.0    & 0.0    \\
+        RepoDB    & 747.5  & 8.77  & 0.9766 & 0.9766 & 0.0    \\
+        Linq2db   & 839.2  & 12.74 & 0.9766 & 0.0    & 0.0    \\
+        NHibernate & 742.1 & 36.06 & 3.9063 & 0.0    & 0.0    \\
+        EF6       & 854.1  & 90.43 & 9.7656 & 0.0    & 0.0    \\
+        EFCore    & 809.1  & 14.49 & 0.9766 & 0.0    & 0.0    \\
+        \hline
+    \end{tabular}
+\end{center}
+
+
+\clearpage
+\begin{landscape}
+\begin{table}
+\centering
+\caption{Performance benchmark results - Mean time (\unit{\micro\second})}
+\label{tab:benchmark_results_time}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Namespace &    Dapper &  PetaPoco &    RepoDB &   Linq2db &  NHibernate &        EF6 &     EFCore \\
+\midrule
+A1\_EntityIdenticalToTable        &      750 &      722 &      748 &      839 &        742 &        854 &        809 \\
+A2\_LimitedEntity                 &      718 &      726 &      735 &      858 &        958 &        882 &        799 \\
+A3\_MultipleEntitiesFromOneResult &      736 &      736 &      745 &      898 &      1 001 &        945 &        832 \\
+A4\_StoredProcedureToEntity       &  523 239 &  505 967 &  523 242 &  519 491 &    621 739 &    514 077 &    521 573 \\
+B1\_SelectionOverIndexedColumn    &      744 &      759 &      762 &      868 &        817 &        905 &        806 \\
+B2\_SelectionOverNonIndexedColumn &   43 612 &   41 100 &   43 052 &   43 708 &     86 419 &    125 169 &     48 016 \\
+B3\_RangeQuery                    &   30 393 &   29 935 &   30 746 &   21 909 &     22 289 &     22 823 &     21 102 \\
+B4\_InQuery                       &      856 &      855 &      876 &      954 &        945 &      1 408 &      1 147 \\
+B5\_TextSearch                    &  747 728 &  747 721 &  745 551 &  745 319 &    746 464 &    746 264 &    744 754 \\
+B6\_PagingQuery                   &    1 327 &    1 314 &    1 556 &    1 458 &      1 447 &      1 710 &      1 406 \\
+C1\_AggregationCount              &   35 006 &   35 289 &  377 349 &   35 372 &     35 553 &     35 364 &     35 286 \\
+C2\_AggregationMax                &    1 240 &    1 227 &    1 264 &    1 380 &      1 291 &      1 366 &      1 304 \\
+C3\_AggregationSum                &   86 499 &   85 944 &   86 899 &   86 145 &     75 137 &     69 827 &     87 825 \\
+D1\_OneToManyRelationship         &      781 &      770 &      806 &    2 997 &      1 042 &      1 581 &        895 \\
+D2\_ManyToManyRelationship        &    4 584 &    4 480 &    6 031 &    9 383 &      5 940 &      6 913 &     14 964 \\
+D3\_OptionalRelationship          &  187 693 &  172 030 &  393 631 &   91 326 &    533 489 &  1 993 146 &  2 548 411 \\
+E1\_ColumnSorting                 &    4 725 &    4 622 &    4 963 &    4 845 &      6 316 &      6 204 &      4 885 \\
+E2\_Distinct                      &    2 181 &    2 148 &    2 180 &    2 374 &      2 229 &      2 340 &      2 270 \\
+F1\_JSONObjectQuery               &    1 459 &    1 478 &    1 457 &    1 552 &      1 494 &      1 490 &      1 544 \\
+F2\_JSONArrayQuery                &    1 723 &    1 718 &    1 732 &    1 795 &      1 761 &      1 771 &      1 839 \\
+G1\_Union                         &      728 &      715 &      723 &    1 580 &      1 538 &      1 613 &      1 561 \\
+G2\_Intersection                  &      739 &      718 &      730 &    1 596 &      1 534 &      1 622 &      1 566 \\
+H1\_Metadata                      &      851 &      843 &      844 &      925 &        866 &        899 &        814 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{landscape}
+
+\clearpage
+\begin{landscape}
+\begin{table}
+\centering
+\caption{Performance benchmark results - Allocated memory (KB)}
+\label{tab:benchmark_results_memory}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Namespace &   Dapper & PetaPoco &   RepoDB &  Linq2db & NHibernate &        EF6 &     EFCore \\
+\midrule
+A1\_EntityIdenticalToTable        &      750 &      722 &      748 &      839 &        742 &        854 &        809 \\
+A2\_LimitedEntity                 &      718 &      726 &      735 &      858 &        958 &        882 &        799 \\
+A3\_MultipleEntitiesFromOneResult &      736 &      736 &      745 &      898 &      1 001 &        945 &        832 \\
+A4\_StoredProcedureToEntity       &  523 239 &  505 967 &  523 242 &  519 491 &    621 739 &    514 077 &    521 573 \\
+B1\_SelectionOverIndexedColumn    &      744 &      759 &      762 &      868 &        817 &        905 &        806 \\
+B2\_SelectionOverNonIndexedColumn &   43 612 &   41 100 &   43 052 &   43 708 &     86 419 &    125 169 &     48 016 \\
+B3\_RangeQuery                    &   30 393 &   29 935 &   30 746 &   21 909 &     22 289 &     22 823 &     21 102 \\
+B4\_InQuery                       &      856 &      855 &      876 &      954 &        945 &      1 408 &      1 147 \\
+B5\_TextSearch                    &  747 728 &  747 721 &  745 551 &  745 319 &    746 464 &    746 264 &    744 754 \\
+B6\_PagingQuery                   &    1 327 &    1 314 &    1 556 &    1 458 &      1 447 &      1 710 &      1 406 \\
+C1\_AggregationCount              &   35 006 &   35 289 &  377 349 &   35 372 &     35 553 &     35 364 &     35 286 \\
+C2\_AggregationMax                &    1 240 &    1 227 &    1 264 &    1 380 &      1 291 &      1 366 &      1 304 \\
+C3\_AggregationSum                &   86 499 &   85 944 &   86 899 &   86 145 &     75 137 &     69 827 &     87 825 \\
+D1\_OneToManyRelationship         &      781 &      770 &      806 &    2 997 &      1 042 &      1 581 &        895 \\
+D2\_ManyToManyRelationship        &    4 584 &    4 480 &    6 031 &    9 383 &      5 940 &      6 913 &     14 964 \\
+D3\_OptionalRelationship          &  187 693 &  172 030 &  393 631 &   91 326 &    533 489 &  1 993 146 &  2 548 411 \\
+E1\_ColumnSorting                 &    4 725 &    4 622 &    4 963 &    4 845 &      6 316 &      6 204 &      4 885 \\
+E2\_Distinct                      &    2 181 &    2 148 &    2 180 &    2 374 &      2 229 &      2 340 &      2 270 \\
+F1\_JSONObjectQuery               &    1 459 &    1 478 &    1 457 &    1 552 &      1 494 &      1 490 &      1 544 \\
+F2\_JSONArrayQuery                &    1 723 &    1 718 &    1 732 &    1 795 &      1 761 &      1 771 &      1 839 \\
+G1\_Union                         &      728 &      715 &      723 &    1 580 &      1 538 &      1 613 &      1 561 \\
+G2\_Intersection                  &      739 &      718 &      730 &    1 596 &      1 534 &      1 622 &      1 566 \\
+H1\_Metadata                      &      851 &      843 &      844 &      925 &        866 &        899 &        814 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{landscape}
