@@ -1,44 +1,41 @@
 \chapter{Experimental comparison}
 
-We will perform an experimental comparison of selected ORM frameworks. In the form of unit tests, we will compare query capabilities across all 7 frameworks.
-We not only want to measure performance, but also assure the results are correct.
+This chapter presents an experimental comparison of the 7 selected ORM frameworks. 
+The primary goals are to assert the correctness of results, measure performance, and assess how effectively each framework integrates into the .NET through its supported query language.
 
-For each framework, we will create a set of unit tests performing pre-selected queries. Through these, we will determine if the framework is capable of performing the query. 
+For each framework, we will create a set of unit tests performing pre-selected queries. They should cover different areas of querying through ORMs, such as entity mapping, relationships, result modification, and aggregation.
 
-We will only test read queries. They will provide us with enough information and metrics to compare the ORMs. Other non-read operations can be the subject of future work.
+We will only test read (SELECT) queries. Those cover a sufficiently large area of features and provide us with enough information to get some insight on capabilities and performance. Other non-read operations, including insert, update, and delete queries, could be explored in future work.
 
-\section{Dataset}
+\section{Dataset}\label{sec:dataset}
 % https://learn.microsoft.com/en-us/sql/samples/wide-world-importers-what-is?view=sql-server-ver16
-To adequately test performance, we need a sufficiently large data set. Microsoft offers some pre-made open source datasets.
+To adequately test performance, we need a sufficiently large data set. Microsoft offers pre-made open source datasets.
 For this comparison, the Wide World Importers sample database \cite{microsoftWWI} has been selected.
+It contains a diverse set of fictional data about a company Wide World Importers described as ``wholesale novelty goods importer and distributor operating from the San Francisco bay area.``\cite{microsoftWWI}
 
-The data set is fictional and does not correspond to a real company. The company description is as follows: ``Wide World Importers (WWI) is a wholesale novelty goods importer and distributor operating from the San Francisco bay area.``\cite{microsoftWWI}
-
-The database contains four schemas: Application, Purchasing, Sales, Warehouse. For each query, we will select a suitable table and its columns that can best showcase the desired feature.
+The database contains over thirty tables split into four schemas: Application, Purchasing, Sales, Warehouse. For each query, we will select a suitable table and columns that can best showcase the desired feature.
 
 \section{Database}\label{sec:database}
 % database, docker, test project, .net
-The dataset is made for Microsoft SQL Server (MS SQL). It is the third most popular database management system as of March 2025 according to DB-Engines Ranking\cite{DBEngines2025Ranking}. With a score of 788.14, it is behind Oracle (1253.08) and MySQL (988.13). The score takes into account number of mentions on websites, frequency of technical discussions, number of job offers mentioning the system, relevance in social networks and other parameters.\cite{DBEnginesRankingMetrics} 
+The dataset is made for Microsoft SQL Server (MSSQL). It is the third most popular database management system as of March 2025 according to DB-Engines Ranking\cite{DBEngines2025Ranking}. With a score of 788.14, it is behind Oracle (1253.08) and MySQL (988.13). The score takes into account number of mentions on websites, frequency of technical discussions, number of job offers mentioning the system, relevance in social networks and other parameters.\cite{DBEnginesRankingMetrics} 
 Microsoft SQL Server is commonly used in .NET applications with EF Core ORM as the three products are all developed by Microsoft.  
 
-Unit tests should be easy to set up and run. Configuring a database can turn into a complicated task. We will create a Docker container running MSSQL. The dataset will be loaded on startup. Execution of unit tests will be just a matter of starting the Docker container and running the \texttt{dotnet test} command (or alternatively using Visual Studio). 
+Unit tests should be easy to set up and run. Configuring a database can turn into a complicated task. We will create a Docker container running MSSQL. The dataset will be loaded on startup. Execution of unit tests will be just a matter of starting the Docker container and running the \texttt{dotnet test} command (or alternatively using Visual Studio Test Explorer). 
 
 \section{Testing approach}\label{sec:testing_approach}
-As for query language, we will opt to use LINQ or any other available query language over raw SQL. 
-If no such query language is available, we will opt to use raw SQL. 
+We will prefer to use LINQ where possible as it is tightly integrated into the .NET environment. 
+If LINQ integration is not available, we will use any suitable alternative. And if there are no other possibilities, we will default to raw SQL queries. 
 
-For mapping database tables to entities, we will try using different methods to show the variety. 
-As we have already seen, there are different approaches like attributes, fluent mapping by code or configuration files. 
+There are multiple different methods for mapping database tables to entities. We will be using different methods to show the variety and their impact or trade-offs. 
 
 If ORM supports caching entities, we will disable it so that our benchmarks are not affected. 
-Another feature that could affect our results is change tracking. 
-For example, EF Core tracks changes made to an entity, so that it can later perform an update. All our tests will only execute read operations, so change tracking would unnecessarily increase measured time or allocated memory.
+A feature related to caching is change tracking. For example, EF Core tracks changes made to an entity, so that it can later perform an update. All our tests will only execute read operations. Change tracking would unnecessarily increase measured time or allocated memory, so we will disable it.
 
-Logging will be turned off for performance tests. It can be advantageous to see generated SQL queries. So where possible, we will enable SQL logging into test output window where possible.
+Logging will be turned off for performance tests. In feature tests, we might want to compare generated SQL. So, we will enable SQL logging into the test output window where possible.
 
 
 \section{Selected queries}\label{sec:selected_queries}
-Our goal is to test the query capabilities as broadly as possible. We want to create queries that use different conditions, result modifications, aggregations, relationships between tables, etc.
+Our goal is to test the query capabilities as broadly as possible. We want to create queries that use different conditions, result modifications, aggregations, relationships between tables, etc. The queries are grouped into categories A-H by the type of features they test.
 
 Each query type will contain an example of what the query should look like in raw SQL. The example can be used to directly query the test database to preview results. The example might be simplified for this text. Unit tests might use a different query language where available.
 
@@ -515,6 +512,45 @@ Notable result files include:
 \section{Results}
 
 \subsection{Features}
+
+
+\clearpage
+\begin{landscape}
+%If the table is too wide, replace \begin{table}[!htp]...\end{table} with
+%\begin{adjustwidth}{-2.5 cm}{-2.5 cm}\centering\begin{threeparttable}[!htb]...\end{threeparttable}\end{adjustwidth}
+\begin{adjustwidth}{-2.5 cm}{-2.5 cm}\centering\begin{threeparttable}[!htb]
+\caption{Feature comparison}\label{tab:feature_comp }
+\scriptsize
+\begin{tabular}{lrrrrrrrr}\toprule
+Benchmark Name &Dapper &PetaPoco &RepoDB &linq2db &NHibernate &EF6 &EF Core \\\midrule
+A1\_EntityIdenticalToTable &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+A2\_LimitedEntity &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+A3\_MultipleEntitiesFromOneResult &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+A4\_StoredProcedureToEntity &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{ea9999}N error &\cellcolor[HTML]{ea9999}N error2 &Y raw SQL \\
+B1\_SelectionOverIndexedColumn &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+B2\_SelectionOverNonIndexedColumn &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+B3\_RangeQuery &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+B4\_InQuery &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+B5\_TextSearch &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+B6\_PagingQuery &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+C1\_AggregationCount &Y raw SQL &Y raw SQL &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+C2\_AggregationMax &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+C3\_AggregationSum &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+D1\_OneToManyRelationship &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping \\
+D2\_ManyToManyRelationship &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping, join entity &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping \\
+D3\_OptionalRelationship &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping \\
+E1\_ColumnSorting &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+E2\_Distinct &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+F1\_NestedJSONQuery &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N custom converter &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+F2\_JSONArrayQuery &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N custom converter &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+G1\_Union &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+G2\_Intersection &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+H1\_Metadata &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}\end{adjustwidth}
+\end{landscape}
+
 
 \subsection{Performance}
 The final benchmark run was executed on a PC with the highest performance power plan while being constantly plugged in. Screen saving was turned off. The only applications running were those essential to the benchmark (database in Docker container and Visual Studio project). No other work was being done. Data further present are a result of that run and are available as an attachment.

@@ -94,6 +94,11 @@
 \usepackage{pdflscape}
 \usepackage{adjustbox}
 
+\usepackage{booktabs, multirow} % for borders and merged ranges
+\usepackage{soul}% for underlines
+\usepackage{xcolor,colortbl} % for cell colors
+\usepackage{changepage,threeparttable} % for wide tables
+
 % You might want to use cleveref for references
 % \usepackage{cleveref}
 
@@ -136,8 +141,9 @@
 %%% Each chapter is kept in a separate file
 \include{preface}
 
+\include{chapters/chap_feat_comp}
 \include{chapters/chap_exp_comparison}
-\include{thesis/chapters/chap_notes}
+\include{chapters/chap_notes}
 
 \include{epilog}
 
