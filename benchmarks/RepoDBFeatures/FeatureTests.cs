@@ -23,7 +23,7 @@ namespace RepoDBFeatures
             .UseSqlServer();
         }
 
-        [Fact]
+        [Fact] 
         public void A1_EntityIdenticalToTable()
         {
             var order = connection.Query<PurchaseOrder>(po => po.PurchaseOrderID == 25).Single();

@@ -19,8 +19,9 @@ internal class Program
     {
         var config = DefaultConfig.Instance;
 
-        if (false) // TESTING
+        if (args.Contains("--testb") || false) // TESTING change to true
         {
+            Console.WriteLine("HELLO");
             config = config.AddJob(
                 Job.Default
                     .WithWarmupCount(1)
