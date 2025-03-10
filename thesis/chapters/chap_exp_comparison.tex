@@ -1,10 +1,9 @@
 \chapter{Experimental comparison}
 
 We will perform an experimental comparison of selected ORM frameworks. In the form of unit tests, we will compare query capabilities across all 7 frameworks.
+We not only want to measure performance, but also assure the results are correct.
 
-For each framework, we will create a set of unit tests performing pre-selected queries. Through these we will determine if the framework is capable of performing the query. 
-
-
+For each framework, we will create a set of unit tests performing pre-selected queries. Through these, we will determine if the framework is capable of performing the query. 
 
 We will only test read queries. They will provide us with enough information and metrics to compare the ORMs. Other non-read operations can be the subject of future work.
 
@@ -17,12 +16,16 @@ The data set is fictional and does not correspond to a real company. The company
 
 The database contains four schemas: Application, Purchasing, Sales, Warehouse. For each query, we will select a suitable table and its columns that can best showcase the desired feature.
 
-\section{Setup}
+\section{Database}\label{sec:database}
 % database, docker, test project, .net
-TODO Why we chose MSSQL
+The dataset is made for Microsoft SQL Server (MS SQL). It is the third most popular database management system as of March 2025 according to DB-Engines Ranking\cite{DBEngines2025Ranking}. With a score of 788.14, it is behind Oracle (1253.08) and MySQL (988.13). The score takes into account number of mentions on websites, frequency of technical discussions, number of job offers mentioning the system, relevance in social networks and other parameters.\cite{DBEnginesRankingMetrics} 
+Microsoft SQL Server is commonly used in .NET applications with EF Core ORM as the three products are all developed by Microsoft.  
 
-\section{Rules/assumptions} % TODO better name
+Unit tests should be easy to set up and run. Configuring a database can turn into a complicated task. We will create a Docker container running MSSQL. The dataset will be loaded on startup. Execution of unit tests will be just a matter of starting the Docker container and running the \texttt{dotnet test} command (or alternatively using Visual Studio). 
+
+\section{Testing approach}\label{sec:testing_approach}
 As for query language, we will opt to use LINQ or any other available query language over raw SQL. 
+If no such query language is available, we will opt to use raw SQL. 
 
 For mapping database tables to entities, we will try using different methods to show the variety. 
 As we have already seen, there are different approaches like attributes, fluent mapping by code or configuration files. 
@@ -30,6 +33,8 @@ As we have already seen, there are different approaches like attributes, fluent 
 If ORM supports caching entities, we will disable it so that our benchmarks are not affected. 
 Another feature that could affect our results is change tracking. 
 For example, EF Core tracks changes made to an entity, so that it can later perform an update. All our tests will only execute read operations, so change tracking would unnecessarily increase measured time or allocated memory.
+
+Logging will be turned off for performance tests. It can be advantageous to see generated SQL queries. So where possible, we will enable SQL logging into test output window where possible.
 
 
 \section{Selected queries}\label{sec:selected_queries}
@@ -358,6 +363,30 @@ The comparison was implemented in the form of a Visual Studio solution, containi
 
 Common project is also included. It contains a single class handling loading the database connection string from a configuration file. There is no dependency between feature tests and performance tests. It could be argued that the code for queries could be extracted to a separate class to avoid duplication. But we have kept it duplicated to isolate unit tests from performance benchmarks. This structure is repeated for each of the seven frameworks we are examining. There is again no dependency between the different frameworks for isolation purposes.
 
+\subsection{Technology overview}
+As we have decided before implementation in \autoref{sec:database}, we are using Microsoft SQL Server database with World Wide Importers data set. The database is running in a Docker container. Base image used is \texttt{mssql/server:2022-latest}\cite{mssqlDocker} provided by Microsoft. The image imports our dataset and waits until it is ready.
+
+The .NET tests are structured in .NET projects grouped in one solution. .NET version 8 was chosen as it is the latest LTS (long term support) version at the time of writing.\cite{netversions} Tests were developed and run using Microsoft Visual Studio 2022, but \texttt{dotnet} CLI commands will be provided as well.
+
+\subsection{Installation instructions}
+The container was tested both in Docker and Podman. A Dockerfile is provided in benchmarks/Dockerfile. Container image can be built and started using the two commands below. Replace `docker` with `podman` if needed. The database will be exposed on port 1444, under username SA and password \texttt{Testingorms123}.
+The third command can be used to test connection. The sqlcmd utility is available only if you have MSSQL installed locally. Otherwise, use any database management tool of your choice.
+
+\begin{lstlisting}[language=sh]
+docker build -t orm-comparison .
+
+docker run -d --name orm-comparison -p 1444:1433 orm-comparison
+
+sqlcmd -S 127.0.0.1,1444 -U SA -P Testingorms123 -Q "SELECT * FROM [WideWorldImporters].[Purchasing].[PurchaseOrders]"
+\end{lstlisting}
+
+To run feature unit tests, build the project in Visual Studio and then use the Test Explorer window to select and run specific tests. Alternatively, navigate to the folder with solution file and run \lstinline{dotnet test}. This will build the project, find all tests, and run them. 
+
+To run performance benchmarks, set \texttt{BenchmarkMain} as a startup project. Right-click it in the Solution Explorer window and choose `Set as Startup project`. Make sure configuration is set to Release, not Debug. Then start the project without debugging (CTRL + F5 keys). A console window will appear. It contains instructions on how to target specific benchmarks. To run all, type in asterisk (*) and press enter. This will trigger full run, which takes approximately one hour to finish. You can switch to test configuration which does only a few number of iterations in \texttt{BenchmarkMain/Program.cs} file. What the configuration does is further explained in following sections. 
+
+Console command for running benchmarks is \lstinline{dotnet run --configuration Release --project BenchmarkMain\BenchmarkMain.csproj}. To run with shorter test configuration append \lstinline{-- --testb} at the end of the command.
+
+
 \subsection{Entities}
 Set of classes either mirroring a database table or containing a necessary subset of properties. The columns mapped always depend on the test they are being used in. The entities are POCOs (plain old CLR objects). The term is derived from POJO (plain old Java objects). \cite{Fowler2003POJO} It refers to classes that don't inherit from any base class or interface. And they are not tied to any specific framework.
 
@@ -435,12 +464,13 @@ public void A1_EntityIdenticalToTable()
 }
 \end{lstlisting}
 
+As decided in \autoref{sec:testing_approach} we have attempted to use LINQ query language. Where not supported we have used any available alternative that did not involve just writing raw SQL. And finally, where nothing else was possible we have used the raw alternative to have a passing test.  
+%TODO mention the table that will have feature comparison
+
 \subsection{Performance benchmarks}
 Feature tests can assert the correctness of returned results and overall functionality. But their execution time can greatly vary. There can be some overhead, coming from test initialization or assertions. The system the benchmarks are running on can also impact results.
 
 To solve these problems we have used BenchmarkDotNet library\cite{BenchmarkDotNet}. It allows writing benchmark methods very similar to unit tests. In fact, they are completely identical to unit tests, the only differences are missing assertions and a different method attribute. It allows us to ``transform methods into benchmarks, track their performance, and share reproducible measurement experiments`` \cite{BenchmarkDotNet}. Work with the library was quite easy, it is very configurable and easy to run. 
-
-
 
 It runs benchmark for each method multiple times. It starts with a few iterations which will not be included in the results. The first few ensure just-in-time compilation has taken effect, then multiple iterations without actually running the method code are started to compile overhead. The overhead is removed from the results, ensuring reliability. 
 
@@ -455,7 +485,32 @@ According to BenchmarkDotNet documentation\cite{BenchmarkDotNetHow} a single ben
     \item WorkloadResult - Result calculated from the actual run without the overhead.
 \end{itemize}
 
-TODO location of results
+After the benchmark run finishes, results and run log can be found in:
+
+\smallskip
+\noindent\path{benchmarks/BenchmarkMain/bin/Release/net8.0/BenchmarkDotNet.Artifacts}
+
+\smallskip
+The referenced run results are copied to:
+
+\smallskip
+\noindent\path{benchmarks/results/joined}
+
+\smallskip
+Notable result files include:
+\begin{itemize}
+    \item \path{BenchmarkRun-joined-2025-03-06-16-10-18-report.csv}\\
+    Measurements of all benchmarks in CSV format.
+
+    \item \path{BenchmarkRun-joined-2025-03-06-16-10-18-report.html}\\
+    Summary table of all benchmarks (HTML format).
+
+    \item \path{BenchmarkRun-joined-2025-03-06-16-10-18-report-github.md}\\
+    Summary table of all benchmarks (Markdown format suitable for GitHub).
+
+    \item \path{BenchmarkRun-joined-2025-03-06-16-10-18-measurements.csv}\\
+    Detailed measurements of every single iteration of each benchmark.
+\end{itemize}
 
 \section{Results}
 
