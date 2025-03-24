@@ -150,6 +150,13 @@ namespace NHibernateFeatures
 
             // Can't map to entity directly, NHibernate throws internal error
             // It can't process the spaces in column names
+
+            // var orders = session.GetNamedQuery("GetOrderUpdates")
+            //     .SetDateTime("from", from)
+            //     .SetDateTime("to", to)
+            //     .SetResultTransformer(NHibernate.Transform.Transformers.AliasToBean<PurchaseOrderUpdate>())
+            //     .List<PurchaseOrderUpdate>();
+
             var orders = session.GetNamedQuery("GetOrderUpdates")
                 .SetDateTime("from", from)
                 .SetDateTime("to", to)
