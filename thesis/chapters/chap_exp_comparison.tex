@@ -51,7 +51,7 @@ SELECT * FROM Purchasing.PurchaseOrders
 WHERE PurchaseOrderId = 25
 \end{lstlisting}
 
-\subsubsection*{A2 Limited entity}
+\subsubsection*{A2 Limited entity} \label{query:a2}
 The resulting entity will have less properties than table columns. Only the data we really need should be transferred. 
 Table \texttt{Purchasing.Suppliers} will be queried and only columns related to supplier's contact info will be retrieved.
 
@@ -61,7 +61,7 @@ FROM Purchasing.Suppliers
 WHERE SupplierID = 10
 \end{lstlisting}
 
-\subsubsection*{A3 Multiple entities from one table}
+\subsubsection*{A3 Multiple entities from one table} \label{query:a3}
 One table will be queried and the result will be divided into two different entities. 
 Table \texttt{Purchasing.Suppliers} will be used again, from which we will retrieve contact information and bank account information into two separate entities. 
 
@@ -73,7 +73,7 @@ FROM Purchasing.Suppliers
 WHERE SupplierID = 10
 \end{lstlisting}
 
-\subsubsection*{A4 Stored procedure result into entity}
+\subsubsection*{A4 Stored procedure result into entity} \label{query:a4}
 This query will execute a stored procedure, limited by parameters, and load the result into an entity.
 The executed stored procedure will be \texttt{Integration.GetOrderUpdates} with parameters LastCutoff and NewCutoff. 
 We will limit the cut-off to a one-year range from 2014 to 2015. 66741 order updates should be returned.
@@ -85,21 +85,21 @@ EXEC WideWorldImporters.Integration.GetOrderUpdates
 @LastCutoff = '2014-01-01', @NewCutoff = '2015-01-01'
 \end{lstlisting}
 
-% \paragraph{} % TODO ASK - jak tady vrátit tenhle text zpět 
+% \paragraph{} % - jak tady vrátit tenhle text zpět 
 \subsubsection*{A Summary}
 Queries \textbf{A1}, \textbf{A2}, and \textbf{A3} will fetch one row based on its ID. The measured time and memory allocation will then show the overhead of the ORM framework when mapping data to the resulting entities. Query \textbf{A4} returns a large number of results, so it is a first query that shows us the performance with high-volume data.
 
 \subsection{B - Selection}
 Probably the most common query operation is limiting results based on a condition. This set of queries will query table \texttt{Sales.OrderLines} with varied conditions.
 
-\subsubsection*{B1 Selection over indexed column}
+\subsubsection*{B1 Selection over indexed column} \label{query:b1}
 The query will retrieve one order line based on the ID of its order. The ID is foreign key with an index built over it.
 
 \begin{lstlisting}[language=SQL]
 SELECT * FROM Sales.OrderLines WHERE OrderID = 26866
 \end{lstlisting}
 
-\subsubsection*{B2 Selection over non-indexed column}
+\subsubsection*{B2 Selection over non-indexed column} \label{query:b2}
 Unlike the first query, this one will fetch order lines filtered by a column without an index. The column that we will filter over will be unit price of the order line.
 It is worth noting that it should not be relevant if a column is indexed or not for ORM comparison. Because all the queries will be performed over the same database system. We include both queries in case an interesting result appears.
 
@@ -107,7 +107,7 @@ It is worth noting that it should not be relevant if a column is indexed or not 
 SELECT * FROM Sales.OrderLines WHERE UnitPrice = 25
 \end{lstlisting}
 
-\subsubsection*{B3 Range query}
+\subsubsection*{B3 Range query} \label{query:b3}
 The previous queries filtered based on a single value, but a range of values is often desirable as well.
 This query will select a subset of order lines with a column \texttt{PickingCompletedWhen} within a selected date range.
 
@@ -117,7 +117,7 @@ WHERE PickingCompletedWhen
 BETWEEN '2014-12-20' AND '2014-12-31'
 \end{lstlisting}
 
-\subsubsection*{B4 In query}
+\subsubsection*{B4 In query} \label{query:b4}
 When a range is not sufficient and we want specific values not fitting into an interval, we can provide a collection of values.
 This query will return order lines belonging to orders with IDs 1, 10, 100, 1000, and 10000.
 
@@ -126,7 +126,7 @@ SELECT * FROM Sales.OrderLines
 WHERE OrderID IN (1, 10, 100, 1000, 10000)
 \end{lstlisting}
 
-\subsubsection*{B5 Text search}
+\subsubsection*{B5 Text search} \label{query:b5}
 This query will test a text search, looking for any order lines with description containing the word ``C++``.  The column does not have a full text search or any other index.
 
 \begin{lstlisting}[language=SQL]
@@ -134,7 +134,7 @@ SELECT * FROM Sales.OrderLines
 WHERE Description LIKE '%C++%'
 \end{lstlisting}
 
-\subsubsection*{B6 Paging}
+\subsubsection*{B6 Paging} \label{query:b6}
 When filtering with a broad condition, a large amount of data might be returned. So we may opt to receive the data in batches. Another use case might be a paged table displayed to a user. For these a paging query with skip and take might be useful.
 This query will fetch all order lines ordered by ID, but will skip first 1000 and take only next 50.
 
@@ -144,10 +144,10 @@ ORDER BY OrderLineID
 OFFSET 1000 ROWS FETCH NEXT 50 ROWS ONLY
 \end{lstlisting}
 
-\subsection{C - Aggregation}
+\subsection{C - Aggregation} \label{query:}
 Aggregation functions are often used when performing calculations on data. We will test a select few.
 
-\subsubsection*{C1 Count}
+\subsubsection*{C1 Count} \label{query:c1}
 Count is very useful when we need to know the number of records that correspond to a specific condition. We will combine it with \texttt{GROUP BY} clause to retrieve distinct tax rates and the number of their occurrence.
 
 \begin{lstlisting}[language=SQL]
@@ -157,14 +157,14 @@ GROUP BY TaxRate
 ORDER BY Count DESC
 \end{lstlisting}
 
-\subsubsection*{C2 Max}
+\subsubsection*{C2 Max}  \label{query:c2}
 Maximum and minimum are also commonly used. We will attempt to retrieve the maximum unit price for all order lines.
 
 \begin{lstlisting}[language=SQL]
 SELECT MAX(UnitPrice) FROM Sales.OrderLines
 \end{lstlisting}
 
-\subsubsection*{C3 Sum}
+\subsubsection*{C3 Sum} \label{query:c3}
 Aggregation functions also allow performing operations. In this test, we will combine the \texttt{SUM} function with a multiplication inside. The result will be the total price across all order lines.
 \begin{lstlisting}[language=SQL]
 SELECT SUM(Quantity * UnitPrice) FROM Sales.OrderLines
@@ -179,7 +179,7 @@ Our test data contain no one to one relation. There should be a small difference
 Some ORMs support lazy loading. That means loading entities in a relation only after accessing the corresponding collection. That would result in more queries being sent and a potential slowdown.
 We will prevent this by setting the loading strategy to eager when possible.
 
-\subsubsection*{D1 One to many}
+\subsubsection*{D1 One to many} \label{query:d1}
 In one to many relation we have one parent and multiple children. A parent entity should have a collection containing its children. Optionally, a child entity can have a reference to its parent.
 In this test, we will use the relation between order and its order lines. We will fetch one specific order along with all its lines.
 
@@ -193,7 +193,7 @@ LEFT JOIN Sales.OrderLines ol ON ol.OrderID = o.OrderID
 WHERE o.OrderID = 530
 \end{lstlisting}
 
-\subsubsection*{D2 Many to many}
+\subsubsection*{D2 Many to many} \label{query:d2}
 In many to many relation, both sides can be connected with multiple entities of the same type. Therefore, it will be represented by a collection on both sides. The collection can contain the entity directly, which makes it easier for developers to work with. If necessary, it can contain entities that represent the join table for this relationship.
 
 This test will consist of two queries. We want to test accessing the relationship from both sides. The first query will fetch stock items with their stock groups. And the other one stock groups with their stock items.
@@ -217,7 +217,7 @@ ORDER BY si.StockItemID
 \end{lstlisting}
 The queries utilise left join, so we will get all stock items, even if they belong to no stock groups. And vice versa for the other query.
 
-\subsubsection*{D3 One to many with optional relation}
+\subsubsection*{D3 One to many with optional relation} \label{query:d3}
 In the D1 test case, the one to many relation was not optional. Each order has at least one order line. In the D2 test case, each item belonged to at least one category as well.
 This test case will utilize an optional one to many relation between a customer and a transaction. 
 
@@ -231,7 +231,7 @@ ORDER BY c.CustomerID
 \subsection{E - Result modification}
 This category will test modifying the result set. We will test sorting by a column and filtering distinct result values.
 
-\subsubsection*{E1 Column sorting}
+\subsubsection*{E1 Column sorting} \label{query:e1}
 Although we have used sorting to order the results of some previous tests to get deterministic results, this test will focus solely on sorting.
 We will sort all purchase orders by their expected delivery date and retrieve only the first one thousand.
 
@@ -240,7 +240,7 @@ SELECT TOP (1000) * FROM Purchasing.PurchaseOrders
 ORDER BY ExpectedDeliveryDate ASC
 \end{lstlisting}
 
-\subsubsection*{E2 Distinct results}
+\subsubsection*{E2 Distinct results} \label{query:e2}
 To test fetching only unique values, we will request all supplier references from purchase orders.
 
 \begin{lstlisting}[language=SQL]
@@ -254,7 +254,7 @@ Table \texttt{Application.People} contains text columns storing JSON values.
 
 During the static comparison, we found that none of the selected ORMs supports XML or any other data format. So we will not be testing for those.
 
-\subsubsection*{F1 JSON object query}
+\subsubsection*{F1 JSON object query} \label{query:f1}
 
 Column \texttt{CustomFields} contains a JSON with many different values. In this test we will focus on property \texttt{Title}. We will query all people with a title set to ``Team Member``.
 We will accomplish that using the \texttt{JSON\_VALUE} SQL function.
@@ -265,7 +265,7 @@ WHERE JSON_VALUE(CustomFields, '$.Title') = 'Team Member'
 ORDER BY PersonId
 \end{lstlisting}
 
-\subsubsection*{F2 JSON array query}
+\subsubsection*{F2 JSON array query} \label{query:f2}
 
 The first case covered querying a JSON object. This one will test querying inside a JSON array. Column \texttt{OtherLanguages} contains a JSON array containing language names.
 
@@ -282,7 +282,7 @@ WHERE EXISTS (
 
 In the last group we will test common set operations. Those are useful when having to combine two sets of data.
 
-\subsubsection*{G1 Union}
+\subsubsection*{G1 Union} \label{query:g1}
 
 Union will combine results from both queries. In this test, we will combine results from two different intervals of IDs and ensure that they are all present in the result.
 
@@ -295,7 +295,7 @@ SELECT SupplierID FROM Purchasing.Suppliers
 ORDER BY SupplierID
 \end{lstlisting}
 
-\subsubsection*{G2 Intersection}
+\subsubsection*{G2 Intersection} \label{query:g2}
 
 Intersection will include results that appear in both of the queries. We will try combining supplier IDs in two overlapping intervals and assert that only the overlap is included. 
 
@@ -310,7 +310,8 @@ ORDER BY SupplierID
 
 \subsection{H - Querying metadata}
 In the last section, we will briefly test the ORM framework's ability to query information about the database itself. While not commonly used in applications, such data can be required in specific cases.
-\subsubsection*{H1 Column data type}
+
+\subsubsection*{H1 Column data type} \label{query:h1}
 The final query will attempt to retrieve the data type of a table column. All information about the database schema is available through \texttt{INFORMATION\_SCHEMA.COLUMNS} table. The selected column has \texttt{NVARCHAR} type. The table contains more information like nullability, maximum length, etc. But for demonstration purposes, this query should be sufficient.
 
 \begin{lstlisting}[language=SQL]
@@ -510,52 +511,29 @@ Notable result files include:
 \end{itemize}
 
 \section{Results}
+Results are accompanied by tables showing results across all test cases. 
 
-\subsection{Features}
+\autoref{tab:feature_comp} showcases feature test results. The base part of the result shows if the query could be expressed in the framework, Y means yes and N means no. Further detail is then clarified. The categories for successful results are, sorted from the most ideal to the least:
+\begin{itemize}
+    \item \textbf{Y LINQ} - The query could be written in LINQ with no issue.
+    \item \textbf{Y lambda expr.} - The query could be written with a lambda expression. Similar to LINQ but can express less.
+    \item \textbf{Y raw SQL} - No statically typed language feature could be used and the query had to be written in SQL. Either in string or using SQL builder.
+    \item \textbf{N manually in memory} - A different or limited query had to be used and the result had to be modified or computed in memory.
+    \item \textbf{N custom JSON parsing/converter} - JSON could not be queried directly.
+    \item \textbf{N error} - The query threw an exception and it was not possible to fix. 
+\end{itemize}
+The negative results are further described in the text.
 
+\autoref{tab:benchmark_results_time} shows measured benchmark time in microseconds (one millionth of a second). And \autoref{tab:benchmark_results_memory} shows allocated memory during the run of the benchmark method.
 
-\clearpage
-\begin{landscape}
-%If the table is too wide, replace \begin{table}[!htp]...\end{table} with
-%\begin{adjustwidth}{-2.5 cm}{-2.5 cm}\centering\begin{threeparttable}[!htb]...\end{threeparttable}\end{adjustwidth}
-\begin{adjustwidth}{-2.5 cm}{-2.5 cm}\centering\begin{threeparttable}[!htb]
-\caption{Feature comparison}\label{tab:feature_comp }
-\scriptsize
-\begin{tabular}{lrrrrrrrr}\toprule
-Benchmark Name &Dapper &PetaPoco &RepoDB &linq2db &NHibernate &EF6 &EF Core \\\midrule
-A1\_EntityIdenticalToTable &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-A2\_LimitedEntity &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-A3\_MultipleEntitiesFromOneResult &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-A4\_StoredProcedureToEntity &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{ea9999}N error &\cellcolor[HTML]{ea9999}N error2 &Y raw SQL \\
-B1\_SelectionOverIndexedColumn &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-B2\_SelectionOverNonIndexedColumn &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-B3\_RangeQuery &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-B4\_InQuery &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-B5\_TextSearch &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-B6\_PagingQuery &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-C1\_AggregationCount &Y raw SQL &Y raw SQL &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-C2\_AggregationMax &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-C3\_AggregationSum &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-D1\_OneToManyRelationship &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping \\
-D2\_ManyToManyRelationship &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping, join entity &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping \\
-D3\_OptionalRelationship &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping \\
-E1\_ColumnSorting &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expression &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-E2\_Distinct &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-F1\_NestedJSONQuery &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N custom converter &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-F2\_JSONArrayQuery &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N custom converter &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{f4cccc}N + custom JSON parsing &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-G1\_Union &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-G2\_Intersection &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
-H1\_Metadata &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL \\
-\bottomrule
-\end{tabular}
-\end{threeparttable}\end{adjustwidth}
-\end{landscape}
+Performance tests have to be considered in the context of the feature test results. It was not possible to always write the test in the same way across all frameworks. In a few cases, it was not possible to do the query using the framework at all. In those cases, to have a passing test, pure ADO.NET query was used. 
 
+In some cases it was not possible to get the desired result purely as a result of a query. Some relations or calculations had to be done in memory. That, of course, majorly affects measured memory consumption. Such anomalies will always be described in the corresponding test results.
 
-\subsection{Performance}
-The final benchmark run was executed on a PC with the highest performance power plan while being constantly plugged in. Screen saving was turned off. The only applications running were those essential to the benchmark (database in Docker container and Visual Studio project). No other work was being done. Data further present are a result of that run and are available as an attachment.
+\subsection{Benchmark execution}
+The final performance benchmark run was executed on a PC with the highest performance power plan while being constantly plugged in. Screen saving was turned off. The only applications running were those essential to the benchmark (database in Docker container and Visual Studio project). No other work was being done. Data further present are a result of that run and are available as an attachment.
 
-The exact PC and runtime specifications are available below. This information is obtained from the benchmark run log. 
+The exact PC and runtime specifications are available below. This information is comes directly from the benchmark run log. 
 \begin{lstlisting}
 BenchmarkDotNet v0.14.0, Windows 11 (10.0.22631.4890/23H2/2023Update/SunValley3)
 AMD Ryzen 5 5600H with Radeon Graphics, 1 CPU, 12 logical and 6 physical cores
@@ -564,23 +542,102 @@ AMD Ryzen 5 5600H with Radeon Graphics, 1 CPU, 12 logical and 6 physical cores
   DefaultJob : .NET 8.0.11 (8.0.1124.51707), X64 RyuJIT AVX2
 \end{lstlisting}
 
-\begin{center}
-    \captionof{table}{A1\_EntityIdenticalToTable}
-    \sisetup{table-format=4.1, separate-uncertainty}
-    \begin{tabular}{l S S S S S}
-        \hline
-        ORM & {Mean (\si{\micro\second})} & {Allocated (KB)} & {Gen0} & {Gen1} & {Gen2} \\
-        \hline
-        Dapper    & 750.2  & 6.24  & 0.0    & 0.0    & 0.0    \\
-        PetaPoco  & 721.8  & 7.99  & 0.9766 & 0.0    & 0.0    \\
-        RepoDB    & 747.5  & 8.77  & 0.9766 & 0.9766 & 0.0    \\
-        Linq2db   & 839.2  & 12.74 & 0.9766 & 0.0    & 0.0    \\
-        NHibernate & 742.1 & 36.06 & 3.9063 & 0.0    & 0.0    \\
-        EF6       & 854.1  & 90.43 & 9.7656 & 0.0    & 0.0    \\
-        EFCore    & 809.1  & 14.49 & 0.9766 & 0.0    & 0.0    \\
-        \hline
-    \end{tabular}
-\end{center}
+\subsection{A - Entity projection}
+The first three queries \hyperref[query:a1]{A1}, \hyperref[query:a2]{A2} and \hyperref[query:a3]{A3} fetched one database record and shaped it in different ways. All ORMs were capable of this task without any issue. It was a matter or having an entity with the chosen columns and shaping a query. The macro frameworks like EF and NHibernate allowed us to set the shape using \texttt{Select} LINQ method. In the micro ones, we had to choose the columns through \texttt{SELECT} part of the SQL statement. 
+There are no major differences in the measured time, just a slight increase for the macro ORMs as would be expected. When looking at allocated memory, we can see a 2-10$\times$ increase for NHibernate  and especially EF6. EF Core is clearly optimized in this area and the increase in allocated memory is not major. 
+
+We encounter a first issue at the \hyperref[query:a4]{A4} query which loads the result of a stored procedure. The stored procedure in our test data returns columns with spaces in their names. While it's not a usual naming convention, it was not expected to make some frameworks completely fail.
+
+Dapper, PetaPoco, RepoDB, linq2db and EF Core had no issue. All of those had to use a raw SQL to specify the query name, there was no way to map it to an object for example. For the context, over 60 000 results were returned. Measured time has no significant difference, but allocated memory differs by a huge margin. PetaPoco, RepoDB and linq2db allocated 16-17 MB, while Dapper and EF Core allocated 24 and 29 MB respectively. After checking with SQL Server Profiler, there is no major difference in the executed query. It always returns the same columns. And our assertions made sure all properties are filled in.
+
+NHibernate was failing on an internal error when converting the stored procedure result.
+The error was \lstinline{NHibernate.PropertyNotFoundException : Could not find a setter for property 'WWI Order ID' in class 'System.RuntimeType'}.
+It suggests its internal representation of the entity could not be filled due to the white space. The only fix we could find was converting the result into a hash table instead of a list of entities. As seen in the measurements, it increased both time and allocated memory significantly compared to others.
+
+And finally, EF6 had the same issue with spaces, except we could not find any workaround in this case. There is no similar feature to load the result into a hash table, or dynamic objects. So the test uses a pure ADO.NET connection, with no EF6 features whatsoever. We consider the test failed and the measurements are not relevant for our comparison.
+
+\subsection{B - Selection}
+This group tests different types of conditions. Feature-wise, all tests pass. There is no exception or difference. As expected, queries in Dapper and PetaPoco have to be written in SQL. While in the other frameworks, we can utilise LINQ to have statically typed queries. 
+
+%  todo time diff
+
+%\clearpage
+\afterpage{
+\begin{landscape}
+%If the table is too wide, replace \begin{table}[!htp]...\end{table} with
+%\begin{adjustwidth}{-2.5 cm}{-2.5 cm}\centering\begin{threeparttable}[!htb]...\end{threeparttable}\end{adjustwidth}
+%\begin{adjustwidth}{-2.5 cm}{-2.5 cm}
+\begin{table}[htp]
+\centering
+\caption{Feature comparison}
+\label{tab:feature_comp}
+\scriptsize
+\begin{threeparttable}[!htb]
+\def\arraystretch{1.25}
+\begin{tabular}{
+>{\raggedright\arraybackslash}p{50.00mm}
+>{\raggedright\arraybackslash}p{20.00mm}
+>{\raggedright\arraybackslash}p{20.00mm}
+>{\raggedright\arraybackslash}p{20.00mm}
+>{\raggedright\arraybackslash}p{20.00mm}
+>{\raggedright\arraybackslash}p{20.00mm}
+>{\raggedright\arraybackslash}p{20.00mm}
+>{\raggedright\arraybackslash}p{20.00mm}
+>{\raggedright\arraybackslash}p{20.00mm}
+}
+\toprule
+\textbf{Benchmark Name} & \textbf{Dapper} & \textbf{PetaPoco} & \textbf{RepoDB} & \textbf{linq2db} & \textbf{NHibernate} & \textbf{EF6} & \textbf{EF Core} \\
+\midrule
+A1\_EntityIdenticalToTable &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expr. &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+A2\_LimitedEntity &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expr. &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+A3\_MultipleEntitiesFromOneResult &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expr. &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+A4\_StoredProcedureToEntity &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{ea9999}N error &\cellcolor[HTML]{ea9999}N error &Y raw SQL \\
+B1\_SelectionOverIndexedColumn &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expr. &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+B2\_SelectionOverNonIndexedColumn &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expr. &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+B3\_RangeQuery &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expr. &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+B4\_InQuery &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expr. &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+B5\_TextSearch &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expr. &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+B6\_PagingQuery &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expr. &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+C1\_AggregationCount &Y raw SQL &Y raw SQL &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+C2\_AggregationMax &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expr. &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+C3\_AggregationSum &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+D1\_OneToManyRelationship &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{d9ead3}Y lambda expr. &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping \\
+D2\_ManyToManyRelationship &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping, join entity &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping \\
+D3\_OptionalRelationship &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{f4cccc}N manually in memory &\cellcolor[HTML]{d9ead3}Y lambda expr. &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping &\cellcolor[HTML]{b7e1cd}Y LINQ + mapping \\
+E1\_ColumnSorting &Y raw SQL &Y raw SQL &\cellcolor[HTML]{d9ead3}Y lambda expr. &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+E2\_Distinct &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+F1\_NestedJSONQuery &\cellcolor[HTML]{f4cccc}N custom JSON parsing &\cellcolor[HTML]{f4cccc}N custom JSON parsing &\cellcolor[HTML]{f4cccc}N custom JSON parsing &\cellcolor[HTML]{f4cccc}N custom converter &\cellcolor[HTML]{f4cccc}N custom JSON parsing &\cellcolor[HTML]{f4cccc}N custom JSON parsing &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+F2\_JSONArrayQuery &\cellcolor[HTML]{f4cccc}N custom JSON parsing &\cellcolor[HTML]{f4cccc}N custom JSON parsing &\cellcolor[HTML]{f4cccc}N custom JSON parsing &\cellcolor[HTML]{f4cccc}N custom converter &\cellcolor[HTML]{f4cccc}N custom JSON parsing &\cellcolor[HTML]{f4cccc}N custom JSON parsing &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+G1\_Union &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+G2\_Intersection &Y raw SQL &Y raw SQL &Y raw SQL &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ &\cellcolor[HTML]{b7e1cd}Y LINQ \\
+H1\_Metadata &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table}
+%\end{adjustwidth}
+\end{landscape}
+}
+
+
+
+% \begin{center}
+%     \captionof{table}{A1\_EntityIdenticalToTable}
+%     \sisetup{table-format=4.1, separate-uncertainty}
+%     \begin{tabular}{l S S S S S}
+%         \hline
+%         ORM & {Mean (\si{\micro\second})} & {Allocated (KB)} & {Gen0} & {Gen1} & {Gen2} \\
+%         \hline
+%         Dapper    & 750.2  & 6.24  & 0.0    & 0.0    & 0.0    \\
+%         PetaPoco  & 721.8  & 7.99  & 0.9766 & 0.0    & 0.0    \\
+%         RepoDB    & 747.5  & 8.77  & 0.9766 & 0.9766 & 0.0    \\
+%         Linq2db   & 839.2  & 12.74 & 0.9766 & 0.0    & 0.0    \\
+%         NHibernate & 742.1 & 36.06 & 3.9063 & 0.0    & 0.0    \\
+%         EF6       & 854.1  & 90.43 & 9.7656 & 0.0    & 0.0    \\
+%         EFCore    & 809.1  & 14.49 & 0.9766 & 0.0    & 0.0    \\
+%         \hline
+%     \end{tabular}
+% \end{center}
 
 
 \clearpage
@@ -589,9 +646,21 @@ AMD Ryzen 5 5600H with Radeon Graphics, 1 CPU, 12 logical and 6 physical cores
 \centering
 \caption{Performance benchmark results - Mean time (\unit{\micro\second})}
 \label{tab:benchmark_results_time}
-\begin{tabular}{lrrrrrrr}
+\scriptsize
+\def\arraystretch{1.35}
+\begin{tabular}{
+>{\raggedright\arraybackslash}p{50.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+}
 \toprule
-Namespace &    Dapper &  PetaPoco &    RepoDB &   Linq2db &  NHibernate &        EF6 &     EFCore \\
+\textbf{Namespace} &    \textbf{Dapper} &  \textbf{PetaPoco} &    \textbf{RepoDB} &   \textbf{Linq2db} &  \textbf{NHibernate} &        \textbf{EF6} &     \textbf{EFCore} \\
 \midrule
 A1\_EntityIdenticalToTable        &      750 &      722 &      748 &      839 &        742 &        854 &        809 \\
 A2\_LimitedEntity                 &      718 &      726 &      735 &      858 &        958 &        882 &        799 \\
@@ -627,33 +696,45 @@ H1\_Metadata                      &      851 &      843 &      844 &      925 & 
 \centering
 \caption{Performance benchmark results - Allocated memory (KB)}
 \label{tab:benchmark_results_memory}
-\begin{tabular}{lrrrrrrr}
+\scriptsize
+\def\arraystretch{1.35}
+\begin{tabular}{
+>{\raggedright\arraybackslash}p{50.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+>{\raggedleft\arraybackslash}p{20.00mm}
+}
 \toprule
-Namespace &   Dapper & PetaPoco &   RepoDB &  Linq2db & NHibernate &        EF6 &     EFCore \\
+\textbf{Namespace}                         &    \textbf{Dapper} &  \textbf{PetaPoco} &    \textbf{RepoDB} &   \textbf{Linq2db} & \textbf{NHibernate} &      \textbf{EF6} &    \textbf{EFCore} \\
 \midrule
-A1\_EntityIdenticalToTable        &      750 &      722 &      748 &      839 &        742 &        854 &        809 \\
-A2\_LimitedEntity                 &      718 &      726 &      735 &      858 &        958 &        882 &        799 \\
-A3\_MultipleEntitiesFromOneResult &      736 &      736 &      745 &      898 &      1 001 &        945 &        832 \\
-A4\_StoredProcedureToEntity       &  523 239 &  505 967 &  523 242 &  519 491 &    621 739 &    514 077 &    521 573 \\
-B1\_SelectionOverIndexedColumn    &      744 &      759 &      762 &      868 &        817 &        905 &        806 \\
-B2\_SelectionOverNonIndexedColumn &   43 612 &   41 100 &   43 052 &   43 708 &     86 419 &    125 169 &     48 016 \\
-B3\_RangeQuery                    &   30 393 &   29 935 &   30 746 &   21 909 &     22 289 &     22 823 &     21 102 \\
-B4\_InQuery                       &      856 &      855 &      876 &      954 &        945 &      1 408 &      1 147 \\
-B5\_TextSearch                    &  747 728 &  747 721 &  745 551 &  745 319 &    746 464 &    746 264 &    744 754 \\
-B6\_PagingQuery                   &    1 327 &    1 314 &    1 556 &    1 458 &      1 447 &      1 710 &      1 406 \\
-C1\_AggregationCount              &   35 006 &   35 289 &  377 349 &   35 372 &     35 553 &     35 364 &     35 286 \\
-C2\_AggregationMax                &    1 240 &    1 227 &    1 264 &    1 380 &      1 291 &      1 366 &      1 304 \\
-C3\_AggregationSum                &   86 499 &   85 944 &   86 899 &   86 145 &     75 137 &     69 827 &     87 825 \\
-D1\_OneToManyRelationship         &      781 &      770 &      806 &    2 997 &      1 042 &      1 581 &        895 \\
-D2\_ManyToManyRelationship        &    4 584 &    4 480 &    6 031 &    9 383 &      5 940 &      6 913 &     14 964 \\
-D3\_OptionalRelationship          &  187 693 &  172 030 &  393 631 &   91 326 &    533 489 &  1 993 146 &  2 548 411 \\
-E1\_ColumnSorting                 &    4 725 &    4 622 &    4 963 &    4 845 &      6 316 &      6 204 &      4 885 \\
-E2\_Distinct                      &    2 181 &    2 148 &    2 180 &    2 374 &      2 229 &      2 340 &      2 270 \\
-F1\_JSONObjectQuery               &    1 459 &    1 478 &    1 457 &    1 552 &      1 494 &      1 490 &      1 544 \\
-F2\_JSONArrayQuery                &    1 723 &    1 718 &    1 732 &    1 795 &      1 761 &      1 771 &      1 839 \\
-G1\_Union                         &      728 &      715 &      723 &    1 580 &      1 538 &      1 613 &      1 561 \\
-G2\_Intersection                  &      739 &      718 &      730 &    1 596 &      1 534 &      1 622 &      1 566 \\
-H1\_Metadata                      &      851 &      843 &      844 &      925 &        866 &        899 &        814 \\
+A1\_EntityIdenticalToTable        &      6.24 &     7.99 &      8.77 &     12.74 &      36.06 &    90.43 &    14.49 \\
+A2\_LimitedEntity                 &      4.74 &     9.64 &      7.99 &     18.25 &      50.70 &   115.18 &    16.11 \\
+A3\_MultipleEntitiesFromOneResult &      7.28 &    13.03 &     10.38 &     27.74 &      84.00 &   211.61 &    25.85 \\
+A4\_StoredProcedureToEntity       &  24294.84 & 16490.15 &  17007.14 &  16490.93 &   91569.96 & 35270.68 & 29008.69 \\
+B1\_SelectionOverIndexedColumn    &      8.63 &    14.30 &      9.79 &     14.63 &      49.46 &   102.35 &    12.88 \\
+B2\_SelectionOverNonIndexedColumn &   7112.75 &  3308.54 &   3410.07 &   3314.16 &   21371.02 & 50014.45 &  5847.86 \\
+B3\_RangeQuery                    &    989.93 &   468.38 &    480.34 &    475.55 &    3048.82 &  6747.98 &   819.92 \\
+B4\_InQuery                       &     16.92 &    20.34 &     16.64 &     19.58 &      87.42 &   354.18 &    19.85 \\
+B5\_TextSearch                    &   1169.29 &   587.24 &    599.41 &    592.78 &    3472.99 &  8113.77 &   979.42 \\
+B6\_PagingQuery                   &     32.59 &    25.06 &     18.25 &     26.58 &     128.29 &   265.26 &    40.52 \\
+C1\_AggregationCount              &      2.75 &     8.79 &  59994.30 &     12.46 &      41.75 &   117.99 &    12.04 \\
+C2\_AggregationMax                &      1.97 &     4.19 &      1.77 &      8.12 &      23.06 &    77.09 &     5.69 \\
+C3\_AggregationSum                &      2.09 &     4.41 &      1.35 &      9.25 &      25.31 &    81.72 &     6.85 \\
+D1\_OneToManyRelationship         &     16.46 &    17.94 &     20.23 &     24.58 &      88.71 &   115.27 &    26.44 \\
+D2\_ManyToManyRelationship        &    433.35 &   381.13 &    854.28 &    352.15 &    1162.43 &  1395.95 &  2555.79 \\
+D3\_OptionalRelationship          &  40923.17 & 24909.64 &  20945.39 &   9083.71 &  144094.98 &278566.55 &175866.23 \\
+E1\_ColumnSorting                 &    349.40 &   156.96 &    162.62 &    162.54 &    1354.02 &  2000.95 &   348.07 \\
+E2\_Distinct                      &      2.42 &     4.78 &      1.66 &      9.34 &      23.72 &    76.19 &     8.54 \\
+F1\_JSONObjectQuery               &     21.71 &    45.25 &     31.82 &     27.09 &      86.13 &    73.38 &    51.68 \\
+F2\_JSONArrayQuery                &      6.04 &    18.12 &      8.25 &     11.30 &      74.31 &    57.24 &    16.86 \\
+G1\_Union                         &      2.39 &     3.45 &      1.40 &     18.03 &      60.07 &   136.10 &    20.35 \\
+G2\_Intersection                  &      2.17 &     3.25 &      1.30 &     17.91 &      61.36 &   135.98 &    21.73 \\
+H1\_Metadata                      &      1.98 &     5.10 &      1.21 &      5.61 &      35.53 &    46.52 &    10.99 \\
 \bottomrule
 \end{tabular}
 \end{table}
