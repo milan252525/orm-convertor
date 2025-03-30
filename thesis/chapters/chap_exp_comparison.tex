@@ -524,11 +524,13 @@ Results are accompanied by tables showing results across all test cases.
 \end{itemize}
 The negative results are further described in the text.
 
-\autoref{tab:benchmark_results_time} shows measured benchmark time in microseconds (one millionth of a second). And \autoref{tab:benchmark_results_memory} shows allocated memory during the run of the benchmark method.
+\autoref{tab:benchmark_results_time} shows measured benchmark time in microseconds (one millionth of a second). And \autoref{tab:benchmark_results_memory} shows allocated memory during the run of the benchmark method. The results presented in text will be rounded to the nearest integer.
 
 Performance tests have to be considered in the context of the feature test results. It was not possible to always write the test in the same way across all frameworks. In a few cases, it was not possible to do the query using the framework at all. In those cases, to have a passing test, pure ADO.NET query was used. 
 
 In some cases it was not possible to get the desired result purely as a result of a query. Some relations or calculations had to be done in memory. That, of course, majorly affects measured memory consumption. Such anomalies will always be described in the corresponding test results.
+
+Certain frameworks do not allow logging of generated SQL statements to console or file. We can work around this using SQL Server Profiler\cite{sqlProfiler}. It is a tool integrated into SQL Server Management Studio. It allows for the capturing of any event happening in the SQL Server database, including incoming SQL queries. That makes us able to inspect the raw query after it leaves our application and the frameworks can make no further edit to it.
 
 \subsection{Benchmark execution}
 The final performance benchmark run was executed on a PC with the highest performance power plan while being constantly plugged in. Screen saving was turned off. The only applications running were those essential to the benchmark (database in Docker container and Visual Studio project). No other work was being done. Data further present are a result of that run and are available as an attachment.
@@ -548,7 +550,7 @@ There are no major differences in the measured time, just a slight increase for 
 
 We encounter a first issue at the \hyperref[query:a4]{A4} query which loads the result of a stored procedure. The stored procedure in our test data returns columns with spaces in their names. While it's not a usual naming convention, it was not expected to make some frameworks completely fail.
 
-Dapper, PetaPoco, RepoDB, linq2db and EF Core had no issue. All of those had to use a raw SQL to specify the query name, there was no way to map it to an object for example. For the context, over 60 000 results were returned. Measured time has no significant difference, but allocated memory differs by a huge margin. PetaPoco, RepoDB and linq2db allocated 16-17 MB, while Dapper and EF Core allocated 24 and 29 MB respectively. After checking with SQL Server Profiler, there is no major difference in the executed query. It always returns the same columns. And our assertions made sure all properties are filled in.
+Dapper, PetaPoco, RepoDB, linq2db and EF Core had no issue. All of those had to use a raw SQL to specify the query name, there was no way to map it to for example an object. For the context, over 60 000 results were returned. Measured time has no significant difference, but allocated memory differs by a huge margin. PetaPoco, RepoDB and linq2db allocated 16-17 MB, while Dapper and EF Core allocated 24 and 29 MB respectively. After checking with SQL Server Profiler\cite{sqlProfiler}, there is no major difference in the executed query. It always returns the same columns. And our assertions made sure all properties are filled in.
 
 NHibernate was failing on an internal error when converting the stored procedure result.
 The error was \lstinline{NHibernate.PropertyNotFoundException : Could not find a setter for property 'WWI Order ID' in class 'System.RuntimeType'}.
@@ -557,9 +559,29 @@ It suggests its internal representation of the entity could not be filled due to
 And finally, EF6 had the same issue with spaces, except we could not find any workaround in this case. There is no similar feature to load the result into a hash table, or dynamic objects. So the test uses a pure ADO.NET connection, with no EF6 features whatsoever. We consider the test failed and the measurements are not relevant for our comparison.
 
 \subsection{B - Selection}
-This group tests different types of conditions. Feature-wise, all tests pass. There is no exception or difference. As expected, queries in Dapper and PetaPoco have to be written in SQL. While in the other frameworks, we can utilise LINQ to have statically typed queries. 
+This group tests different types of conditions. Feature-wise, all tests pass. There is no exception or difference. As expected, queries in Dapper and PetaPoco have to be written in SQL. While in the other frameworks, we can utilize LINQ (or lambda expressions) to have statically typed queries. 
 
-%  todo time diff
+While the tests do pass, measurements differ a lot per ORM and query. Let us examine the queries one by one.
+
+As we have discussed when defining the queries, it is not relevant for ORM comparison using the same relational database if a column is indexed or not. We will therefore not compare query B1 and B2 in this sense. However, the first query only returns 5 rows, while the second over thirteen thousand.
+
+Query \hyperref[query:b1]{B1} has relatively little difference in terms of measured time. The macro ORMs again show a small increase. But the big difference is in the memory consumption. EF6 allocated 102 KB and NHibernate 49 KB. The other frameworks allocated in the range of 8 to 15 KB.
+Especially interesting is the memory consumption between Dapper (9 KB) and PetaPoco (14 KB). While taking almost the same time, PetaPoco allocated two times more memory. 
+% TODO profile memory
+
+The second query \hyperref[query:b2]{B2} shows unusual results in measured time, NHibernate took 2 times more and EF6 3 times more time than other frameworks. After checking with SQL profiler, there is no difference in SQL queries that would affect performance or the amount of data returned.
+
+In terms of memory, we can again see the spike for NHibernate and EF6, allocating 7 and 16 times more respectively. If we compare Dapper and PetaPoco, this time Dapper allocated approximately two times more memory. 
+This might suggest PetaPoco has a bigger framework overhead, which shows at small results. But for bigger amounts of objects, it has better memory optimization. 
+
+The third query \hyperref[query:b3]{B3} took about 22 milliseconds for most frameworks. Dapper, PetaPoco and RepoDB, the three smaller ORMs, took about 30 milliseconds. There is an interesting difference in the query. In Dapper and PetaPoco, where SQL is written by us, we used \texttt{BETWEEN} condition for selecting a date range. Other ORMs broke this condition down into separate less than or equal to and greater than or equal to parts. This could hint at what the reason for slower execution might be. But RepoDB does not use \texttt{BETWEEN} making this assumption invalid. Profile tool shows no other difference in the generated query. As for memory consumption, we can see significant spike for NHibernate and EF6.
+
+The query \hyperref[query:b4]{B4} fetched 15 results from a table with over 231 000 rows using the IN statement on primary key.
+
+
+
+% possible TODO find sources comparing SELECT * vs listing all columns 
+
 
 %\clearpage
 \afterpage{
