@@ -574,14 +574,27 @@ The second query \hyperref[query:b2]{B2} shows unusual results in measured time,
 In terms of memory, we can again see the spike for NHibernate and EF6, allocating 7 and 16 times more respectively. If we compare Dapper and PetaPoco, this time Dapper allocated approximately two times more memory. 
 This might suggest PetaPoco has a bigger framework overhead, which shows at small results. But for bigger amounts of objects, it has better memory optimization. 
 
-The third query \hyperref[query:b3]{B3} took about 22 milliseconds for most frameworks. Dapper, PetaPoco and RepoDB, the three smaller ORMs, took about 30 milliseconds. There is an interesting difference in the query. In Dapper and PetaPoco, where SQL is written by us, we used \texttt{BETWEEN} condition for selecting a date range. Other ORMs broke this condition down into separate less than or equal to and greater than or equal to parts. This could hint at what the reason for slower execution might be. But RepoDB does not use \texttt{BETWEEN} making this assumption invalid. Profile tool shows no other difference in the generated query. As for memory consumption, we can see significant spike for NHibernate and EF6.
+The third query \hyperref[query:b3]{B3} took about 22 milliseconds for most frameworks. Dapper, PetaPoco and RepoDB, the three smaller ORMs, took about 30 milliseconds. There is an interesting difference in the query. In Dapper and PetaPoco, where SQL is written by us, we used \texttt{BETWEEN} condition for selecting a date range. Other ORMs broke this condition down into two operators (less than or equal to and greater than or equal to). This could hint at what the reason for slower execution might be. But RepoDB does not use \texttt{BETWEEN} making this assumption invalid. Profiler tool shows no other difference in the generated query. As for memory consumption, we can see a significant spike for NHibernate and EF6.
 
-The query \hyperref[query:b4]{B4} fetched 15 results from a table with over 231 000 rows using the IN statement on primary key.
+The query \hyperref[query:b4]{B4} fetched 15 results from a table with over 231,000 rows using the IN statement on the primary key. The measured time and memory allocation were similar across the results, with NHibernate and EF6 showing memory allocation spikes again. 
 
+The differences in measured time for queries \hyperref[query:b5]{B5} and \hyperref[query:b6]{B6} are almost negligible. The generated queries had no difference. Surprising results are in memory allocation, where Dapper consumed more memory than PetaPoco while running the same query and returning the same amount of columns and rows.
+
+Throughout this category, we have seen a higher memory consumption in NHibernate and EF6. The generated queries had only syntactic and naming differences. Structurally and logically, they were identical. This suggests these two frameworks might be less memory efficient. We will explore this further in the following categories.
+
+\subsection{C - Aggregation}
+The following three queries tested different aggregation functions over different data. The first one \hyperref[query:c1]{C1} performed a combination of group by and count over the same column. RepoDB has no support for \texttt{group by} operation, so it failed this test. The measured times are almost identical for other frameworks. NHibernate and EF6 have approximately a 4 and 10 times memory consumption increase respectively.
+
+All frameworks were able to perform query \hyperref[query:c2]{C2} without any unexpected differences.
+
+In the query \hyperref[query:c3]{C3}, we have used the \texttt{sum} aggregation function, but with a multiplication inside of it. For all order lines we have asked for sum of quantity multiplied by unit price. While RepoDB supports the Sum function, it returned incorrect results when multiplication is inside of it. When checking profiled query, it dropped the multiplication and only summed over unit price. So this is another failed test for RepoDB.
+The operation went through an entire table. The measured time is consistent across all frameworks. The returned result is just one number and we can see some slight increase in memory consumption for the bigger ORMs.
+
+In summary, RepoDB did not handle aggregation functions very well. EF Core is quite optimized, returning similar results to macro ORMs. On the other hand, NHibernate and EF6 have increased memory usage again.
 
 
 % possible TODO find sources comparing SELECT * vs listing all columns 
-
+% TODO profiled queries as attachment?
 
 %\clearpage
 \afterpage{
