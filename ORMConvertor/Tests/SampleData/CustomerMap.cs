@@ -27,92 +27,105 @@ public static class CustomerMap
         }
         """;
 
-    public static EntityMap Map => new()
+    public static EntityMap Map
     {
-        Entity = new Entity
+        get
         {
-            Name = "Person",
-            Namespace = "EFCoreEntities",
-            AccessModifier = AccessModifier.Public,
-            Attributes = [
-                new() {
-                    Name = "Table",
-                    PositionalParameters = ["Customers"],
-                    NamedParameters = new() {
-                        ["Schema"] = "Sales",
-                    },
-                },
-            ],
-        },
-        Table = "Customers",
-        Schema = "Sales",
-        PropertyMaps = [
-            new() {
-                Property = new Property
+            var map = new EntityMap
+            {
+                Entity = new Entity
                 {
-                    Name = "CustomerID",
-                    Type = "int",
+                    Name = "Person",
+                    Namespace = "EFCoreEntities",
                     AccessModifier = AccessModifier.Public,
-                    HasGetter = true,
-                    HasSetter = true,
                     Attributes = [
                         new() {
-                            Name = "Key",
-                        },
-                    ],
+                           Name = "Table",
+                           PositionalParameters = ["Customers"],
+                           NamedParameters = new() {
+                               ["Schema"] = "Sales",
+                           },
+                       },
+                   ],
                 },
-            },
-            new() {
-                Property = new Property
-                {
-                    Name = "CustomerName",
-                    Type = "int",
-                    AccessModifier = AccessModifier.Public,
-                    OtherModifiers = ["required"],
-                    HasGetter = true,
-                    HasSetter = true
-                },
-            },
-            new() {
-                Property = new Property
-                {
-                    Name = "AccountOpenedDate",
-                    Type = "DateTime",
-                    AccessModifier = AccessModifier.Public,
-                    HasGetter = true,
-                    HasSetter = true
-                },
-            },
-            new() {
-                Property = new Property
-                {
-                    Name = "CreditLimit",
-                    Type = "decimal",
-                    IsNullable = true,
-                    AccessModifier = AccessModifier.Public,
-                    HasGetter = true,
-                    HasSetter = true
-                },
-                IsNullable = true,
-            },
-            new() {
-                Property = new Property
-                {
-                    Name = "Transactions",
-                    Type = "List<CustomerTransaction>",
-                    AccessModifier = AccessModifier.Public,
-                    HasGetter = true,
-                    HasSetter = true,
-                    DefaultValue = "[]",
-                },
-                Relations = [
+                Table = "Customers",
+                Schema = "Sales",
+                PropertyMaps = [
                     new() {
-                        Cardinality = Cardinality.OneToMany,
-                        Source = "Customer",
-                        Target = "CustomerTransaction",
-                    },
-                ]
-            },
-        ],
-    };
+                       Property = new Property
+                       {
+                           Name = "CustomerID",
+                           Type = "int",
+                           AccessModifier = AccessModifier.Public,
+                           HasGetter = true,
+                           HasSetter = true,
+                           Attributes = [
+                               new() {
+                                   Name = "Key",
+                               },
+                           ],
+                       },
+                   },
+                   new() {
+                       Property = new Property
+                       {
+                           Name = "CustomerName",
+                           Type = "int",
+                           AccessModifier = AccessModifier.Public,
+                           OtherModifiers = ["required"],
+                           HasGetter = true,
+                           HasSetter = true
+                       },
+                   },
+                   new() {
+                       Property = new Property
+                       {
+                           Name = "AccountOpenedDate",
+                           Type = "DateTime",
+                           AccessModifier = AccessModifier.Public,
+                           HasGetter = true,
+                           HasSetter = true
+                       },
+                   },
+                   new() {
+                       Property = new Property
+                       {
+                           Name = "CreditLimit",
+                           Type = "decimal",
+                           IsNullable = true,
+                           AccessModifier = AccessModifier.Public,
+                           HasGetter = true,
+                           HasSetter = true
+                       },
+                       IsNullable = true,
+                   },
+                   new() {
+                       Property = new Property
+                       {
+                           Name = "Transactions",
+                           Type = "List<CustomerTransaction>",
+                           AccessModifier = AccessModifier.Public,
+                           HasGetter = true,
+                           HasSetter = true,
+                           DefaultValue = "[]",
+                       },
+                       Relations = [
+                           new() {
+                               Cardinality = Cardinality.OneToMany,
+                               Source = "Customer",
+                               Target = "CustomerTransaction",
+                           },
+                       ]
+                   },
+               ],
+            };
+
+            foreach (var propertyMap in map.PropertyMaps)
+            {
+                map.Entity.Properties.Add(propertyMap.Property);
+            }
+
+            return map;
+        }
+    }
 }

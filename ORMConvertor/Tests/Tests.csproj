@@ -32,4 +32,10 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.0.0-pre.49" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AbstractWrappers\AbstractWrappers.csproj" />
+    <ProjectReference Include="..\DapperWrappers\DapperWrappers.csproj" />
+    <ProjectReference Include="..\Model\Model.csproj" />
+  </ItemGroup>
+
 </Project>
