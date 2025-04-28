@@ -1,13 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.11.35431.28
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORMConvertor", "ORMConvertor.csproj", "{F1999CD0-E4D4-4AC6-A6F1-1418C8C9DD26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ORMConvertor", "ORMConvertor\ORMConvertor.csproj", "{A49CC576-AE98-4360-8487-089763629A1C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8ACBC917-C5FC-4462-8157-084DCBFA512D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{123C53B5-C1BF-4F4A-B8B2-8D08ECB58D2F}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitignore = .gitignore
 	EndProjectSection
 EndProject
 Global
@@ -16,12 +17,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F1999CD0-E4D4-4AC6-A6F1-1418C8C9DD26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F1999CD0-E4D4-4AC6-A6F1-1418C8C9DD26}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F1999CD0-E4D4-4AC6-A6F1-1418C8C9DD26}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F1999CD0-E4D4-4AC6-A6F1-1418C8C9DD26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A49CC576-AE98-4360-8487-089763629A1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A49CC576-AE98-4360-8487-089763629A1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A49CC576-AE98-4360-8487-089763629A1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A49CC576-AE98-4360-8487-089763629A1C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {56ED9B20-3053-4CE8-BC3C-289E557AA6AF}
 	EndGlobalSection
 EndGlobal
