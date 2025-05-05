@@ -8,7 +8,7 @@ public class Property
 
     public required string Type { get; set; }
 
-    public bool? IsNullable { get; set; } = false;
+    public bool IsNullable { get; set; } = false;
 
     public AccessModifier? AccessModifier { get; set; }
 

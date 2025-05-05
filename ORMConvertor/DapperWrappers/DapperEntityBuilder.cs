@@ -51,30 +51,18 @@ public class DapperEntityBuilder : AbstractEntityBuilder
     {
         foreach (var property in EntityMap.Entity.Properties)
         {
-            var modifier = AccessModifierConvertor.ToModifierString(property.AccessModifier);
-            var otherModifiers = string.Join(' ', property.OtherModifiers).Trim();
+            var modifiers = $"{AccessModifierConvertor.ToModifierString(property.AccessModifier)} {string.Join(' ', property.OtherModifiers)}".Trim();
+            var type = property.IsNullable ? $"{property.Type}?" : property.Type;
 
-            var type = property.Type;
-            if (property.IsNullable ?? false)
-            {
-                type += "?";
-            }
+            var getterSetter = (property.HasGetter || property.HasSetter)
+                ? $" {{ {(property.HasGetter ? "get;" : string.Empty)}{(property.HasSetter ? "set;" : string.Empty)} }}"
+                : string.Empty;
 
-            var name = property.Name;
+            var defaultValue = string.IsNullOrWhiteSpace(property.DefaultValue)
+                ? string.Empty
+                : $" = {property.DefaultValue};";
 
-            var modifiers = string.IsNullOrWhiteSpace(otherModifiers)
-                ? modifier
-                : $"{modifier} {otherModifiers}";
-
-            codeResult.Append($"\t{modifiers} {type} {name}");
-
-            if (property.HasGetter || property.HasSetter)
-            {
-                var getter = property.HasGetter ? "get;" : string.Empty;
-                var setter = property.HasGetter ? "set;" : string.Empty;
-                codeResult.Append($" {{ {getter}{setter} }}");
-            }
-
+            codeResult.AppendLine($"\t{modifiers} {type} {property.Name}{getterSetter}{defaultValue}");
             codeResult.AppendLine();
         }
     }

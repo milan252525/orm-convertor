@@ -19,12 +19,16 @@ public abstract class AbstractEntityBuilder
         EntityMap.Schema = schemaName;
     }
 
+    public void AddNamespace(string namespaceName)
+    {
+        EntityMap.Entity.Namespace = namespaceName;
+    }
+
     public void AddClassHeader(string accessModifier, string className)
     {
         EntityMap.Entity.Name = className;
 
-        // TODO Move away
-        EntityMap.Entity.AccessModifier = AccessModifierConvertor.FromString(accessModifier);
+        EntityMap.Entity.AccessModifier = AccessModifierConvertor.FromString(accessModifier.Trim());
     }
 
     public void AddPrimaryKey(PrimaryKeyStrategy strategy, string propertyName)
@@ -41,16 +45,31 @@ public abstract class AbstractEntityBuilder
         string propertyName,
         Dictionary<string, string> databaseProperties,
         string? accessModifier = null,
-        List<string>? OtherModifiers = null
+        List<string>? OtherModifiers = null,
+        bool hasGetter = false,
+        bool hasSetter = false,
+        string? defaultValue = null,
+        bool isNullable = false
     )
     {
-        EntityMap.Entity.Properties.Add(
-            new Property
+        var property = new Property
+        {
+            Name = propertyName,
+            Type = type,
+            AccessModifier = AccessModifierConvertor.FromString(accessModifier),
+            OtherModifiers = OtherModifiers ?? [],
+            HasGetter = hasGetter,
+            HasSetter = hasSetter,
+            DefaultValue = defaultValue,
+            IsNullable = isNullable,
+        };
+
+        EntityMap.Entity.Properties.Add(property);
+
+        EntityMap.PropertyMaps.Add(
+            new PropertyMap
             {
-                Name = propertyName,
-                Type = type,
-                AccessModifier = AccessModifierConvertor.FromString(accessModifier),
-                OtherModifiers = OtherModifiers ?? []
+                Property = property,
             }
         );
     }
