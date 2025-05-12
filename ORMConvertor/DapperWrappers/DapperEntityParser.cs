@@ -83,7 +83,6 @@ public class DapperEntityParser(AbstractEntityBuilder entityBuilder) : IParser
             entityBuilder.AddProperty(
                 type,
                 name,
-                databaseProperties: [],
                 accessModifiers,
                 otherModifiers,
                 hasGetter: hasGetter,

@@ -2,11 +2,11 @@
 
 public enum PrimaryKeyStrategy
 {
-    None,
-    Increment,
-    Identity,
-    Sequence,
-    HiLo,
-    Uuid,
-    Guid,
+    None = 0,
+    Increment = 1,
+    Identity = 2,
+    Sequence = 3,
+    HiLo = 4,
+    Uuid = 5,
+    Guid = 6,
 }

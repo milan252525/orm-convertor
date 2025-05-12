@@ -7,13 +7,27 @@ public class PrimaryKeyStrategyConvertor
     {
         return strategy switch
         {
-            "None" => PrimaryKeyStrategy.None,
-            "Increment" => PrimaryKeyStrategy.Increment,
-            "Identity" => PrimaryKeyStrategy.Identity,
-            "Sequence" => PrimaryKeyStrategy.Sequence,
-            "HiLo" => PrimaryKeyStrategy.HiLo,
-            "Uuid" => PrimaryKeyStrategy.Uuid,
-            "Guid" => PrimaryKeyStrategy.Guid,
+            "increment" => PrimaryKeyStrategy.Increment,
+            "identity" => PrimaryKeyStrategy.Identity,
+            "sequence" => PrimaryKeyStrategy.Sequence,
+            "hilo" => PrimaryKeyStrategy.HiLo,
+            "uuid" => PrimaryKeyStrategy.Uuid,
+            "guid" => PrimaryKeyStrategy.Guid,
+            _ => PrimaryKeyStrategy.None
+        };
+    }
+
+    public static string ToNHibernate(PrimaryKeyStrategy strategy)
+    {
+        return strategy switch
+        {
+            PrimaryKeyStrategy.None => throw new NotImplementedException(),
+            PrimaryKeyStrategy.Increment => "increment",
+            PrimaryKeyStrategy.Identity => "identity",
+            PrimaryKeyStrategy.Sequence => "sequence",
+            PrimaryKeyStrategy.HiLo => "hilo",
+            PrimaryKeyStrategy.Uuid => "uuid",
+            PrimaryKeyStrategy.Guid => "guid",
             _ => throw new NotImplementedException()
         };
     }

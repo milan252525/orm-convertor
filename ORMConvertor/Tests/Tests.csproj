@@ -36,10 +36,7 @@
     <ProjectReference Include="..\AbstractWrappers\AbstractWrappers.csproj" />
     <ProjectReference Include="..\DapperWrappers\DapperWrappers.csproj" />
     <ProjectReference Include="..\Model\Model.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="NHibernate\" />
+    <ProjectReference Include="..\NHibernateWrappers\NHibernateWrappers.csproj" />
   </ItemGroup>
 
 </Project>

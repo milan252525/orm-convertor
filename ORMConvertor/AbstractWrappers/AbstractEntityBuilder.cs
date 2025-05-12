@@ -23,7 +23,10 @@ public abstract class AbstractEntityBuilder
     /// <param name="tableName">Table name</param>
     public void AddTable(string tableName)
     {
-        EntityMap.Table = tableName;
+        if (!string.IsNullOrEmpty(tableName))
+        {
+            EntityMap.Table = tableName;
+        }
     }
 
     /// <summary>
@@ -32,7 +35,10 @@ public abstract class AbstractEntityBuilder
     /// <param name="schemaName">Schema name</param>
     public void AddSchema(string schemaName)
     {
-        EntityMap.Schema = schemaName;
+        if (!string.IsNullOrEmpty(schemaName))
+        {
+            EntityMap.Schema = schemaName;
+        }
     }
 
     /// <summary>
@@ -62,7 +68,32 @@ public abstract class AbstractEntityBuilder
     /// <param name="propertyName">Property name to be used as primary key</param>
     public void AddPrimaryKey(PrimaryKeyStrategy strategy, string propertyName)
     {
+        // Find the property in the entity's properties
+        var property = EntityMap.Entity.Properties.FirstOrDefault(p => p.Name == propertyName);
+        if (property == null)
+        {
+            // If not found, create and add it
+            property = new Property
+            {
+                Name = propertyName,
+                Type = string.Empty
+            };
+            EntityMap.Entity.Properties.Add(property);
+        }
 
+        // Find or create the property map
+        var propertyMap = EntityMap.PropertyMaps.FirstOrDefault(pm => pm.Property.Name == propertyName);
+        if (propertyMap == null)
+        {
+            propertyMap = new PropertyMap
+            {
+                Property = property
+            };
+            EntityMap.PropertyMaps.Add(propertyMap);
+        }
+
+        propertyMap.OtherDatabaseProperties["IsPrimaryKey"] = "true";
+        propertyMap.OtherDatabaseProperties["PrimaryKeyStrategy"] = ((int)strategy).ToString();
     }
 
     /// <summary>
@@ -70,8 +101,41 @@ public abstract class AbstractEntityBuilder
     /// </summary>
     /// <param name="cardinality">Relationship cardinality</param>
     /// <param name="propertyName">Property name to be used as foreign key</param>
-    public void AddForeignKey(Cardinality cardinality, string propertyName)
+    public void AddForeignKey(Cardinality cardinality, string propertyName, string target)
     {
+        // Find the property in the entity's properties
+        var property = EntityMap.Entity.Properties.FirstOrDefault(p => p.Name == propertyName);
+        if (property == null)
+        {
+            // If not found, create and add it
+            property = new Property
+            {
+                Name = propertyName,
+                Type = string.Empty
+            };
+            EntityMap.Entity.Properties.Add(property);
+        }
+
+        // Find or create the property map
+        var propertyMap = EntityMap.PropertyMaps.FirstOrDefault(pm => pm.Property.Name == propertyName);
+        if (propertyMap == null)
+        {
+            propertyMap = new PropertyMap
+            {
+                Property = property
+            };
+            EntityMap.PropertyMaps.Add(propertyMap);
+        }
+
+        propertyMap.OtherDatabaseProperties["IsForeignKey"] = "true";
+        propertyMap.OtherDatabaseProperties["ForeignKeyCardinality"] = ((int)cardinality).ToString();
+
+        propertyMap.Relations.Add(new Relation
+        {
+            Source = EntityMap?.Entity?.Name,
+            Target = target,
+            Cardinality = cardinality
+        });
     }
 
     /// <summary>
@@ -156,15 +220,24 @@ public abstract class AbstractEntityBuilder
                     break;
                 case "precision":
                     if (int.TryParse(kvp.Value, out var precision))
+                    {
                         propertyMap.Precision = precision;
+                    }
+
                     break;
                 case "scale":
                     if (int.TryParse(kvp.Value, out var scale))
+                    {
                         propertyMap.Scale = scale;
+                    }
+
                     break;
                 case "isnullable" or "nullable":
                     if (bool.TryParse(kvp.Value, out var isNullable))
+                    {
                         propertyMap.IsNullable = isNullable;
+                    }
+
                     break;
                 default:
                     propertyMap.OtherDatabaseProperties[kvp.Key] = kvp.Value;

@@ -48,15 +48,15 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
     {
         // Header (class name)
         var nameAttr = classElement.Attribute("name")?.Value;
-        if (!string.IsNullOrEmpty(nameAttr))
-        {
-            var fullType = nameAttr.Split(',')[0].Trim();
-            var className = fullType.Contains('.')
-                ? fullType[(fullType.LastIndexOf('.') + 1)..]
-                : fullType;
+        //if (!string.IsNullOrEmpty(nameAttr))
+        //{
+        //    var fullType = nameAttr.Split(',')[0].Trim();
+        //    var className = fullType.Contains('.')
+        //        ? fullType[(fullType.LastIndexOf('.') + 1)..]
+        //        : fullType;
 
-            entityBuilder.AddClassHeader(string.Empty, className);
-        }
+        //    entityBuilder.AddClassHeader(string.Empty, className);
+        //}
 
         // Table and schema
         var table = classElement.Attribute("table")?.Value;
@@ -116,10 +116,10 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
                 dbProps["type"] = t;
             }
 
-            var notNullAttr = prop.Attribute("not-null")?.Value;
-            bool isNullable = notNullAttr == "false";
-
-            dbProps["nullable"] = isNullable.ToString().ToLowerInvariant();
+            if (bool.TryParse(prop.Attribute("not-null")?.Value, out var notNull))
+            {
+                dbProps["nullable"] = (!notNull).ToString().ToLowerInvariant();
+            }
 
             entityBuilder.SetPropertyDatabaseMapping(
                 propertyName,
@@ -135,7 +135,8 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
              e.Name.LocalName == "many-to-one"))
         {
             var propName = relation.Attribute("name")?.Value;
-            if (string.IsNullOrEmpty(propName))
+            var target = relation.Attribute("class")?.Value;
+            if (string.IsNullOrEmpty(propName) || string.IsNullOrEmpty(target))
             {
                 continue;
             }
@@ -147,7 +148,7 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
                 _ => throw new InvalidOperationException()
             };
 
-            entityBuilder.AddForeignKey(cardinality, propName);
+            entityBuilder.AddForeignKey(cardinality, propName, target);
         }
 
         string[] collectionTypes = ["bag", "set", "list", "map"];
@@ -159,17 +160,26 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
                 continue;
             }
 
-            if (collection.Elements().Any(e => e.Name.LocalName == "one-to-many"))
+            var oneToMany = collection.Elements().FirstOrDefault(e => e.Name.LocalName == "one-to-many");
+            if (oneToMany != null)
             {
-                entityBuilder.AddForeignKey(Cardinality.OneToMany, propName);
-            }
-            else if (collection.Elements().Any(e => e.Name.LocalName == "many-to-many"))
-            {
-                entityBuilder.AddForeignKey(Cardinality.ManyToMany, propName);
+                var target = oneToMany.Attribute("class")?.Value;
+                if (!string.IsNullOrEmpty(target))
+                {
+                    entityBuilder.AddForeignKey(Cardinality.OneToMany, propName, target);
+                }
+                continue;
             }
 
-            // register a OneToMany foreign‐key/relation
-            entityBuilder.AddForeignKey(Cardinality.OneToMany, propName);
+            var manyToMany = collection.Elements().FirstOrDefault(e => e.Name.LocalName == "many-to-many");
+            if (manyToMany != null)
+            {
+                var target = manyToMany.Attribute("class")?.Value;
+                if (!string.IsNullOrEmpty(target))
+                {
+                    entityBuilder.AddForeignKey(Cardinality.ManyToMany, propName, target);
+                }
+            }
         }
     }
 }
