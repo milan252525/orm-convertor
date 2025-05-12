@@ -5,4 +5,5 @@ public enum Cardinality
     OneToOne,
     OneToMany,
     ManyToMany,
+    ManyToOne,
 }

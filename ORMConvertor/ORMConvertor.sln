@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractWrappers", "Abstrac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DapperWrappers", "DapperWrappers\DapperWrappers.csproj", "{AD61E702-D223-40BC-9C08-76CC462A2186}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernateWrappers", "NHibernateWrappers\NHibernateWrappers.csproj", "{FCD84546-7796-4D57-A329-7BFAB923AE5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{AD61E702-D223-40BC-9C08-76CC462A2186}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD61E702-D223-40BC-9C08-76CC462A2186}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD61E702-D223-40BC-9C08-76CC462A2186}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCD84546-7796-4D57-A329-7BFAB923AE5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCD84546-7796-4D57-A329-7BFAB923AE5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCD84546-7796-4D57-A329-7BFAB923AE5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCD84546-7796-4D57-A329-7BFAB923AE5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

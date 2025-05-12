@@ -38,4 +38,8 @@
     <ProjectReference Include="..\Model\Model.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NHibernate\" />
+  </ItemGroup>
+
 </Project>

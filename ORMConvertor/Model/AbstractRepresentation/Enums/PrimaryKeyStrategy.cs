@@ -3,5 +3,10 @@
 public enum PrimaryKeyStrategy
 {
     None,
-    AutoIncrement
+    Increment,
+    Identity,
+    Sequence,
+    HiLo,
+    Uuid,
+    Guid,
 }
