@@ -10,13 +10,15 @@ public class DapperEntityBuilder : AbstractEntityBuilder
 {
     private readonly StringBuilder codeResult = new();
 
+    /// <summary>
+    /// Builds the entity representation and its mapping.
+    /// </summary>
+    /// <returns></returns>
     public override ConversionResult Build()
     {
         BuildImports();
         BuildTableSchema();
         BuildProperties();
-        //BuildPrimaryKey();
-        //BuildForeignKey();
         FinalizeBuild();
 
         return new ConversionResult
@@ -26,11 +28,17 @@ public class DapperEntityBuilder : AbstractEntityBuilder
         };
     }
 
+    /// <summary>
+    /// Dapper does not support foreign keys.
+    /// </summary>
     protected override void BuildForeignKey()
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Dapper needs no imports for the entity. Only builds namespace if provided.
+    /// </summary>
     protected override void BuildImports()
     {
         if (EntityMap.Entity.Namespace != null)
@@ -42,11 +50,17 @@ public class DapperEntityBuilder : AbstractEntityBuilder
         // no imports for Dapper
     }
 
+    /// <summary>
+    /// Dapper does not support primary keys.
+    /// </summary>
     protected override void BuildPrimaryKey()
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Builds the properties of the entity.
+    /// </summary>
     protected override void BuildProperties()
     {
         foreach (var property in EntityMap.Entity.Properties)
@@ -67,6 +81,10 @@ public class DapperEntityBuilder : AbstractEntityBuilder
         }
     }
 
+    /// <summary>
+    /// Dapped support no information about table schema.
+    /// Only builds the class.
+    /// </summary>
     protected override void BuildTableSchema()
     {
         var modifier = AccessModifierConvertor.ToModifierString(EntityMap.Entity.AccessModifier);
@@ -76,6 +94,9 @@ public class DapperEntityBuilder : AbstractEntityBuilder
         codeResult.AppendLine("{");
     }
 
+    /// <summary>
+    /// Finalizes the build process by closing the class definition.
+    /// </summary>
     protected override void FinalizeBuild()
     {
         codeResult.AppendLine("}");

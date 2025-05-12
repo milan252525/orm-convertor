@@ -5,8 +5,16 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace DapperWrappers;
 
-public class DapperEntityParser(AbstractEntityBuilder entityBuilder)
+/// <summary>
+/// Parses Dapper entity class from C# source code.
+/// Uses .NET compiler (Roslyn) to parse code and extract relevant information.
+/// </summary>
+public class DapperEntityParser(AbstractEntityBuilder entityBuilder) : IParser
 {
+    /// <summary>
+    /// Parses a C# class definition (optionally within a namespace) from the provided source code string.
+    /// </summary>
+    /// <param name="source">C# source code containing a single class, optionally wrapped in a namespace.</param>
     public void Parse(string source)
     {
         var root = CSharpSyntaxTree.ParseText(source).GetCompilationUnitRoot();
