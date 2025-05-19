@@ -300,6 +300,9 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
         return pkMap?.ColumnName ?? pkMap?.Property.Name ?? "Id";
     }
 
+    /// <summary>
+    /// Appends a line to the XML mapping with indentation.
+    /// </summary>
     private void AppendXml(int indentLevels, string content, bool appendLine = true)
     {
         var indent = new string(' ', indentLevels * 4);
@@ -313,7 +316,11 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
         
     }
 
-    private string BuildPropertySignature(Property prop, bool isPrimaryKey = false)
+    /// <summary>
+    /// Builds the property signature for C# code.
+    /// Adds modifiers, type, name, getter/setter, and default value.
+    /// </summary>
+    private static string BuildPropertySignature(Property prop, bool isPrimaryKey = false)
     {
         var otherMods = new List<string>(prop.OtherModifiers ?? []);
         if (!otherMods.Any(m => m.Equals("virtual", StringComparison.OrdinalIgnoreCase)))
