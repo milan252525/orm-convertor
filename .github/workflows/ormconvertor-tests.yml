@@ -1,0 +1,35 @@
+name: ORMConvertor tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ORMConvertor/**" # run only when something inside the solution changed
+  pull_request:
+    paths:
+      - "ORMConvertor/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults: # all subsequent `run:` steps execute from ORMConvertor/
+      run:
+        working-directory: ORMConvertor
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore ORMConvertor.sln
+
+      - name: Build
+        run: dotnet build ORMConvertor.sln --configuration Release --no-restore
+
+      - name: Test (xUnit v3)
+        run: dotnet test Tests/Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=test_results.trx"
