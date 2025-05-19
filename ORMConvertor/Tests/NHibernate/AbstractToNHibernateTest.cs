@@ -23,10 +23,10 @@ public class AbstractToNHibernateTest
         Assert.Multiple(() =>
         {
             Assert.Equal(Model.ContentType.CSharp, entityOutput.ContentType);
-            Assert.Equal(CustomerMapNHibernate.SourceEntity, entityOutput.Content.Trim());
+            Assert.Equal(CustomerMapNHibernate.SourceEntity, entityOutput.Content);
 
             Assert.Equal(Model.ContentType.XML, xmlOutput.ContentType);
-            Assert.Equal(CustomerMapNHibernate.SourceMapping, xmlOutput.Content.Trim());
+            Assert.Equal(CustomerMapNHibernate.SourceMapping, xmlOutput.Content);
         });
     }
 }

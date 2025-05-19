@@ -21,6 +21,7 @@ public class CustomerMapDapper
             public List<CustomerTransaction> Transactions { get; set; } = [];
 
         }
+        
         """;
 
     public static EntityMap Map

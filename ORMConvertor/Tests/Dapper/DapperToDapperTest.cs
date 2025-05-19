@@ -16,6 +16,6 @@ public class DapperToDapperTest
         var result = builder.Build().Single();
 
         Assert.Equal(Model.ContentType.CSharp, result.ContentType);
-        Assert.Equal(CustomerMapDapper.Source, result.Content.Trim());
+        Assert.Equal(CustomerMapDapper.Source, result.Content);
     }
 }

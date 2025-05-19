@@ -102,6 +102,5 @@ public class DapperEntityBuilder : AbstractEntityBuilder
     protected override void FinalizeBuild()
     {
         codeResult.AppendLine("}");
-        codeResult.AppendLine();
     }
 }

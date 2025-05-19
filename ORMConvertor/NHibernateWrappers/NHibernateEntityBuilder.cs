@@ -223,14 +223,13 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
     protected override void FinalizeBuild()
     {
         codeResult.AppendLine("}");
-        codeResult.AppendLine();
 
         if (classOpened)
         {
             AppendXml(1, "</class>");
         }
 
-        AppendXml(0, "</hibernate-mapping>");
+        AppendXml(0, "</hibernate-mapping>", appendLine: false);
     }
 
     /// <summary>
@@ -309,11 +308,12 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
         if (appendLine)
         {
             mappingResult.AppendLine($"{indent}{content}");
-        } else
+        }
+        else
         {
             mappingResult.Append($"{indent}{content}");
         }
-        
+
     }
 
     /// <summary>

@@ -20,6 +20,7 @@ public class CustomerMapNHibernate
             public virtual List<CustomerTransaction> Transactions { get; set; } = [];
 
         }
+
         """;
 
     public const string SourceMapping = """

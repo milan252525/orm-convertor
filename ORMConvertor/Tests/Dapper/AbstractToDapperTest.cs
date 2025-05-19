@@ -20,6 +20,6 @@ public class AbstractToDapperTest
         var entityOutput = results.Single();
 
         Assert.Equal(Model.ContentType.CSharp, entityOutput.ContentType);
-        Assert.Equal(CustomerMapDapper.Source, entityOutput.Content.Trim());
+        Assert.Equal(CustomerMapDapper.Source, entityOutput.Content);
     }
 }
