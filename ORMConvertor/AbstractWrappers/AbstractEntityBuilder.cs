@@ -130,12 +130,12 @@ public abstract class AbstractEntityBuilder
         propertyMap.OtherDatabaseProperties["IsForeignKey"] = "true";
         propertyMap.OtherDatabaseProperties["ForeignKeyCardinality"] = ((int)cardinality).ToString();
 
-        propertyMap.Relations.Add(new Relation
+        propertyMap.Relation = new Relation
         {
             Source = EntityMap?.Entity?.Name,
             Target = target,
             Cardinality = cardinality
-        });
+        };
     }
 
     /// <summary>

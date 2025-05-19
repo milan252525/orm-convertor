@@ -6,25 +6,30 @@ namespace Tests.SampleData;
 public static class CustomerMapEFCore
 {
     public const string Source = """
+        namespace EFCoreEntities;
+
         using System.ComponentModel.DataAnnotations;
         using System.ComponentModel.DataAnnotations.Schema;
-
-        namespace EFCoreEntities;
 
         [Table("Customers", Schema = "Sales")]
         public class Customer
         {
             [Key]
-            public int CustomerID { get; set; }
+            public required int CustomerID { get; set; }
 
+            [MaxLength(200)]
             public required string CustomerName { get; set; }
 
-            public DateTime AccountOpenedDate { get; set; }
+            [Precision(7)]
+            public required DateTime AccountOpenedDate { get; set; }
 
+            [Precision(18, 2)]
             public decimal? CreditLimit { get; set; }
 
             public List<CustomerTransaction> Transactions { get; set; } = [];
+
         }
+
         """;
 
     public static EntityMap Map
@@ -38,15 +43,7 @@ public static class CustomerMapEFCore
                     Name = "Customer",
                     Namespace = "EFCoreEntities",
                     AccessModifier = AccessModifier.Public,
-                    Attributes = [
-                        new() {
-                           Name = "Table",
-                           PositionalParameters = ["Customers"],
-                           NamedParameters = new() {
-                               ["Schema"] = "Sales",
-                           },
-                       },
-                   ],
+                    Attributes = []
                 },
                 Table = "Customers",
                 Schema = "Sales",
@@ -59,12 +56,11 @@ public static class CustomerMapEFCore
                            AccessModifier = AccessModifier.Public,
                            HasGetter = true,
                            HasSetter = true,
-                           Attributes = [
-                               new() {
-                                   Name = "Key",
-                               },
-                           ],
                        },
+                       OtherDatabaseProperties = new Dictionary<string, string>
+                       {
+                           { "IsPrimaryKey", "true" },
+                       }
                    },
                    new() {
                        Property = new Property
@@ -76,6 +72,9 @@ public static class CustomerMapEFCore
                            HasGetter = true,
                            HasSetter = true
                        },
+                       IsNullable = false,
+                       Type = "string",
+                       Length = 200
                    },
                    new() {
                        Property = new Property
@@ -86,6 +85,9 @@ public static class CustomerMapEFCore
                            HasGetter = true,
                            HasSetter = true
                        },
+                       IsNullable = false,
+                       Type = "datetime2",
+                       Precision = 7
                    },
                    new() {
                        Property = new Property
@@ -98,6 +100,9 @@ public static class CustomerMapEFCore
                            HasSetter = true
                        },
                        IsNullable = true,
+                       Type = "decimal",
+                       Precision = 18,
+                       Scale = 2
                    },
                    new() {
                        Property = new Property
@@ -109,13 +114,16 @@ public static class CustomerMapEFCore
                            HasSetter = true,
                            DefaultValue = "[]",
                        },
-                       Relations = [
-                           new() {
-                               Cardinality = Cardinality.OneToMany,
-                               Source = "Customer",
-                               Target = "CustomerTransaction",
-                           },
-                       ]
+                       Relation = new() {
+                           Cardinality = Cardinality.OneToMany,
+                           Source = "Customer",
+                           Target = "CustomerTransaction",
+                       },
+                       OtherDatabaseProperties = new Dictionary<string, string>
+                       {
+                           { "IsForeignKey", "true" },
+                           { "ForeignKeyCardinality", ((int)Cardinality.OneToMany).ToString() }
+                       }
                    },
                ],
             };

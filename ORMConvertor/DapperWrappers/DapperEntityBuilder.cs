@@ -13,7 +13,6 @@ public class DapperEntityBuilder : AbstractEntityBuilder
     /// <summary>
     /// Builds the entity representation and its mapping.
     /// </summary>
-    /// <returns></returns>
     public override List<ConversionSource> Build()
     {
         BuildImports();

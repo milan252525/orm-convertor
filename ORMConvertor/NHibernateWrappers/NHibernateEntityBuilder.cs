@@ -65,7 +65,7 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
     protected override void BuildTableSchema()
     {
         var modifier = AccessModifierConvertor.ToModifierString(EntityMap.Entity.AccessModifier);
-        var name = EntityMap.Entity.Name ?? "__MissingName";
+        var name = EntityMap.Entity.Name;
 
         // C#
         codeResult.AppendLine($"{modifier} class {name}");
@@ -144,9 +144,9 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
         // 1:1 and N:1 foreign keys
         foreach (var foreignKeyPropertyMap in EntityMap.PropertyMaps.Where(p => p.OtherDatabaseProperties.TryGetValue("IsForeignKey", out var v) && v.Equals("true", StringComparison.OrdinalIgnoreCase)))
         {
-            var rel = foreignKeyPropertyMap.Relations.First(); // single relation per FK property
+            var rel = foreignKeyPropertyMap.Relation; // single relation per FK property
 
-            var xmlTag = rel.Cardinality switch
+            var xmlTag = rel?.Cardinality switch
             {
                 Cardinality.OneToOne => "one-to-one",
                 Cardinality.ManyToOne => "many-to-one",
@@ -161,13 +161,13 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
             AppendPropertyToCode(foreignKeyPropertyMap.Property); // navigation property in C#
 
             var columnName = foreignKeyPropertyMap.ColumnName ?? foreignKeyPropertyMap.Property.Name;
-            AppendXml(2, $"<{xmlTag} name=\"{foreignKeyPropertyMap.Property.Name}\" class=\"{rel.Target}\" column=\"{columnName}\" />");
+            AppendXml(2, $"<{xmlTag} name=\"{foreignKeyPropertyMap.Property.Name}\" class=\"{rel!.Target}\" column=\"{columnName}\" />");
         }
 
         // 1:N and N:N collections
-        foreach (var propertyMap in EntityMap.PropertyMaps.Where(p => p.Relations.Any(r => r.Cardinality is Cardinality.OneToMany or Cardinality.ManyToMany)))
+        foreach (var propertyMap in EntityMap.PropertyMaps.Where(p => p.Relation?.Cardinality is Cardinality.OneToMany or Cardinality.ManyToMany))
         {
-            var relation = propertyMap.Relations.First();
+            var relation = propertyMap.Relation!;
 
             // C# collection type - List<target>
             var targetShortName = relation.Target.Contains('.')
@@ -176,26 +176,7 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
 
             var collectionType = $"List<{targetShortName}>";
 
-            var otherMods = new List<string>(propertyMap.Property.OtherModifiers ?? []);
-            if (!otherMods.Any(m => m.Equals("virtual", StringComparison.OrdinalIgnoreCase)))
-            {
-                otherMods.Add("virtual");
-            }
-
-            var access = AccessModifierConvertor.ToModifierString(propertyMap.Property.AccessModifier);
-            var modifiers = $"{access} {string.Join(' ', otherMods)}".Trim();
-
-            var hasGetter = propertyMap.Property.HasGetter;
-            var hasSetter = propertyMap.Property.HasSetter;
-            var getterSetter = (hasGetter || hasSetter)
-                ? $" {{ {(hasGetter ? "get;" : string.Empty)}{(hasSetter ? " set;" : string.Empty)} }}"
-                : string.Empty;
-
-            var initializer = string.IsNullOrWhiteSpace(propertyMap.Property.DefaultValue)
-                ? " = new();"
-                : $" = {propertyMap.Property.DefaultValue};";
-
-            codeResult.AppendLine($"    {modifiers} {collectionType} {propertyMap.Property.Name}{getterSetter}{initializer}");
+            codeResult.AppendLine($"    {BuildPropertySignature(propertyMap.Property)}");
             codeResult.AppendLine();
 
             // XML <bag> (TODO: allow set/list/map etc.)

@@ -128,13 +128,11 @@ public class CustomerMapNHibernate
                            HasSetter = true,
                            DefaultValue = "[]",
                        },
-                       Relations = [
-                           new() {
-                               Cardinality = Cardinality.OneToMany,
-                               Source = "Customer",
-                               Target = "CustomerTransaction",
-                           },
-                       ],
+                       Relation = new() {
+                           Cardinality = Cardinality.OneToMany,
+                           Source = "Customer",
+                           Target = "CustomerTransaction",
+                       },
                        OtherDatabaseProperties = new Dictionary<string, string>
                        {
                            { "IsForeignKey", "true" },

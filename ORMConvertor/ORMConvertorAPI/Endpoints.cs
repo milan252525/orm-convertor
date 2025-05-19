@@ -1,5 +1,6 @@
 ﻿using AbstractWrappers;
 using DapperWrappers;
+using EFCoreWrappers;
 using Model;
 using NHibernateWrappers;
 
@@ -16,6 +17,7 @@ public static class Endpoints
             new (2, ContentType.CSharp, "Entity (C# class)"),
             new (3, ContentType.XML, "Mapping file (XML)"),
         ]),
+        new (ORMType.EFCore, [new(4, ContentType.CSharp, "Entity (C# class)")]),
     ];
     public record ConvertRequest(ORMType SourceOrm, ORMType TargetOrm, List<ConversionSource> Sources);
     public record ConvertResponse(List<ConversionSource> Sources);
@@ -72,6 +74,7 @@ public static class Endpoints
         {
             ORMType.Dapper => new DapperEntityBuilder(),
             ORMType.NHibernate => new NHibernateEntityBuilder(),
+            ORMType.EFCore => new EFCoreEntityBuilder(),
             _ => null
         };
     }

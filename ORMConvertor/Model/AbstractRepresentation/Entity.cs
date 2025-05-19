@@ -4,7 +4,7 @@ namespace Model.AbstractRepresentation;
 
 public class Entity
 {
-    public string? Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public AccessModifier? AccessModifier { get; set; }
 

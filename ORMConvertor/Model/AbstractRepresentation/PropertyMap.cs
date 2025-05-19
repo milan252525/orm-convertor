@@ -18,5 +18,5 @@ public class PropertyMap
 
     public Dictionary<string, string> OtherDatabaseProperties { get; set; } = [];
 
-    public List<Relation> Relations { get; set; } = [];
+    public Relation? Relation { get; set; } = null;
 }

@@ -11,7 +11,7 @@ public class DapperToAbstractTest
     public void DapperToAbstractOverall() {
         var sourceCode = CustomerMapDapper.Source;
 
-        AbstractEntityBuilder builder = new DapperEntityBuilder();
+        AbstractEntityBuilder builder = new DummyEntityBuilder();
         var parser = new DapperEntityParser(builder);
 
         parser.Parse(sourceCode);

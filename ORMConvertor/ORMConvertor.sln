@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernateWrappers", "NHibe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORMConvertorAPI", "ORMConvertorAPI\ORMConvertorAPI.csproj", "{047B000E-CB2D-4BFB-B563-493829A04BAA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreWrappers", "EFCoreWrappers\EFCoreWrappers.csproj", "{08A43EC3-709F-434C-90E7-79FF16B5A5CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{047B000E-CB2D-4BFB-B563-493829A04BAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{047B000E-CB2D-4BFB-B563-493829A04BAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{047B000E-CB2D-4BFB-B563-493829A04BAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08A43EC3-709F-434C-90E7-79FF16B5A5CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08A43EC3-709F-434C-90E7-79FF16B5A5CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08A43EC3-709F-434C-90E7-79FF16B5A5CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08A43EC3-709F-434C-90E7-79FF16B5A5CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
