@@ -16,7 +16,8 @@ public class AbstractToDapperTest
             EntityMap = source
         };
 
-        var result = builder.Build();
+        var results = builder.Build();
+        var entityOutput = results.Single();
 
         var expectedResult = """
             namespace EFCoreEntities;
@@ -36,7 +37,7 @@ public class AbstractToDapperTest
             }
             """;
 
-        Assert.Equal(Model.ContentType.CSharp, result.ContentType);
-        Assert.Equal(expectedResult, result.Content.Trim());
+        Assert.Equal(Model.ContentType.CSharp, entityOutput.ContentType);
+        Assert.Equal(expectedResult, entityOutput.Content.Trim());
     }
 }

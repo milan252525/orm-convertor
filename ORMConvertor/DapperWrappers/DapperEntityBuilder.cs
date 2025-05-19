@@ -14,18 +14,20 @@ public class DapperEntityBuilder : AbstractEntityBuilder
     /// Builds the entity representation and its mapping.
     /// </summary>
     /// <returns></returns>
-    public override ConversionResult Build()
+    public override List<ConversionResult> Build()
     {
         BuildImports();
         BuildTableSchema();
         BuildProperties();
         FinalizeBuild();
 
-        return new ConversionResult
-        {
-            ContentType = ContentType.CSharp,
-            Content = codeResult.ToString()
-        };
+        return [
+            new ConversionResult
+            {
+                ContentType = ContentType.CSharp,
+                Content = codeResult.ToString()
+            }
+        ];
     }
 
     /// <summary>

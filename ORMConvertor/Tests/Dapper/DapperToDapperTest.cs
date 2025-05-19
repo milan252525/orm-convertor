@@ -31,7 +31,7 @@ public class DapperToDapperTest
         var parser = new DapperEntityParser(builder);
 
         parser.Parse(source);
-        var result = builder.Build();
+        var result = builder.Build().Single();
 
         Assert.Equal(Model.ContentType.CSharp, result.ContentType);
         Assert.Equal(source, result.Content.Trim());
