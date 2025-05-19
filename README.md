@@ -1,3 +1,5 @@
+[![ORMConvertor tests](https://github.com/milan252525/orm-comparison/actions/workflows/ormconvertor-tests.yml/badge.svg)](https://github.com/milan252525/orm-comparison/actions/workflows/ormconvertor-tests.yml)
+
 # Framework-Agnostic Query Adaptation: Ensuring SQL Compatibility Across .NET Database Frameworks
 There are numerous .NET frameworks available for accessing database systems, each with its own unique features and methods for executing SQL queries. These frameworks differ in their support for database functionalities, and when an application is migrated from one .NET framework to another, query compatibility issues may arise. For example, certain features or SQL constructs supported by one framework may not be available in another, leading to difficulties in query execution and application performance.
 
