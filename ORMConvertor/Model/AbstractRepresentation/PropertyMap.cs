@@ -12,6 +12,8 @@ public class PropertyMap
 
     public int? Scale { get; set; }
 
+    public int? Length { get; set; }
+
     public bool? IsNullable { get; set; }
 
     public Dictionary<string, string> OtherDatabaseProperties { get; set; } = [];

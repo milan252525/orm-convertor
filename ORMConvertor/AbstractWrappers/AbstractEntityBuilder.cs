@@ -223,14 +223,18 @@ public abstract class AbstractEntityBuilder
                     {
                         propertyMap.Precision = precision;
                     }
-
                     break;
                 case "scale":
                     if (int.TryParse(kvp.Value, out var scale))
                     {
                         propertyMap.Scale = scale;
                     }
-
+                    break;
+                case "length":
+                    if (int.TryParse(kvp.Value, out var length))
+                    {
+                        propertyMap.Length = length;
+                    }
                     break;
                 case "isnullable" or "nullable":
                     if (bool.TryParse(kvp.Value, out var isNullable))

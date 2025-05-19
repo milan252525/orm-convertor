@@ -47,7 +47,7 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
     private void ParseClass(XElement classElement)
     {
         // Header (class name)
-        var nameAttr = classElement.Attribute("name")?.Value;
+        //var nameAttr = classElement.Attribute("name")?.Value;
         //if (!string.IsNullOrEmpty(nameAttr))
         //{
         //    var fullType = nameAttr.Split(',')[0].Trim();
@@ -119,6 +119,21 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
             if (bool.TryParse(prop.Attribute("not-null")?.Value, out var notNull))
             {
                 dbProps["nullable"] = (!notNull).ToString().ToLowerInvariant();
+            }
+
+            if (prop.Attribute("precision")?.Value is string prec && !string.IsNullOrWhiteSpace(prec))
+            {
+                dbProps["precision"] = prec;
+            }
+
+            if (prop.Attribute("scale")?.Value is string sc && !string.IsNullOrWhiteSpace(sc))
+            {
+                dbProps["scale"] = sc;
+            }
+
+            if (prop.Attribute("length")?.Value is string len && !string.IsNullOrWhiteSpace(len))
+            {
+                dbProps["length"] = len;
             }
 
             entityBuilder.SetPropertyDatabaseMapping(

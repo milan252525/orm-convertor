@@ -4,7 +4,6 @@ using Model;
 using Model.AbstractRepresentation;
 using Model.AbstractRepresentation.Enums;
 using NHibernateWrappers.Convertors;
-using System.Data.Common;
 using System.Text;
 
 namespace NHibernateWrappers;
@@ -250,17 +249,12 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
     private void AppendPropertyToXml(PropertyMap propertyMap)
     {
         var prop = propertyMap.Property;
+
         var attrs = new List<string> { $"name=\"{prop.Name}\"" };
 
         if (!string.IsNullOrWhiteSpace(propertyMap.ColumnName) && propertyMap.ColumnName != prop.Name)
         {
             attrs.Add($"column=\"{propertyMap.ColumnName}\"");
-        }
-
-        // TODO improve type mapping
-        if (propertyMap.Type != null)
-        {
-            attrs.Add($"type=\"{propertyMap.Type}\"");
         }
 
         if (propertyMap.IsNullable.HasValue)
@@ -272,8 +266,28 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
             attrs.Add("not-null=\"true\"");
         }
 
-        var xml = $"<property {string.Join(' ', attrs)} />";
-        AppendXml(2, xml);
+        // TODO improve type mapping
+        if (propertyMap.Type != null)
+        {
+            attrs.Add($"type=\"{propertyMap.Type}\"");
+        }
+
+        if (propertyMap.Precision.HasValue)
+        {
+            attrs.Add($"precision=\"{propertyMap.Precision.Value}\"");
+        }
+
+        if (propertyMap.Scale.HasValue)
+        {
+            attrs.Add($"scale=\"{propertyMap.Scale.Value}\"");
+        }
+
+        if (propertyMap.Length.HasValue)
+        {
+            attrs.Add($"length=\"{propertyMap.Length.Value}\"");
+        }
+
+        AppendXml(2, $"<property {string.Join(' ', attrs)} />");
     }
 
     /// <summary>
@@ -286,17 +300,26 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
         return pkMap?.ColumnName ?? pkMap?.Property.Name ?? "Id";
     }
 
-    private void AppendXml(int indentLevels, string content)
+    private void AppendXml(int indentLevels, string content, bool appendLine = true)
     {
         var indent = new string(' ', indentLevels * 4);
-        mappingResult.AppendLine($"{indent}{content}");
+        if (appendLine)
+        {
+            mappingResult.AppendLine($"{indent}{content}");
+        } else
+        {
+            mappingResult.Append($"{indent}{content}");
+        }
+        
     }
 
     private string BuildPropertySignature(Property prop, bool isPrimaryKey = false)
     {
         var otherMods = new List<string>(prop.OtherModifiers ?? []);
         if (!otherMods.Any(m => m.Equals("virtual", StringComparison.OrdinalIgnoreCase)))
+        {
             otherMods.Add("virtual");
+        }
 
         var access = AccessModifierConvertor.ToModifierString(prop.AccessModifier);
         var modifiers = $"{access} {string.Join(' ', otherMods)}".Trim();
