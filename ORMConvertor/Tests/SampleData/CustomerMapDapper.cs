@@ -19,6 +19,7 @@ public class CustomerMapDapper
             public decimal? CreditLimit { get; set; }
 
             public List<CustomerTransaction> Transactions { get; set; } = [];
+
         }
         """;
 

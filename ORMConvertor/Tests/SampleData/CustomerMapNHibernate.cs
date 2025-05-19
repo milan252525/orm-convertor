@@ -18,6 +18,7 @@ public class CustomerMapNHibernate
             public virtual decimal? CreditLimit { get; set; }
 
             public virtual List<CustomerTransaction> Transactions { get; set; } = [];
+
         }
         """;
 
@@ -28,9 +29,9 @@ public class CustomerMapNHibernate
                 <id name="CustomerID" column="CustomerID" type="int">
                     <generator class="identity" />
                 </id>
-                <property name="CustomerName" not-null="true" />
-                <property name="AccountOpenedDate" not-null="true" />
-                <property name="CreditLimit" not-null="false" />
+                <property name="CustomerName" not-null="true" type="string" length="200" />
+                <property name="AccountOpenedDate" not-null="true" type="datetime2" precision="7" />
+                <property name="CreditLimit" not-null="false" type="decimal" precision="18" scale="2" />
                 <bag name="Transactions" inverse="true" cascade="all-delete-orphan">
                     <key column="CustomerID" />
                     <one-to-many class="CustomerTransaction" />
@@ -82,6 +83,8 @@ public class CustomerMapNHibernate
                            HasSetter = true
                        },
                        IsNullable = false,
+                       Type = "string",
+                       Length = 200
                    },
                    new() {
                        Property = new Property
@@ -94,6 +97,8 @@ public class CustomerMapNHibernate
                            HasSetter = true
                        },
                        IsNullable = false,
+                       Type = "datetime2",
+                       Precision = 7
                    },
                    new() {
                        Property = new Property
@@ -107,6 +112,9 @@ public class CustomerMapNHibernate
                            HasSetter = true
                        },
                        IsNullable = true,
+                       Type = "decimal",
+                       Precision = 18,
+                       Scale = 2
                    },
                    new() {
                        Property = new Property

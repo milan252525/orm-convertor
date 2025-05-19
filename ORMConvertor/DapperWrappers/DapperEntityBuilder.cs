@@ -71,14 +71,14 @@ public class DapperEntityBuilder : AbstractEntityBuilder
             var type = property.IsNullable ? $"{property.Type}?" : property.Type;
 
             var getterSetter = (property.HasGetter || property.HasSetter)
-                ? $" {{ {(property.HasGetter ? "get;" : string.Empty)}{(property.HasSetter ? "set;" : string.Empty)} }}"
+                ? $" {{ {(property.HasGetter ? "get; " : string.Empty)}{(property.HasSetter ? "set; " : string.Empty)}}}"
                 : string.Empty;
 
             var defaultValue = string.IsNullOrWhiteSpace(property.DefaultValue)
                 ? string.Empty
                 : $" = {property.DefaultValue};";
 
-            codeResult.AppendLine($"\t{modifiers} {type} {property.Name}{getterSetter}{defaultValue}");
+            codeResult.AppendLine($"    {modifiers} {type} {property.Name}{getterSetter}{defaultValue}");
             codeResult.AppendLine();
         }
     }
