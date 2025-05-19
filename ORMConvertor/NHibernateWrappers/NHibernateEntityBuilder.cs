@@ -251,7 +251,7 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
 
         var attrs = new List<string> { $"name=\"{prop.Name}\"" };
 
-        if (!string.IsNullOrWhiteSpace(propertyMap.ColumnName) && propertyMap.ColumnName != prop.Name)
+        if (!string.IsNullOrWhiteSpace(propertyMap.ColumnName))
         {
             attrs.Add($"column=\"{propertyMap.ColumnName}\"");
         }

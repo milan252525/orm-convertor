@@ -7,13 +7,24 @@ namespace ORMConvertorAPI;
 
 public static class Endpoints
 {
+    public record RequiredContentUnit(int Id, ContentType ContentType, string Description);
+    public record RequiredContentDefinition(ORMType OrmType, List<RequiredContentUnit> Required);
 
-    public sealed record ConvertRequest(ORMType SourceOrm, ORMType TargetOrm, List<ConversionSource> Sources);
+    public static List<RequiredContentDefinition> requiredContent = [
+        new (ORMType.Dapper, [new(1, ContentType.CSharp, "Entity (C# class)")]),
+        new (ORMType.NHibernate, [
+            new (2, ContentType.CSharp, "Entity (C# class)"),
+            new (3, ContentType.XML, "Mapping file (XML)"),
+        ]),
+    ];
+    public record ConvertRequest(ORMType SourceOrm, ORMType TargetOrm, List<ConversionSource> Sources);
+    public record ConvertResponse(List<ConversionSource> Sources);
 
-    public sealed record ConvertResponse(List<ConversionSource> Sources);
 
     public static void Map(WebApplication app)
     {
+        app.MapGet("/required-content", () => requiredContent);
+
         app.MapPost("/convert",
             (ConvertRequest req) =>
             {
@@ -35,16 +46,19 @@ public static class Endpoints
 
                 foreach (var parser in parsers)
                 {
-                    var content = req.Sources
+                    var parsable = req.Sources
                         .Where(x => parser.CanParse(x.ContentType))
-                        .First().Content;
+                        .FirstOrDefault();
 
-                    parser.Parse(content);
+                    if (parsable != null)
+                    {
+                        parser.Parse(parsable.Content);
+                    }
                 }
 
                 results.AddRange(builder.Build());
 
-                return Results.Ok(new ConvertResponse(req.Sources));
+                return Results.Ok(new ConvertResponse(results));
             })
            .WithName("Convert")
            .Produces<ConvertResponse>(StatusCodes.Status200OK)

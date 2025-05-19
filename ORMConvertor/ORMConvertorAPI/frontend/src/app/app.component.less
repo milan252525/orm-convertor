@@ -1,0 +1,37 @@
+.pane-container {
+  position: relative;
+  display: flex;
+  height: 97vh;
+}
+
+.pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.pane label {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.left {
+  border-right: 1px solid rgb(132, 132, 132);
+}
+
+.convert-btn {
+  position: absolute;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  left: 50%;
+  padding: 1rem 2.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+}

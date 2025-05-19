@@ -1,0 +1,11 @@
+<div class="content-display">
+  <div class="description">{{ description }}</div>
+  <div class="code-wrapper">
+    <textarea
+      class="code-area"
+      [(ngModel)]="content"
+      (ngModelChange)="contentChange.emit($event)"
+      [readonly]="readonly"
+    ></textarea>
+  </div>
+</div>

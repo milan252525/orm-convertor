@@ -26,7 +26,7 @@ public class NHibernateEntityParser(AbstractEntityBuilder entityBuilder) : IPars
         // Supporting single class per source for now
         var cls = root.DescendantNodes()
                   .OfType<ClassDeclarationSyntax>()
-                  .Single();
+                  .First();
 
         if (ns is not null)
         {

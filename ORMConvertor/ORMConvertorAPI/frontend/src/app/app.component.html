@@ -1,0 +1,48 @@
+<div class="pane-container">
+
+  <div class="pane left">
+    <label>
+      Source ORM
+      <select [(ngModel)]="sourceOrm" (ngModelChange)="onSourceOrmChange($event)">
+        <option [value]="ormTypeEnum.Dapper">Dapper</option>
+        <option [value]="ormTypeEnum.NHibernate">NHibernate</option>
+        <option [value]="ormTypeEnum.EFCore">EFCore</option>
+      </select>
+    </label>
+
+    @if (error) {
+      <pre>{{ error }}</pre>
+    }
+
+    @for (unit of displayUnits; track $index) {
+      <app-content-display
+        [description]="unit.description"
+        [contentType]="unit.contentType"
+        [(content)]="contentByUnit[unit.id]">
+      </app-content-display>
+    }
+  </div>
+
+  <button class="convert-btn" (click)="convert()">Convert</button>
+
+  <div class="pane right">
+    <label>
+      Target ORM
+      <select [(ngModel)]="targetOrm" (ngModelChange)="onTargetOrmChange($event)">
+        <option [value]="ormTypeEnum.Dapper">Dapper</option>
+        <option [value]="ormTypeEnum.NHibernate">NHibernate</option>
+        <option [value]="ormTypeEnum.EFCore">EFCore</option>
+      </select>
+    </label>
+
+    @for (unit of convertedUnits; track $index) {
+      <app-content-display
+        [description]="unit.contentType | contentTypeToString"
+        [contentType]="unit.contentType"
+        [content]="unit.content"
+        [readonly]="true">
+      </app-content-display>
+    }
+  </div>
+
+</div>

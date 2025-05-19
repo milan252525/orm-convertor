@@ -29,6 +29,9 @@ public class Program
 
         Endpoints.Map(app);
 
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
+
         app.Run();
     }
 }

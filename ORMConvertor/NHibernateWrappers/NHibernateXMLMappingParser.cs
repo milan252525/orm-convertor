@@ -23,6 +23,11 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
     /// <param name="source">String containing XML mapping file</param>
     public void Parse(string source)
     {
+        if (string.IsNullOrEmpty(source))
+        {
+            return;
+        }
+
         var xmlDoc = XDocument.Parse(source);
         var mapping = xmlDoc.Root;
         if (mapping == null || mapping.Name.LocalName != "hibernate-mapping")
