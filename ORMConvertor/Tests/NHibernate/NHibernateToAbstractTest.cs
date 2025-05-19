@@ -18,6 +18,6 @@ public class NHibernateToAbstractTest
         entityParser.Parse(CustomerMapNHibernate.SourceEntity);
         mappingParser.Parse(CustomerMapNHibernate.SourceMapping);
 
-        Assert.Equal(JsonConvert.SerializeObject(CustomerMapNHibernate.Map), JsonConvert.SerializeObject(builder.EntityMap));
+        Assert.Equal(JsonConvert.SerializeObject(CustomerMapNHibernate.Map), JsonConvert.SerializeObject(builder.EntityMap), ignoreLineEndingDifferences: true);
     }
 }

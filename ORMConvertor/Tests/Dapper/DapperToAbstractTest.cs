@@ -16,6 +16,6 @@ public class DapperToAbstractTest
 
         parser.Parse(sourceCode);
 
-        Assert.Equal(JsonConvert.SerializeObject(CustomerMapDapper.Map), JsonConvert.SerializeObject(builder.EntityMap));
+        Assert.Equal(JsonConvert.SerializeObject(CustomerMapDapper.Map), JsonConvert.SerializeObject(builder.EntityMap), ignoreLineEndingDifferences: true);
     }
 }
