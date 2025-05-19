@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Model;
 
 namespace NHibernateWrappers;
 
@@ -11,6 +12,11 @@ namespace NHibernateWrappers;
 /// <param name="source">C# source code containing a single class, optionally wrapped in a namespace.</param>
 public class NHibernateEntityParser(AbstractEntityBuilder entityBuilder) : IParser
 {
+    public bool CanParse(ContentType contentType)
+    {
+        return contentType == ContentType.CSharp;
+    }
+
     public void Parse(string source)
     {
         var root = CSharpSyntaxTree.ParseText(source).GetCompilationUnitRoot();

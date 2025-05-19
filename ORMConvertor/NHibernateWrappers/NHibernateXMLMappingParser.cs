@@ -1,4 +1,5 @@
 ﻿using AbstractWrappers;
+using Model;
 using Model.AbstractRepresentation.Enums;
 using NHibernateWrappers.Convertors;
 using System.Xml.Linq;
@@ -11,6 +12,11 @@ namespace NHibernateWrappers;
 /// </summary>
 public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : IParser
 {
+    public bool CanParse(ContentType contentType)
+    {
+        return contentType == ContentType.XML;
+    }
+
     /// <summary>
     /// Parses an NHibernate mapping XML file from the provided source code string.
     /// </summary>

@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Model;
 
 namespace DapperWrappers;
 
@@ -11,6 +12,11 @@ namespace DapperWrappers;
 /// </summary>
 public class DapperEntityParser(AbstractEntityBuilder entityBuilder) : IParser
 {
+    public bool CanParse(ContentType contentType)
+    {
+        return contentType == ContentType.CSharp;
+    }
+
     /// <summary>
     /// Parses a C# class definition (optionally within a namespace) from the provided source code string.
     /// </summary>

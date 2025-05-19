@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35431.28
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ORMConvertor", "ORMConvertor\ORMConvertor.csproj", "{A49CC576-AE98-4360-8487-089763629A1C}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{123C53B5-C1BF-4F4A-B8B2-8D08ECB58D2F}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -21,16 +19,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DapperWrappers", "DapperWra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernateWrappers", "NHibernateWrappers\NHibernateWrappers.csproj", "{FCD84546-7796-4D57-A329-7BFAB923AE5D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORMConvertorAPI", "ORMConvertorAPI\ORMConvertorAPI.csproj", "{047B000E-CB2D-4BFB-B563-493829A04BAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A49CC576-AE98-4360-8487-089763629A1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A49CC576-AE98-4360-8487-089763629A1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A49CC576-AE98-4360-8487-089763629A1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A49CC576-AE98-4360-8487-089763629A1C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2403EFCF-A927-4A84-AEA0-C800DE64ABBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2403EFCF-A927-4A84-AEA0-C800DE64ABBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2403EFCF-A927-4A84-AEA0-C800DE64ABBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,6 +47,10 @@ Global
 		{FCD84546-7796-4D57-A329-7BFAB923AE5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCD84546-7796-4D57-A329-7BFAB923AE5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCD84546-7796-4D57-A329-7BFAB923AE5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{047B000E-CB2D-4BFB-B563-493829A04BAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{047B000E-CB2D-4BFB-B563-493829A04BAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{047B000E-CB2D-4BFB-B563-493829A04BAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{047B000E-CB2D-4BFB-B563-493829A04BAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

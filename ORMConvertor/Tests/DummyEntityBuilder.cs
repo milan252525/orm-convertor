@@ -4,7 +4,7 @@ using Model;
 namespace Tests;
 public class DummyEntityBuilder : AbstractEntityBuilder
 {
-    public override List<ConversionResult> Build()
+    public override List<ConversionSource> Build()
     {
         throw new NotImplementedException();
     }

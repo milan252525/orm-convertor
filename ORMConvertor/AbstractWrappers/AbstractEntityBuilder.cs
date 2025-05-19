@@ -254,7 +254,7 @@ public abstract class AbstractEntityBuilder
     /// Build the conversion result for the entity.
     /// </summary>
     /// <returns>List of ConversionResult containing the generated content and type (C#, XML, ...)</returns>
-    public abstract List<ConversionResult> Build();
+    public abstract List<ConversionSource> Build();
 
     /// <summary>
     /// Build import statements for the entity.

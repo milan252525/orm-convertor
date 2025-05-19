@@ -21,7 +21,7 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
     /// Entity is C# class, mapping is XML.
     /// Other types of mapping are not supported for now.
     /// </summary>
-    public override List<ConversionResult> Build()
+    public override List<ConversionSource> Build()
     {
         BuildImports();
         BuildTableSchema();
