@@ -28,7 +28,7 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
             return;
         }
 
-        var xmlDoc = XDocument.Parse(source);
+        var xmlDoc = XDocument.Parse(source.Trim());
         var mapping = xmlDoc.Root;
         if (mapping == null || mapping.Name.LocalName != "hibernate-mapping")
         {
@@ -38,6 +38,9 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
         ParseMapping(mapping);
     }
 
+    /// <summary>
+    /// Parses the mapping element of the NHibernate XML mapping file.
+    /// </summary>
     private void ParseMapping(XElement mapping)
     {
         // Mapping-level namespace (attribute)
@@ -55,6 +58,9 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
         }
     }
 
+    /// <summary>
+    /// Parses the class element of the NHibernate XML mapping file.
+    /// </summary>
     private void ParseClass(XElement classElement)
     {
         // Header (class name)
@@ -87,6 +93,9 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
         ParseRelations(classElement);
     }
 
+    /// <summary>
+    /// Parses the primary key element.
+    /// </summary>
     private void ParsePrimaryKey(XElement classElement)
     {
         var idElem = classElement.Elements().FirstOrDefault(e => e.Name.LocalName == "id");
@@ -106,6 +115,9 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
         }
     }
 
+    /// <summary>
+    /// Parses the properties of the class element, extracting their names, types, and database attributes.
+    /// </summary>
     private void ParseProperties(XElement classElement)
     {
         foreach (var prop in classElement.Elements().Where(e => e.Name.LocalName == "property"))
@@ -154,6 +166,9 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
         }
     }
 
+    /// <summary>
+    /// Parses the relations defined in the class element, such as one-to-one, many-to-one, one-to-many, and many-to-many.
+    /// </summary>
     private void ParseRelations(XElement classElement)
     {
         foreach (var relation in classElement.Elements().Where(e =>

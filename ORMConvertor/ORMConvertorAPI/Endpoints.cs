@@ -90,6 +90,9 @@ public static class Endpoints
                 new NHibernateEntityParser(entityBuilder),
                 new NHibernateXMLMappingParser(entityBuilder)
             ],
+            ORMType.EFCore => [
+                new EFCoreEntityParser(entityBuilder)
+            ],
             _ => []
         };
     }

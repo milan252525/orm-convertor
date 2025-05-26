@@ -9,7 +9,6 @@ namespace NHibernateWrappers;
 /// <summary>
 /// Parses a C# class definition (optionally within a namespace) from the provided source code string.
 /// </summary>
-/// <param name="source">C# source code containing a single class, optionally wrapped in a namespace.</param>
 public class NHibernateEntityParser(AbstractEntityBuilder entityBuilder) : IParser
 {
     public bool CanParse(ContentType contentType)
@@ -17,6 +16,10 @@ public class NHibernateEntityParser(AbstractEntityBuilder entityBuilder) : IPars
         return contentType == ContentType.CSharp;
     }
 
+    /// <summary>
+    /// Parses a C# class definition (optionally within a namespace) from the provided source code string.
+    /// </summary>
+    /// <param name="source">C# source code containing a single class, optionally wrapped in a namespace.</param>
     public void Parse(string source)
     {
         var root = CSharpSyntaxTree.ParseText(source).GetCompilationUnitRoot();
@@ -36,11 +39,17 @@ public class NHibernateEntityParser(AbstractEntityBuilder entityBuilder) : IPars
         ParseProperties(cls);
     }
 
+    /// <summary>
+    /// Parses the namespace declaration.
+    /// </summary>
     private void ParseNamespace(BaseNamespaceDeclarationSyntax namespaceDeclaration)
     {
         entityBuilder.AddNamespace(namespaceDeclaration.Name.ToString());
     }
 
+    /// <summary>
+    /// Parses the class header, including modifiers and class name.
+    /// </summary>
     private void ParseClassHeader(ClassDeclarationSyntax classDeclaration)
     {
         var modifiers = string.Join(" ", classDeclaration.Modifiers.Select(m => m.Text));
@@ -51,6 +60,9 @@ public class NHibernateEntityParser(AbstractEntityBuilder entityBuilder) : IPars
         );
     }
 
+    /// <summary>
+    /// Parses the properties of the class, extracting their types, names, access modifiers, and other attributes.
+    /// </summary>
     private void ParseProperties(ClassDeclarationSyntax classDeclaration)
     {
         foreach (var prop in classDeclaration.Members.OfType<PropertyDeclarationSyntax>())

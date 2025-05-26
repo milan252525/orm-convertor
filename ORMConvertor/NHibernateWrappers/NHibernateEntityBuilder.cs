@@ -249,7 +249,7 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
         // TODO improve type mapping
         if (propertyMap.Type != null)
         {
-            attrs.Add($"type=\"{propertyMap.Type}\"");
+            attrs.Add($"type=\"{propertyMap.Type.Replace("nvarchar", "string")}\"");
         }
 
         if (propertyMap.Precision.HasValue)

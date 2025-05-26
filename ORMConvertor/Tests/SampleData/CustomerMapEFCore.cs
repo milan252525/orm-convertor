@@ -54,12 +54,15 @@ public static class CustomerMapEFCore
                            Name = "CustomerID",
                            Type = "int",
                            AccessModifier = AccessModifier.Public,
+                           OtherModifiers = ["required"],
                            HasGetter = true,
                            HasSetter = true,
                        },
+                       IsNullable = false,
                        OtherDatabaseProperties = new Dictionary<string, string>
                        {
                            { "IsPrimaryKey", "true" },
+                           { "PrimaryKeyStrategy", ((int)PrimaryKeyStrategy.Identity).ToString() },
                        }
                    },
                    new() {
@@ -72,9 +75,8 @@ public static class CustomerMapEFCore
                            HasGetter = true,
                            HasSetter = true
                        },
+                       Length = 200,
                        IsNullable = false,
-                       Type = "string",
-                       Length = 200
                    },
                    new() {
                        Property = new Property
@@ -82,12 +84,12 @@ public static class CustomerMapEFCore
                            Name = "AccountOpenedDate",
                            Type = "DateTime",
                            AccessModifier = AccessModifier.Public,
+                           OtherModifiers = ["required"],
                            HasGetter = true,
                            HasSetter = true
                        },
+                       Precision = 7,
                        IsNullable = false,
-                       Type = "datetime2",
-                       Precision = 7
                    },
                    new() {
                        Property = new Property
@@ -99,10 +101,9 @@ public static class CustomerMapEFCore
                            HasGetter = true,
                            HasSetter = true
                        },
-                       IsNullable = true,
-                       Type = "decimal",
                        Precision = 18,
-                       Scale = 2
+                       Scale = 2,
+                       IsNullable = true,
                    },
                    new() {
                        Property = new Property
@@ -119,10 +120,11 @@ public static class CustomerMapEFCore
                            Source = "Customer",
                            Target = "CustomerTransaction",
                        },
+                       IsNullable = false,
                        OtherDatabaseProperties = new Dictionary<string, string>
                        {
                            { "IsForeignKey", "true" },
-                           { "ForeignKeyCardinality", ((int)Cardinality.OneToMany).ToString() }
+                           { "ForeignKeyCardinality", ((int)Cardinality.OneToMany).ToString() },
                        }
                    },
                ],

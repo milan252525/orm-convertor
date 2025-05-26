@@ -154,7 +154,7 @@ public class EFCoreEntityBuilder : AbstractEntityBuilder
     {
         var otherMods = new List<string>(prop.OtherModifiers ?? []);
 
-        if (!nullable && !otherMods.Contains("required"))
+        if (!nullable && !otherMods.Contains("required") && string.IsNullOrEmpty(prop.DefaultValue))
         {
             otherMods.Add("required");
         }
@@ -185,14 +185,22 @@ public class EFCoreEntityBuilder : AbstractEntityBuilder
             attributes.AppendLine($"    [Key]");
         }
 
-        if (propMap.ColumnName != null)
+        if (propMap.ColumnName != null || propMap.Type != null)
         {
-            //string args = propMap.Type != null
-            //    ? $"{propMap.ColumnName}, TypeName = \"{propMap.Type}\""
-            //    : propMap.ColumnName;
+            var parts = new List<string>();
+            if (propMap.ColumnName != null)
+            {
+                parts.Add($"\"{propMap.ColumnName}\"");
+            }
 
-            attributes.AppendLine($"    [Column({propMap.ColumnName})]");
+            if (propMap.Type != null)
+            {
+                parts.Add($"TypeName=\"{propMap.Type.Replace("string", "nvarchar")}\""); // TODO Types
+            }
+
+            attributes.AppendLine($"    [Column({string.Join(", ", parts)})]");
         }
+
 
         if (propMap.Length != null)
         {
