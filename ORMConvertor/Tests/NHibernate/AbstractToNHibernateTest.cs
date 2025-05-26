@@ -1,4 +1,5 @@
 ﻿using AbstractWrappers;
+using Model;
 using NHibernateWrappers;
 using Tests.SampleData;
 
@@ -17,15 +18,15 @@ public class AbstractToNHibernateTest
         };
 
         var results = builder.Build();
-        var entityOutput = results.Single(x => x.ContentType == Model.ContentType.CSharp);
-        var xmlOutput = results.Single(x => x.ContentType == Model.ContentType.XML);
+        var entityOutput = results.Single(x => x.ContentType == ContentType.CSharp);
+        var xmlOutput = results.Single(x => x.ContentType == ContentType.XML);
 
         Assert.Multiple(() =>
         {
-            Assert.Equal(Model.ContentType.CSharp, entityOutput.ContentType);
+            Assert.Equal(ContentType.CSharp, entityOutput.ContentType);
             Assert.Equal(CustomerMapNHibernate.SourceEntity, entityOutput.Content, ignoreLineEndingDifferences: true);
 
-            Assert.Equal(Model.ContentType.XML, xmlOutput.ContentType);
+            Assert.Equal(ContentType.XML, xmlOutput.ContentType);
             Assert.Equal(CustomerMapNHibernate.SourceMapping, xmlOutput.Content, ignoreLineEndingDifferences: true);
         });
     }

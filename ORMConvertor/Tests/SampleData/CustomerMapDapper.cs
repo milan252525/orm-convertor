@@ -1,5 +1,5 @@
-﻿using Model.AbstractRepresentation.Enums;
-using Model.AbstractRepresentation;
+﻿using Model.AbstractRepresentation;
+using Model.AbstractRepresentation.Enums;
 
 namespace Tests.SampleData;
 

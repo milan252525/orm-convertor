@@ -1,5 +1,6 @@
 ﻿using AbstractWrappers;
 using DapperWrappers;
+using Model;
 using Tests.SampleData;
 
 namespace Tests.Dapper;
@@ -15,7 +16,7 @@ public class DapperToDapperTest
         parser.Parse(CustomerMapDapper.Source);
         var result = builder.Build().Single();
 
-        Assert.Equal(Model.ContentType.CSharp, result.ContentType);
+        Assert.Equal(ContentType.CSharp, result.ContentType);
         Assert.Equal(CustomerMapDapper.Source, result.Content, ignoreLineEndingDifferences: true);
     }
 }
