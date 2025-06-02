@@ -100,7 +100,17 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
 
         var prop = primaryKeyPropertyMap.Property;
         var columnName = primaryKeyPropertyMap.ColumnName ?? prop.Name;
-        var nhType = primaryKeyPropertyMap.Type ?? prop.Type; // TODO map C# > NH types centrally
+        string nhType;
+        if (primaryKeyPropertyMap.Type != null)
+        {
+            nhType = DatabaseTypeConvertor.ToNHibernate(primaryKeyPropertyMap.Type.Value);
+        }
+        else
+        {
+            // TODO this would be a place to query database for the missing type
+            // for now we guess it from CLR type
+            nhType = DatabaseTypeConvertor.GuessFromPropertyType(prop.Type.CLRType);
+        }
 
         var generatorClass = primaryKeyPropertyMap.OtherDatabaseProperties.TryGetValue("PrimaryKeyStrategy", out var s) && int.TryParse(s, out var intVal)
             ? PrimaryKeyStrategyConvertor.ToNHibernate((PrimaryKeyStrategy)intVal)
@@ -246,10 +256,9 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
             attrs.Add("not-null=\"true\"");
         }
 
-        // TODO improve type mapping
-        if (propertyMap.Type != null)
+        if (propertyMap.Type.HasValue)
         {
-            attrs.Add($"type=\"{propertyMap.Type.Replace("nvarchar", "string")}\"");
+            attrs.Add($"type=\"{DatabaseTypeConvertor.ToNHibernate(propertyMap.Type.Value)}\"");
         }
 
         if (propertyMap.Precision.HasValue)
@@ -311,7 +320,8 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
 
         var access = AccessModifierConvertor.ToModifierString(prop.AccessModifier);
         var modifiers = $"{access} {string.Join(' ', otherMods)}".Trim();
-        var type = (!isPrimaryKey && prop.IsNullable) ? $"{prop.Type}?" : prop.Type;
+        var clrType = CLRTypeConvertor.ToString(prop.Type);
+        var type = (!isPrimaryKey && prop.IsNullable) ? $"{clrType}?" : clrType;
 
         var getterSetter = (prop.HasGetter || prop.HasSetter)
             ? $" {{ {(prop.HasGetter ? "get;" : "")}{(prop.HasSetter ? " set;" : "")} }}"

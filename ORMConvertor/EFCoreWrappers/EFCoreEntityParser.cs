@@ -1,4 +1,5 @@
 ﻿using AbstractWrappers;
+using EFCoreWrappers.Convertors;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -138,7 +139,7 @@ public class EFCoreEntityParser(AbstractEntityBuilder entityBuilder) : IParser
 
             bool nullableSyntax = prop.Type is NullableTypeSyntax;
             string type = ((prop.Type as NullableTypeSyntax)?.ElementType ?? prop.Type).ToString();
-
+            
             var defaultValue = prop.Initializer?.Value?.ToString();
 
             var dbProps = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -260,7 +261,7 @@ public class EFCoreEntityParser(AbstractEntityBuilder entityBuilder) : IParser
             }
             else if (named.Equals("TypeName", StringComparison.OrdinalIgnoreCase))
             {
-                dbProps["Type"] = GetString(arg.Expression) ?? string.Empty;
+                dbProps["Type"] = ((int)DatabaseTypeConvertor.FromEfCore(GetString(arg.Expression))).ToString();
             }
         }
     }

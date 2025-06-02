@@ -1,4 +1,6 @@
-﻿namespace Model.AbstractRepresentation;
+﻿using Model.AbstractRepresentation.Enums;
+
+namespace Model.AbstractRepresentation;
 
 public class PropertyMap
 {
@@ -6,7 +8,7 @@ public class PropertyMap
 
     public string? ColumnName { get; set; }
 
-    public string? Type { get; set; }
+    public DatabaseType? Type { get; set; }
 
     public int? Precision { get; set; }
 

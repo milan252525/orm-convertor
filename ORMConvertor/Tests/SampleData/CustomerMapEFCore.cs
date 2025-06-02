@@ -20,9 +20,11 @@ public static class CustomerMapEFCore
             [MaxLength(200)]
             public required string CustomerName { get; set; }
 
+            [Column(TypeName="datetime2")]
             [Precision(7)]
             public required DateTime AccountOpenedDate { get; set; }
 
+            [Column(TypeName="decimal")]
             [Precision(18, 2)]
             public decimal? CreditLimit { get; set; }
 
@@ -52,7 +54,7 @@ public static class CustomerMapEFCore
                        Property = new Property
                        {
                            Name = "CustomerID",
-                           Type = "int",
+                           Type = new CLRTypeModel(){ CLRType = CLRType.Int },
                            AccessModifier = AccessModifier.Public,
                            OtherModifiers = ["required"],
                            HasGetter = true,
@@ -69,7 +71,7 @@ public static class CustomerMapEFCore
                        Property = new Property
                        {
                            Name = "CustomerName",
-                           Type = "string",
+                           Type = new CLRTypeModel(){ CLRType = CLRType.String },
                            AccessModifier = AccessModifier.Public,
                            OtherModifiers = ["required"],
                            HasGetter = true,
@@ -82,7 +84,7 @@ public static class CustomerMapEFCore
                        Property = new Property
                        {
                            Name = "AccountOpenedDate",
-                           Type = "DateTime",
+                           Type = new CLRTypeModel(){ CLRType = CLRType.DateTime },
                            AccessModifier = AccessModifier.Public,
                            OtherModifiers = ["required"],
                            HasGetter = true,
@@ -90,12 +92,13 @@ public static class CustomerMapEFCore
                        },
                        Precision = 7,
                        IsNullable = false,
+                       Type = DatabaseType.DateTime2
                    },
                    new() {
                        Property = new Property
                        {
                            Name = "CreditLimit",
-                           Type = "decimal",
+                           Type = new CLRTypeModel(){ CLRType = CLRType.Decimal },
                            IsNullable = true,
                            AccessModifier = AccessModifier.Public,
                            HasGetter = true,
@@ -104,12 +107,13 @@ public static class CustomerMapEFCore
                        Precision = 18,
                        Scale = 2,
                        IsNullable = true,
+                       Type = DatabaseType.Decimal
                    },
                    new() {
                        Property = new Property
                        {
                            Name = "Transactions",
-                           Type = "List<CustomerTransaction>",
+                           Type = new CLRTypeModel(){ CLRType = CLRType.List, GenericParam = "CustomerTransaction" },
                            AccessModifier = AccessModifier.Public,
                            HasGetter = true,
                            HasSetter = true,

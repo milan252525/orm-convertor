@@ -44,7 +44,7 @@ public class CustomerMapDapper
                        Property = new Property
                        {
                            Name = "CustomerID",
-                           Type = "int",
+                           Type = new() { CLRType = CLRType.Int },
                            AccessModifier = AccessModifier.Public,
                            HasGetter = true,
                            HasSetter = true,
@@ -54,7 +54,7 @@ public class CustomerMapDapper
                        Property = new Property
                        {
                            Name = "CustomerName",
-                           Type = "string",
+                           Type = new() { CLRType = CLRType.String },
                            AccessModifier = AccessModifier.Public,
                            OtherModifiers = ["required"],
                            HasGetter = true,
@@ -65,7 +65,7 @@ public class CustomerMapDapper
                        Property = new Property
                        {
                            Name = "AccountOpenedDate",
-                           Type = "DateTime",
+                           Type = new() { CLRType = CLRType.DateTime },
                            AccessModifier = AccessModifier.Public,
                            HasGetter = true,
                            HasSetter = true
@@ -75,7 +75,7 @@ public class CustomerMapDapper
                        Property = new Property
                        {
                            Name = "CreditLimit",
-                           Type = "decimal",
+                           Type = new() { CLRType = CLRType.Decimal },
                            IsNullable = true,
                            AccessModifier = AccessModifier.Public,
                            HasGetter = true,
@@ -86,7 +86,7 @@ public class CustomerMapDapper
                        Property = new Property
                        {
                            Name = "Transactions",
-                           Type = "List<CustomerTransaction>",
+                           Type = new() { CLRType = CLRType.List, GenericParam = "CustomerTransaction"},
                            AccessModifier = AccessModifier.Public,
                            HasGetter = true,
                            HasSetter = true,

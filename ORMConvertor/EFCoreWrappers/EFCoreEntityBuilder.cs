@@ -1,8 +1,9 @@
 ﻿using AbstractWrappers;
 using AbstractWrappers.Convertors;
+using EFCoreWrappers.Convertors;
 using Model;
 using Model.AbstractRepresentation;
-using Model.AbstractRepresentation.Enums;
+using System.Data;
 using System.Text;
 
 namespace EFCoreWrappers;
@@ -79,7 +80,6 @@ public class EFCoreEntityBuilder : AbstractEntityBuilder
 
         var prop = primaryKeyPropertyMap.Property;
         var columnName = primaryKeyPropertyMap.ColumnName ?? prop.Name;
-        var efType = primaryKeyPropertyMap.Type ?? prop.Type; // TODO map C# > NH types centrally
 
         // TODO primary key strategy
 
@@ -161,7 +161,9 @@ public class EFCoreEntityBuilder : AbstractEntityBuilder
 
         var access = AccessModifierConvertor.ToModifierString(prop.AccessModifier);
         var modifiers = $"{access} {string.Join(' ', otherMods)}".Trim();
-        var type = (!isPrimaryKey && prop.IsNullable) ? $"{prop.Type}?" : prop.Type;
+
+        var dbType = CLRTypeConvertor.ToString(prop.Type);
+        var type = (!isPrimaryKey && prop.IsNullable) ? $"{dbType}?" : dbType;
 
         var getterSetter = (prop.HasGetter || prop.HasSetter)
             ? $" {{ {(prop.HasGetter ? "get;" : "")}{(prop.HasSetter ? " set;" : "")} }}"
@@ -185,6 +187,7 @@ public class EFCoreEntityBuilder : AbstractEntityBuilder
             attributes.AppendLine($"    [Key]");
         }
 
+        // This would be a place to query database type in the future, if needed
         if (propMap.ColumnName != null || propMap.Type != null)
         {
             var parts = new List<string>();
@@ -193,9 +196,10 @@ public class EFCoreEntityBuilder : AbstractEntityBuilder
                 parts.Add($"\"{propMap.ColumnName}\"");
             }
 
-            if (propMap.Type != null)
+            if (propMap.Type.HasValue)
             {
-                parts.Add($"TypeName=\"{propMap.Type.Replace("string", "nvarchar")}\""); // TODO Types
+                var typeText = DatabaseTypeConvertor.ToEFCore(propMap.Type.Value);
+                parts.Add($"TypeName=\"{typeText}\"");
             }
 
             attributes.AppendLine($"    [Column({string.Join(", ", parts)})]");

@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Model;
+using NHibernateWrappers.Convertors;
 
 namespace NHibernateWrappers;
 

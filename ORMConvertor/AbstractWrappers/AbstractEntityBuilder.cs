@@ -76,7 +76,7 @@ public abstract class AbstractEntityBuilder
             property = new Property
             {
                 Name = propertyName,
-                Type = string.Empty
+                Type = new (){ CLRType = CLRType.None  } // Should be replaced with actual type later
             };
             EntityMap.Entity.Properties.Add(property);
         }
@@ -111,7 +111,7 @@ public abstract class AbstractEntityBuilder
             property = new Property
             {
                 Name = propertyName,
-                Type = string.Empty
+                Type = new() { CLRType = CLRType.None } // Should be replaced with actual type later
             };
             EntityMap.Entity.Properties.Add(property);
         }
@@ -150,20 +150,40 @@ public abstract class AbstractEntityBuilder
     /// <param name="defaultValue">Default value</param>
     /// <param name="isNullable">Indicates if property is nullable</param>
     public void AddProperty(
-        string type,
-        string propertyName,
-        string? accessModifier = null,
-        List<string>? OtherModifiers = null,
-        bool hasGetter = false,
-        bool hasSetter = false,
-        string? defaultValue = null,
-        bool isNullable = false
-    )
+    string type,
+    string propertyName,
+    string? accessModifier = null,
+    List<string>? OtherModifiers = null,
+    bool hasGetter = false,
+    bool hasSetter = false,
+    string? defaultValue = null,
+    bool isNullable = false
+)
     {
+        // Parse type and generic parameter (if any)
+        int genericStart = type.IndexOf('<');
+        int genericEnd = type.LastIndexOf('>');
+        string? genericParameter = null;
+        string baseTypeString;
+
+        if (genericStart >= 0 && genericEnd > genericStart)
+        {
+            // Type has a generic parameter, e.g., List<string>
+            genericParameter = type.Substring(genericStart + 1, genericEnd - genericStart - 1).Trim();
+            baseTypeString = type[..genericStart].Trim();
+        }
+        else
+        {
+            // Type is not generic
+            baseTypeString = type.Trim();
+        }
+
+        var clrType = CLRTypeConvertor.FromString(baseTypeString);
+
         var property = new Property
         {
             Name = propertyName,
-            Type = type,
+            Type = new CLRTypeModel { CLRType = clrType, GenericParam = genericParameter },
             AccessModifier = AccessModifierConvertor.FromString(accessModifier),
             OtherModifiers = OtherModifiers ?? [],
             HasGetter = hasGetter,
@@ -173,13 +193,7 @@ public abstract class AbstractEntityBuilder
         };
 
         EntityMap.Entity.Properties.Add(property);
-
-        EntityMap.PropertyMaps.Add(
-            new PropertyMap
-            {
-                Property = property,
-            }
-        );
+        EntityMap.PropertyMaps.Add(new PropertyMap { Property = property });
     }
 
     /// <summary>
@@ -197,11 +211,10 @@ public abstract class AbstractEntityBuilder
             property = EntityMap.Entity.Properties.FirstOrDefault(p => p.Name == propertyName);
             if (property == null)
             {
-                property = new Property { Name = propertyName, Type = string.Empty };
+                property = new Property { Name = propertyName, Type = new() { CLRType = CLRType.None } };
                 EntityMap.Entity.Properties.Add(property);
             }
-            propertyMap = new PropertyMap { Property = property };
-            EntityMap.PropertyMaps.Add(propertyMap);
+            propertyMap = new PropertyMap { Property = property }; 
         }
         else
         {
@@ -216,7 +229,7 @@ public abstract class AbstractEntityBuilder
                     propertyMap.ColumnName = kvp.Value;
                     break;
                 case "type":
-                    propertyMap.Type = kvp.Value;
+                    propertyMap.Type = (DatabaseType)int.Parse(kvp.Value);
                     break;
                 case "precision":
                     if (int.TryParse(kvp.Value, out var precision))

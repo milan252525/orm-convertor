@@ -27,12 +27,12 @@ public class CustomerMapNHibernate
         <?xml version="1.0" encoding="utf-8" ?>
         <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernateEntities">
             <class name="NHibernateEntities.Customer, NHibernateEntities" table="Customers" schema="Sales">
-                <id name="CustomerID" column="CustomerID" type="int">
+                <id name="CustomerID" column="CustomerID" type="Int32">
                     <generator class="identity" />
                 </id>
-                <property name="CustomerName" not-null="true" type="string" length="200" />
-                <property name="AccountOpenedDate" not-null="true" type="datetime2" precision="7" />
-                <property name="CreditLimit" not-null="false" type="decimal" precision="18" scale="2" />
+                <property name="CustomerName" not-null="true" type="String" length="200" />
+                <property name="AccountOpenedDate" not-null="true" type="DateTime" precision="7" />
+                <property name="CreditLimit" not-null="false" type="Decimal" precision="18" scale="2" />
                 <bag name="Transactions" inverse="true" cascade="all-delete-orphan">
                     <key column="CustomerID" />
                     <one-to-many class="CustomerTransaction" />
@@ -61,7 +61,7 @@ public class CustomerMapNHibernate
                        Property = new Property
                        {
                            Name = "CustomerID",
-                           Type = "int",
+                           Type = new CLRTypeModel(){ CLRType = CLRType.Int },
                            AccessModifier = AccessModifier.Public,
                            OtherModifiers = ["virtual"],
                            HasGetter = true,
@@ -77,35 +77,35 @@ public class CustomerMapNHibernate
                        Property = new Property
                        {
                            Name = "CustomerName",
-                           Type = "string",
+                           Type = new CLRTypeModel(){ CLRType = CLRType.String },
                            AccessModifier = AccessModifier.Public,
                            OtherModifiers = ["virtual", "required"],
                            HasGetter = true,
                            HasSetter = true
                        },
                        IsNullable = false,
-                       Type = "string",
+                       Type = DatabaseType.NVarChar,
                        Length = 200
                    },
                    new() {
                        Property = new Property
                        {
                            Name = "AccountOpenedDate",
-                           Type = "DateTime",
+                           Type = new CLRTypeModel(){ CLRType = CLRType.DateTime },
                            AccessModifier = AccessModifier.Public,
                            OtherModifiers = ["virtual"],
                            HasGetter = true,
                            HasSetter = true
                        },
                        IsNullable = false,
-                       Type = "datetime2",
+                       Type = DatabaseType.DateTime2,
                        Precision = 7
                    },
                    new() {
                        Property = new Property
                        {
                            Name = "CreditLimit",
-                           Type = "decimal",
+                           Type = new CLRTypeModel(){ CLRType = CLRType.Decimal },
                            IsNullable = true,
                            AccessModifier = AccessModifier.Public,
                            OtherModifiers = ["virtual"],
@@ -113,7 +113,7 @@ public class CustomerMapNHibernate
                            HasSetter = true
                        },
                        IsNullable = true,
-                       Type = "decimal",
+                       Type = DatabaseType.Decimal,
                        Precision = 18,
                        Scale = 2
                    },
@@ -121,7 +121,7 @@ public class CustomerMapNHibernate
                        Property = new Property
                        {
                            Name = "Transactions",
-                           Type = "List<CustomerTransaction>",
+                           Type = new CLRTypeModel(){ CLRType = CLRType.List, GenericParam = "CustomerTransaction" },
                            AccessModifier = AccessModifier.Public,
                            OtherModifiers = ["virtual"],
                            HasGetter = true,

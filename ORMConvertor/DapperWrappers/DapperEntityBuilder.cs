@@ -67,7 +67,8 @@ public class DapperEntityBuilder : AbstractEntityBuilder
         foreach (var property in EntityMap.Entity.Properties)
         {
             var modifiers = $"{AccessModifierConvertor.ToModifierString(property.AccessModifier)} {string.Join(' ', property.OtherModifiers)}".Trim();
-            var type = property.IsNullable ? $"{property.Type}?" : property.Type;
+            var clrType = CLRTypeConvertor.ToString(property.Type);
+            var type = property.IsNullable ? $"{clrType}?" : clrType;
 
             var getterSetter = (property.HasGetter || property.HasSetter)
                 ? $" {{ {(property.HasGetter ? "get; " : string.Empty)}{(property.HasSetter ? "set; " : string.Empty)}}}"

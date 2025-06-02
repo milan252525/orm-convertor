@@ -136,7 +136,7 @@ public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : I
 
             if (prop.Attribute("type")?.Value is string t && !string.IsNullOrEmpty(t))
             {
-                dbProps["type"] = t;
+                dbProps["type"] = ((int)DatabaseTypeConvertor.FromNHibernate(t)).ToString();
             }
 
             if (bool.TryParse(prop.Attribute("not-null")?.Value, out var notNull))

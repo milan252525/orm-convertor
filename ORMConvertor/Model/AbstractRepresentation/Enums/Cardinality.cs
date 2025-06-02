@@ -2,8 +2,8 @@
 
 public enum Cardinality
 {
-    OneToOne,
-    OneToMany,
-    ManyToMany,
-    ManyToOne,
+    OneToOne = 1,
+    OneToMany = 2,
+    ManyToMany = 3,
+    ManyToOne = 4,
 }
