@@ -69,7 +69,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.http
-      .get<RequiredContentDefinition[]>("/required-content")
+      .get<RequiredContentDefinition[]>("/orm/required-content")
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((required) => {
         this.requiredContent = required;
@@ -114,7 +114,7 @@ export class AppComponent implements OnInit {
     this.error = "";
     this.convertedUnits = [];
     this.http
-      .post<ConvertResponse>("/convert", body)
+      .post<ConvertResponse>("/orm/convert", body)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (r) => {

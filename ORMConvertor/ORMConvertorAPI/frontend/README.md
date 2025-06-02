@@ -1,4 +1,5 @@
-`ng build && rmdir /s /q "..\wwwroot" && mkdir "..\wwwroot" && xcopy /s /e /y "dist\browser" "..\wwwroot\"`
+# Build command
+`ng build --configuration production --base-href /orm/ --deploy-url /orm/ && rmdir /s /q "..\wwwroot" && mkdir "..\wwwroot" && xcopy /s /e /y "dist\browser" "..\wwwroot\"`
 
 # OrmConvert
 
