@@ -1,4 +1,5 @@
 ﻿using AbstractWrappers;
+using Model;
 using Model.Exceptions;
 using Model.QueryInstructions;
 using System.Text;
@@ -12,7 +13,7 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
     private string? sourceEntity;
     private string sourceName = "connection";
 
-    public override string Build()
+    public override List<ConversionSource> Build()
     {
         var query = BuildSelectQuery().Trim();
         var indent = new string(' ', 8);
@@ -20,7 +21,8 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
 
         // Indentation fix :(
         var template =
-@"public List<{0}> Query() {{
+@"public List<{0}> Query() 
+{{
     return {2}.Query<{0}>(
         """"""
         {1}
@@ -29,7 +31,13 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
 }}
 "; ;
 
-        return string.Format(template.Trim(), sourceEntity, indentedQuery.TrimStart(), sourceName);
+        var finalMethod = string.Format(template.Trim(), sourceEntity, indentedQuery.TrimStart(), sourceName);
+        return [
+            new() {
+                Content = finalMethod,
+                ContentType = ContentType.CSharpQuery
+            }
+        ];
     }
 
     private string BuildSelectQuery()
@@ -62,6 +70,7 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
         if (projections.Count == 0)
         {
             sqlBuilder.Append('*');
+            sqlBuilder.AppendLine();
             return;
         }
 
@@ -83,7 +92,11 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
             throw new QueryBuilderException("None or too many query sources.");
         }
 
-        sourceEntity = fromInstructions.First().Table.Split('.').Last();
+        sourceEntity = fromInstructions.First().Table.Split('.').LastOrDefault();
+        if (sourceEntity != null && sourceEntity.EndsWith('s'))
+        {
+            sourceEntity = sourceEntity[..^1];
+        }
 
         sqlBuilder.Append("FROM ");
         sqlBuilder.Append(fromInstructions.First().Accept(visitor));
@@ -117,7 +130,7 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
             if (i < selectInstructions.Count - 1)
             {
                 sqlBuilder.AppendLine();
-                sqlBuilder.Append("\tAND ");
+                sqlBuilder.Append("    AND ");
             }
         }
         sqlBuilder.AppendLine();

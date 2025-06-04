@@ -13,7 +13,8 @@ public class EFCoreLingToDapperSqlTest
         AbstractQueryBuilder builder = new DapperSqlQueryBuilder();
 
         var mockEntityMap = new EntityMap() { Entity = new(), Table = "Customers", Schema = "Sales" };
-        var parser = new EFCoreLinqQueryParser(builder, mockEntityMap);
+        
+        var parser = new EFCoreLinqQueryParser(builder);
 
         const string linqSource = """
         public void Query()
@@ -26,12 +27,13 @@ public class EFCoreLingToDapperSqlTest
         }
         """;
 
-        parser.Parse(linqSource);
-        string sql = builder.Build();
+        parser.Parse(linqSource, mockEntityMap);
+        string sql = builder.Build().First().Content;
 
         string expected = """"
-        public List<Customers> Query() {
-            return connection.Query<Customers>(
+        public List<Customer> Query() 
+        {
+            return connection.Query<Customer>(
                 """
                 SELECT c.CustomerName AS Name
                 FROM Sales.Customers AS c

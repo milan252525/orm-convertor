@@ -8,18 +8,26 @@ using Model.QueryInstructions.Enums;
 
 namespace EFCoreWrappers;
 
-public class EFCoreLinqQueryParser(AbstractQueryBuilder queryBuilder, EntityMap? entityMap) : CSharpSyntaxWalker, IParser
+public class EFCoreLinqQueryParser(AbstractQueryBuilder queryBuilder) : CSharpSyntaxWalker, IQueryParser
 {
     private SemanticModel? semanticModel = null;
     private bool fromWasEmitted;
+    private EntityMap? entityMap;
 
     public bool CanParse(ContentType contentType)
     {
-        return contentType == ContentType.CSharp;
+        return contentType == ContentType.CSharpQuery;
     }
 
     public void Parse(string source)
     {
+        Parse(source, null);
+    }
+
+    public void Parse(string source, EntityMap? entityMap)
+    {
+        this.entityMap = entityMap;
+
         // Parse the snippet into a Roslyn SyntaxTree.
         // Adding a dummy surrounding class/namespace keeps it syntactically valid.
         string wrappedSource = $@"""
@@ -310,5 +318,4 @@ public class EFCoreLinqQueryParser(AbstractQueryBuilder queryBuilder, EntityMap?
         IdentifierNameSyntax id => id.Identifier.Text,
         _ => "unknown_table"
     };
-
 }

@@ -18,12 +18,12 @@ public class AbstractToNHibernateTest
         };
 
         var results = builder.Build();
-        var entityOutput = results.Single(x => x.ContentType == ContentType.CSharp);
+        var entityOutput = results.Single(x => x.ContentType == ContentType.CSharpEntity);
         var xmlOutput = results.Single(x => x.ContentType == ContentType.XML);
 
         Assert.Multiple(() =>
         {
-            Assert.Equal(ContentType.CSharp, entityOutput.ContentType);
+            Assert.Equal(ContentType.CSharpEntity, entityOutput.ContentType);
             Assert.Equal(CustomerMapNHibernate.SourceEntity, entityOutput.Content, ignoreLineEndingDifferences: true);
 
             Assert.Equal(ContentType.XML, xmlOutput.ContentType);

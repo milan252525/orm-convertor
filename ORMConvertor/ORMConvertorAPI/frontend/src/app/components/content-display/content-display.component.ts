@@ -8,7 +8,7 @@ import { ContentType } from '../../model/content-type';
   styleUrls: ["./content-display.component.less"],
 })
 export class ContentDisplayComponent {
-  @Input() contentType: ContentType = ContentType.CSharp;
+  @Input() contentType: ContentType = ContentType.CSharpEntity;
   @Input() content: string = "";
   @Input() description: string = "";
   @Output() contentChange = new EventEmitter<string>();

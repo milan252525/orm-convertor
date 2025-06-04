@@ -1,4 +1,5 @@
-﻿using Model.QueryInstructions;
+﻿using Model;
+using Model.QueryInstructions;
 using Model.QueryInstructions.Enums;
 
 namespace AbstractWrappers;
@@ -63,5 +64,5 @@ public abstract class AbstractQueryBuilder()
         instructions.Add(new HavingInstruction(leftTable, leftProperty, leftConstant, leftFunction, op, rightTable, rightProperty, rightConstant, rightFunction));
     }
 
-    public abstract string Build();
+    public abstract List<ConversionSource> Build();
 }

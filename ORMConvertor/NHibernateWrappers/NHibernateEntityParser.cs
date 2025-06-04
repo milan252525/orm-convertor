@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Model;
+using Model.AbstractRepresentation;
 using NHibernateWrappers.Convertors;
 
 namespace NHibernateWrappers;
@@ -14,7 +15,7 @@ public class NHibernateEntityParser(AbstractEntityBuilder entityBuilder) : IPars
 {
     public bool CanParse(ContentType contentType)
     {
-        return contentType == ContentType.CSharp;
+        return contentType == ContentType.CSharpEntity;
     }
 
     /// <summary>

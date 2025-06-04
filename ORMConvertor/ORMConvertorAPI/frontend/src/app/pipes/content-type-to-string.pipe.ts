@@ -7,10 +7,12 @@ import { ContentType } from "../model/content-type";
 export class ContentTypeToStringPipe implements PipeTransform {
   transform(value: ContentType): string {
     switch (value) {
-      case ContentType.CSharp:
-        return "C#";
+      case ContentType.CSharpEntity:
+        return "C# Entity";
       case ContentType.XML:
         return "XML";
+        case ContentType.CSharpQuery:
+          return "C# Query";
       default:
         return "Unknown";
     }

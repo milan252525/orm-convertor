@@ -32,7 +32,7 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
 
         return
         [
-            new() { ContentType = ContentType.CSharp, Content = codeResult.ToString() },
+            new() { ContentType = ContentType.CSharpEntity, Content = codeResult.ToString() },
             new() { ContentType = ContentType.XML, Content = mappingResult.ToString() }
         ];
     }

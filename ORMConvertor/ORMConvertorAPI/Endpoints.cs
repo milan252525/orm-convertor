@@ -12,12 +12,15 @@ public static class Endpoints
     public record RequiredContentDefinition(ORMType OrmType, List<RequiredContentUnit> Required);
 
     public static List<RequiredContentDefinition> requiredContent = [
-        new (ORMType.Dapper, [new(1, ContentType.CSharp, "Entity (C# class)")]),
+        new (ORMType.Dapper, [new(1, ContentType.CSharpEntity, "Entity (C# class)")]),
         new (ORMType.NHibernate, [
-            new (2, ContentType.CSharp, "Entity (C# class)"),
-            new (3, ContentType.XML, "Mapping file (XML)"),
+            new (2, ContentType.CSharpEntity, "Entity (C# class)"),
+            new (3, ContentType.XML, "Mapping File (XML)"),
         ]),
-        new (ORMType.EFCore, [new(4, ContentType.CSharp, "Entity (C# class)")]),
+        new (ORMType.EFCore, [
+            new(4, ContentType.CSharpEntity, "Entity (C# class)"),
+            new (5, ContentType.CSharpQuery, "LINQ Query (optional, wrapped in a method)"),
+        ]),
     ];
     public record ConvertRequest(ORMType SourceOrm, ORMType TargetOrm, List<ConversionSource> Sources);
     public record ConvertResponse(List<ConversionSource> Sources);
@@ -30,14 +33,15 @@ public static class Endpoints
         app.MapPost("/convert",
             (ConvertRequest req) =>
             {
-                var builder = GetBuilder(req.TargetOrm);
+                var entityBuilder = GetEntityBuilder(req.TargetOrm);
+                var queryBuilder = GetQueryBuilder(req.TargetOrm);
 
-                if (builder == null)
+                if (entityBuilder == null)
                 {
                     return Results.BadRequest("Target ORM not supported");
                 }
 
-                var parsers = GetParsers(req.SourceOrm, builder);
+                var parsers = GetParsers(req.SourceOrm, entityBuilder, queryBuilder);
 
                 if (parsers.Count == 0)
                 {
@@ -48,17 +52,36 @@ public static class Endpoints
 
                 foreach (var parser in parsers)
                 {
+                    // Skip parsing queries when target query builder is not yet implemented
+                    if (parser.CanParse(ContentType.CSharpQuery) && queryBuilder == null)
+                    {
+                        continue;
+                    }
+
                     var parsable = req.Sources
                         .Where(x => parser.CanParse(x.ContentType))
                         .FirstOrDefault();
 
-                    if (parsable != null)
+                    if (parsable == null)
+                    {
+                        continue;
+                    }
+
+                    if (parser is IQueryParser queryParser)
+                    {
+                        queryParser.Parse(parsable.Content, entityBuilder.EntityMap);
+                    }
+                    else
                     {
                         parser.Parse(parsable.Content);
                     }
                 }
 
-                results.AddRange(builder.Build());
+                results.AddRange(entityBuilder.Build());
+                if (queryBuilder != null)
+                {
+                    results.AddRange(queryBuilder.Build());
+                }
 
                 return Results.Ok(new ConvertResponse(results));
             })
@@ -68,7 +91,7 @@ public static class Endpoints
            .WithOpenApi();
     }
 
-    private static AbstractEntityBuilder? GetBuilder(ORMType ormType)
+    private static AbstractEntityBuilder? GetEntityBuilder(ORMType ormType)
     {
         return ormType switch
         {
@@ -78,8 +101,19 @@ public static class Endpoints
             _ => null
         };
     }
+    private static AbstractQueryBuilder? GetQueryBuilder(ORMType ormType)
+    {
+        return ormType switch
+        {
+            ORMType.Dapper => new DapperSqlQueryBuilder(),
+            ORMType.NHibernate => null,
+            ORMType.EFCore => null,
+            _ => null
+        };
+    }
 
-    private static List<IParser> GetParsers(ORMType ormType, AbstractEntityBuilder entityBuilder)
+
+    private static List<IParser> GetParsers(ORMType ormType, AbstractEntityBuilder entityBuilder, AbstractQueryBuilder? queryBuilder)
     {
         return ormType switch
         {
@@ -91,7 +125,8 @@ public static class Endpoints
                 new NHibernateXMLMappingParser(entityBuilder)
             ],
             ORMType.EFCore => [
-                new EFCoreEntityParser(entityBuilder)
+                new EFCoreEntityParser(entityBuilder),
+                new EFCoreLinqQueryParser(queryBuilder!)
             ],
             _ => []
         };

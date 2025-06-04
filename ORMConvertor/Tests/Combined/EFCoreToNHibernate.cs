@@ -60,7 +60,7 @@ public class EFCoreToNHibernate
         entityParser.Parse(sourceCode);
 
         var results = builder.Build();
-        var entityOutput = results.Single(x => x.ContentType == ContentType.CSharp);
+        var entityOutput = results.Single(x => x.ContentType == ContentType.CSharpEntity);
         var xmlOutput = results.Single(x => x.ContentType == ContentType.XML);
 
         string expectedEntity = """
@@ -136,7 +136,7 @@ public class EFCoreToNHibernate
 
         Assert.Multiple(() =>
         {
-            Assert.Equal(ContentType.CSharp, entityOutput.ContentType);
+            Assert.Equal(ContentType.CSharpEntity, entityOutput.ContentType);
             Assert.Equal(expectedEntity, entityOutput.Content, ignoreLineEndingDifferences: true);
 
             Assert.Equal(ContentType.XML, xmlOutput.ContentType);

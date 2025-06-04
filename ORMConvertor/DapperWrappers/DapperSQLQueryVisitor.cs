@@ -111,45 +111,8 @@ public class DapperSQLQueryVisitor : IQueryVisitor
 
     public string Visit(HavingInstruction instr)
     {
-        string left;
-        if (instr.LeftTable != null && instr.LeftProperty != null)
-        {
-            string leftColumn = $"{instr.LeftTable}.{instr.LeftProperty}";
-            left = instr.LeftFunction != null
-                ? $"{instr.LeftFunction}({leftColumn})"
-                : leftColumn;
-        }
-        else if (instr.LeftConstant != null)
-        {
-            string leftConstant = instr.LeftConstant.Replace('"', '\'');
-            left = instr.LeftFunction != null
-                ? $"{instr.LeftFunction}({leftConstant})"
-                : leftConstant;
-        }
-        else
-        {
-            throw new QueryBuilderException("HavingInstruction: Left side must be a table.column or a constant.");
-        }
-
-        string right;
-        if (instr.RightTable != null && instr.RightProperty != null)
-        {
-            string rightColumn = $"{instr.RightTable}.{instr.RightProperty}";
-            right = instr.RightFunction != null
-                ? $"{instr.RightFunction}({rightColumn})"
-                : rightColumn;
-        }
-        else if (instr.RightConstant != null)
-        {
-            string rightConstant = instr.RightConstant.Replace('"', '\'');
-            right = instr.RightFunction != null
-                ? $"{instr.RightFunction}({rightConstant})"
-                : rightConstant;
-        }
-        else
-        {
-            throw new QueryBuilderException("HavingInstruction: Right side must be a table.column or a constant.");
-        }
+        string left = BuildOperand(instr.LeftTable, instr.LeftProperty, instr.LeftConstant, instr.LeftFunction);
+        string right = BuildOperand(instr.RightTable, instr.RightProperty, instr.RightConstant, instr.RightFunction);
 
         string op = instr.Operator switch
         {
@@ -167,6 +130,33 @@ public class DapperSQLQueryVisitor : IQueryVisitor
         };
 
         return $"{left} {op} {right}";
+    }
+
+    private static string BuildOperand(
+        string? table,
+        string? property,
+        string? constant,
+        string? function
+    )
+    {
+        if (property != null)
+        {
+            string column = table != null ? $"{table}.{property}" : property;
+            return function != null
+                ? $"{function}({column})"
+                : column;
+        }
+        else if (constant != null)
+        {
+            string value = constant.Replace('"', '\'');
+            return function != null
+                ? $"{function}({value})"
+                : value;
+        }
+        else
+        {
+            throw new QueryBuilderException($"Having operand must be a table.column or a constant.");
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 ﻿namespace Model;
 public enum ContentType
 {
-    CSharp = 10,
-    XML = 20
+    CSharpEntity = 10,
+    CSharpQuery = 20,
+    XML = 30
 }

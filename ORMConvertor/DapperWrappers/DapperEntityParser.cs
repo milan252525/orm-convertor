@@ -15,7 +15,7 @@ public class DapperEntityParser(AbstractEntityBuilder entityBuilder) : IParser
 {
     public bool CanParse(ContentType contentType)
     {
-        return contentType == ContentType.CSharp;
+        return contentType == ContentType.CSharpEntity;
     }
 
     /// <summary>

@@ -15,11 +15,11 @@ public class EFCoreToEFCoreTest
         entityParser.Parse(CustomerMapEFCore.Source);
 
         var results = builder.Build();
-        var entityOutput = results.Single(x => x.ContentType == ContentType.CSharp);
+        var entityOutput = results.Single(x => x.ContentType == ContentType.CSharpEntity);
 
         Assert.Multiple(() =>
         {
-            Assert.Equal(ContentType.CSharp, entityOutput.ContentType);
+            Assert.Equal(ContentType.CSharpEntity, entityOutput.ContentType);
             Assert.Equal(CustomerMapEFCore.Source, entityOutput.Content, ignoreLineEndingDifferences: true);
         });
     }
