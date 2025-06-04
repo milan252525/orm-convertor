@@ -1,7 +1,7 @@
 ﻿using AbstractWrappers;
 using EFCoreWrappers;
 using Newtonsoft.Json;
-using Tests.SampleData;
+using SampleData;
 
 namespace Tests.EFCore;
 
@@ -14,8 +14,8 @@ public class EFCoreToAbstractTest
         // however we will only be inspecting how the abstract representation is built
         AbstractEntityBuilder builder = new DummyEntityBuilder();
         var entityParser = new EFCoreEntityParser(builder);
-        entityParser.Parse(CustomerMapEFCore.Source);
+        entityParser.Parse(CustomerSampleEFCore.Entity);
 
-        Assert.Equal(JsonConvert.SerializeObject(CustomerMapEFCore.Map), JsonConvert.SerializeObject(builder.EntityMap), ignoreLineEndingDifferences: true);
+        Assert.Equal(JsonConvert.SerializeObject(CustomerSampleEFCore.Map), JsonConvert.SerializeObject(builder.EntityMap), ignoreLineEndingDifferences: true);
     }
 }

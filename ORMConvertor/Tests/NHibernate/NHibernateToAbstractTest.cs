@@ -1,8 +1,7 @@
 ﻿using AbstractWrappers;
-using DapperWrappers;
 using Newtonsoft.Json;
 using NHibernateWrappers;
-using Tests.SampleData;
+using SampleData;
 
 namespace Tests.NHibernate;
 public class NHibernateToAbstractTest
@@ -15,9 +14,9 @@ public class NHibernateToAbstractTest
         AbstractEntityBuilder builder = new DummyEntityBuilder();  
         var entityParser = new NHibernateEntityParser(builder);
         var mappingParser = new NHibernateXMLMappingParser(builder);
-        entityParser.Parse(CustomerMapNHibernate.SourceEntity);
-        mappingParser.Parse(CustomerMapNHibernate.SourceMapping);
+        entityParser.Parse(CustomerSampleNHibernate.Entity);
+        mappingParser.Parse(CustomerSampleNHibernate.XmlMapping);
 
-        Assert.Equal(JsonConvert.SerializeObject(CustomerMapNHibernate.Map), JsonConvert.SerializeObject(builder.EntityMap), ignoreLineEndingDifferences: true);
+        Assert.Equal(JsonConvert.SerializeObject(CustomerSampleNHibernate.Map), JsonConvert.SerializeObject(builder.EntityMap), ignoreLineEndingDifferences: true);
     }
 }

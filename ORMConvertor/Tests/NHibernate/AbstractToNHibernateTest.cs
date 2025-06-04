@@ -1,7 +1,7 @@
 ﻿using AbstractWrappers;
 using Model;
 using NHibernateWrappers;
-using Tests.SampleData;
+using SampleData;
 
 namespace Tests.NHibernate;
 
@@ -10,7 +10,7 @@ public class AbstractToNHibernateTest
     [Fact]
     public void AbstractToNHibernateOverall()
     {
-        var source = CustomerMapNHibernate.Map;
+        var source = CustomerSampleNHibernate.Map;
 
         AbstractEntityBuilder builder = new NHibernateEntityBuilder
         {
@@ -24,10 +24,10 @@ public class AbstractToNHibernateTest
         Assert.Multiple(() =>
         {
             Assert.Equal(ContentType.CSharpEntity, entityOutput.ContentType);
-            Assert.Equal(CustomerMapNHibernate.SourceEntity, entityOutput.Content, ignoreLineEndingDifferences: true);
+            Assert.Equal(CustomerSampleNHibernate.Entity, entityOutput.Content, ignoreLineEndingDifferences: true);
 
             Assert.Equal(ContentType.XML, xmlOutput.ContentType);
-            Assert.Equal(CustomerMapNHibernate.SourceMapping, xmlOutput.Content, ignoreLineEndingDifferences: true);
+            Assert.Equal(CustomerSampleNHibernate.XmlMapping, xmlOutput.Content, ignoreLineEndingDifferences: true);
         });
     }
 }

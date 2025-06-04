@@ -38,6 +38,7 @@
     <ProjectReference Include="..\EFCoreWrappers\EFCoreWrappers.csproj" />
     <ProjectReference Include="..\Model\Model.csproj" />
     <ProjectReference Include="..\NHibernateWrappers\NHibernateWrappers.csproj" />
+    <ProjectReference Include="..\SampleData\SampleData.csproj" />
   </ItemGroup>
 
 </Project>

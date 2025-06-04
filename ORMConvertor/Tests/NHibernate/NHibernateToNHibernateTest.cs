@@ -1,7 +1,7 @@
 ﻿using AbstractWrappers;
 using Model;
 using NHibernateWrappers;
-using Tests.SampleData;
+using SampleData;
 
 namespace Tests.NHibernate;
 
@@ -13,8 +13,8 @@ public class NHibernateToNHibernateTest
         AbstractEntityBuilder builder = new NHibernateEntityBuilder();
         var entityParser = new NHibernateEntityParser(builder);
         var mappingParser = new NHibernateXMLMappingParser(builder);
-        entityParser.Parse(CustomerMapNHibernate.SourceEntity);
-        mappingParser.Parse(CustomerMapNHibernate.SourceMapping);
+        entityParser.Parse(CustomerSampleNHibernate.Entity);
+        mappingParser.Parse(CustomerSampleNHibernate.XmlMapping);
 
         var results = builder.Build();
         var entityOutput = results.Single(x => x.ContentType == ContentType.CSharpEntity);
@@ -23,10 +23,10 @@ public class NHibernateToNHibernateTest
         Assert.Multiple(() =>
         {
             Assert.Equal(ContentType.CSharpEntity, entityOutput.ContentType);
-            Assert.Equal(CustomerMapNHibernate.SourceEntity, entityOutput.Content, ignoreLineEndingDifferences: true);
+            Assert.Equal(CustomerSampleNHibernate.Entity, entityOutput.Content, ignoreLineEndingDifferences: true);
 
             Assert.Equal(ContentType.XML, xmlOutput.ContentType);
-            Assert.Equal(CustomerMapNHibernate.SourceMapping, xmlOutput.Content, ignoreLineEndingDifferences: true);
+            Assert.Equal(CustomerSampleNHibernate.XmlMapping, xmlOutput.Content, ignoreLineEndingDifferences: true);
         });
     }
 }

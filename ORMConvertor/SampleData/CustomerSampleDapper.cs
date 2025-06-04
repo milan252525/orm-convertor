@@ -1,37 +1,27 @@
 ﻿using Model.AbstractRepresentation;
 using Model.AbstractRepresentation.Enums;
 
-namespace Tests.SampleData;
+namespace SampleData;
 
-public static class CustomerMapEFCore
+public class CustomerSampleDapper
 {
-    public const string Source = """
-        namespace EFCoreEntities;
+    public const string Entity = """
+        namespace DapperEntities;
 
-        using System.ComponentModel.DataAnnotations;
-        using System.ComponentModel.DataAnnotations.Schema;
-
-        [Table("Customers", Schema = "Sales")]
         public class Customer
         {
-            [Key]
-            public required int CustomerID { get; set; }
+            public int CustomerID { get; set; }
 
-            [MaxLength(200)]
             public required string CustomerName { get; set; }
 
-            [Column(TypeName="datetime2")]
-            [Precision(7)]
-            public required DateTime AccountOpenedDate { get; set; }
+            public DateTime AccountOpenedDate { get; set; }
 
-            [Column(TypeName="decimal")]
-            [Precision(18, 2)]
             public decimal? CreditLimit { get; set; }
 
             public List<CustomerTransaction> Transactions { get; set; } = [];
 
         }
-
+        
         """;
 
     public static EntityMap Map
@@ -43,93 +33,72 @@ public static class CustomerMapEFCore
                 Entity = new Entity
                 {
                     Name = "Customer",
-                    Namespace = "EFCoreEntities",
+                    Namespace = "DapperEntities",
                     AccessModifier = AccessModifier.Public,
-                    Attributes = []
+                    Attributes = [],
                 },
-                Table = "Customers",
-                Schema = "Sales",
+                Table = default,
+                Schema = default,
                 PropertyMaps = [
                     new() {
                        Property = new Property
                        {
                            Name = "CustomerID",
-                           Type = new CLRTypeModel(){ CLRType = CLRType.Int },
+                           Type = new() { CLRType = CLRType.Int },
                            AccessModifier = AccessModifier.Public,
-                           OtherModifiers = ["required"],
                            HasGetter = true,
                            HasSetter = true,
                        },
-                       IsNullable = false,
-                       OtherDatabaseProperties = new Dictionary<string, string>
-                       {
-                           { "IsPrimaryKey", "true" },
-                           { "PrimaryKeyStrategy", ((int)PrimaryKeyStrategy.Identity).ToString() },
-                       }
                    },
                    new() {
                        Property = new Property
                        {
                            Name = "CustomerName",
-                           Type = new CLRTypeModel(){ CLRType = CLRType.String },
+                           Type = new() { CLRType = CLRType.String },
                            AccessModifier = AccessModifier.Public,
                            OtherModifiers = ["required"],
                            HasGetter = true,
                            HasSetter = true
                        },
-                       Length = 200,
-                       IsNullable = false,
                    },
                    new() {
                        Property = new Property
                        {
                            Name = "AccountOpenedDate",
-                           Type = new CLRTypeModel(){ CLRType = CLRType.DateTime },
+                           Type = new() { CLRType = CLRType.DateTime },
                            AccessModifier = AccessModifier.Public,
-                           OtherModifiers = ["required"],
                            HasGetter = true,
                            HasSetter = true
                        },
-                       Precision = 7,
-                       IsNullable = false,
-                       Type = DatabaseType.DateTime2
                    },
                    new() {
                        Property = new Property
                        {
                            Name = "CreditLimit",
-                           Type = new CLRTypeModel(){ CLRType = CLRType.Decimal },
+                           Type = new() { CLRType = CLRType.Decimal },
                            IsNullable = true,
                            AccessModifier = AccessModifier.Public,
                            HasGetter = true,
                            HasSetter = true
-                       },
-                       Precision = 18,
-                       Scale = 2,
-                       IsNullable = true,
-                       Type = DatabaseType.Decimal
+                       }
                    },
                    new() {
                        Property = new Property
                        {
                            Name = "Transactions",
-                           Type = new CLRTypeModel(){ CLRType = CLRType.List, GenericParam = "CustomerTransaction" },
+                           Type = new() { CLRType = CLRType.List, GenericParam = "CustomerTransaction"},
                            AccessModifier = AccessModifier.Public,
                            HasGetter = true,
                            HasSetter = true,
                            DefaultValue = "[]",
                        },
-                       Relation = new() {
-                           Cardinality = Cardinality.OneToMany,
-                           Source = "Customer",
-                           Target = "CustomerTransaction",
-                       },
-                       IsNullable = false,
-                       OtherDatabaseProperties = new Dictionary<string, string>
-                       {
-                           { "IsForeignKey", "true" },
-                           { "ForeignKeyCardinality", ((int)Cardinality.OneToMany).ToString() },
-                       }
+                       //Relations = [
+                       //    new() {
+                       //        Cardinality = Cardinality.OneToMany,
+                       //        Source = "Customer",
+                       //        Target = "CustomerTransaction",
+                       //    },
+                       //]
                    },
                ],
             };

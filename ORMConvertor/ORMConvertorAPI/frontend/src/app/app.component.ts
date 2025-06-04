@@ -65,6 +65,8 @@ export class AppComponent implements OnInit {
   displayUnits: RequiredContentUnit[] = [];
   contentByUnit: { [unitId: string]: string } = {};
 
+  samples: Map<number, string> = new Map();
+
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
@@ -74,6 +76,15 @@ export class AppComponent implements OnInit {
       .subscribe((required) => {
         this.requiredContent = required;
         this.updateRequiredUnits();
+      });
+
+    this.http
+      .get<Map<number, string>>("/orm/samples")
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((samples) => {
+        this.samples = new Map(
+          Object.entries(samples).map(([k, v]) => [Number(k), v as string])
+        );
       });
   }
 
@@ -123,5 +134,14 @@ export class AppComponent implements OnInit {
         },
         error: (err) => (this.error = err.message),
       });
+  }
+
+  fillWithSamples(): void {
+    this.displayUnits.forEach((u) => {
+      const sample = this.samples.get(u.id);
+      if (sample !== undefined) {
+        this.contentByUnit[u.id] = sample;
+      }
+    });
   }
 }

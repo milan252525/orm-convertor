@@ -1,7 +1,7 @@
 ﻿using AbstractWrappers;
 using EFCoreWrappers;
 using Model;
-using Tests.SampleData;
+using SampleData;
 
 namespace Tests.EFCore;
 
@@ -12,7 +12,7 @@ public class EFCoreToEFCoreTest
     {
         AbstractEntityBuilder builder = new EFCoreEntityBuilder();
         var entityParser = new EFCoreEntityParser(builder);
-        entityParser.Parse(CustomerMapEFCore.Source);
+        entityParser.Parse(CustomerSampleEFCore.Entity);
 
         var results = builder.Build();
         var entityOutput = results.Single(x => x.ContentType == ContentType.CSharpEntity);
@@ -20,7 +20,7 @@ public class EFCoreToEFCoreTest
         Assert.Multiple(() =>
         {
             Assert.Equal(ContentType.CSharpEntity, entityOutput.ContentType);
-            Assert.Equal(CustomerMapEFCore.Source, entityOutput.Content, ignoreLineEndingDifferences: true);
+            Assert.Equal(CustomerSampleEFCore.Entity, entityOutput.Content, ignoreLineEndingDifferences: true);
         });
     }
 }

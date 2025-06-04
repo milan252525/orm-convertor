@@ -1,7 +1,7 @@
 ﻿using AbstractWrappers;
 using DapperWrappers;
 using Model;
-using Tests.SampleData;
+using SampleData;
 
 namespace Tests.Dapper;
 
@@ -10,7 +10,7 @@ public class AbstractToDapperTest
     [Fact]
     public void AbstractToDapperOverall()
     {
-        var source = CustomerMapDapper.Map;
+        var source = CustomerSampleDapper.Map;
 
         AbstractEntityBuilder builder = new DapperEntityBuilder
         {
@@ -21,6 +21,6 @@ public class AbstractToDapperTest
         var entityOutput = results.Single();
 
         Assert.Equal(ContentType.CSharpEntity, entityOutput.ContentType);
-        Assert.Equal(CustomerMapDapper.Source, entityOutput.Content, ignoreLineEndingDifferences: true);
+        Assert.Equal(CustomerSampleDapper.Entity, entityOutput.Content, ignoreLineEndingDifferences: true);
     }
 }

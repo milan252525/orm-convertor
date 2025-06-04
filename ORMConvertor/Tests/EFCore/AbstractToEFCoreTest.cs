@@ -1,7 +1,7 @@
 ﻿using AbstractWrappers;
 using EFCoreWrappers;
 using Model;
-using Tests.SampleData;
+using SampleData;
 
 namespace Tests.EFCore;
 
@@ -10,7 +10,7 @@ public class AbstractToEFCoreTest
     [Fact]
     public void AbstractToEFCoreOverall()
     {
-        var source = CustomerMapEFCore.Map;
+        var source = CustomerSampleEFCore.Map;
 
         AbstractEntityBuilder builder = new EFCoreEntityBuilder
         {
@@ -21,6 +21,6 @@ public class AbstractToEFCoreTest
         var entityOutput = results.Single();
 
         Assert.Equal(ContentType.CSharpEntity, entityOutput.ContentType);
-        Assert.Equal(CustomerMapEFCore.Source, entityOutput.Content, ignoreLineEndingDifferences: true);
+        Assert.Equal(CustomerSampleEFCore.Entity, entityOutput.Content, ignoreLineEndingDifferences: true);
     }
 }
