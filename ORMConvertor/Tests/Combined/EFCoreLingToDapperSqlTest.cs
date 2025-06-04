@@ -1,0 +1,42 @@
+﻿using AbstractWrappers;
+using DapperWrappers;
+using EFCoreWrappers;
+using Model.AbstractRepresentation;
+
+namespace Tests.Combined;
+
+public class EFCoreLingToDapperSqlTest
+{
+    [Fact]
+    public void SimpleLinqToSql()
+    {
+        AbstractQueryBuilder builder = new DapperSqlQueryBuilder();
+
+        var mockEntityMap = new EntityMap() { Entity = new(), Table = "Customers", Schema = "Sales" };
+        var parser = new EFCoreLinqQueryParser(builder, mockEntityMap);
+
+        const string linqSource = """
+        public void Query()
+        {
+            var q = ctx.Customers
+                .Where(c => c.Id != 25)
+                .OrderByDescending(c => c.Name)
+                .Select(c => new { Name = c.CustomerName })
+                .ToList();
+        }
+        """;
+
+        parser.Parse(linqSource);
+        string sql = builder.Build();
+
+        string expected = """
+        SELECT c.CustomerName AS Name
+        FROM Sales.Customers AS c
+        WHERE c.Id <> 25
+        ORDER BY c.Name DESC
+
+        """;
+
+        Assert.Equal(expected, sql, ignoreWhiteSpaceDifferences: true, ignoreLineEndingDifferences: true);
+    }
+}
