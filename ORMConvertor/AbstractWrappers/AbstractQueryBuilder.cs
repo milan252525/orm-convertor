@@ -21,34 +21,46 @@ public abstract class AbstractQueryBuilder()
         instructions.Add(new SubQueryInstruction(body));
     }
 
-    public void From(string table)
+    public void From(string table, string? alias = null)
     {
-        instructions.Add(new FromInstruction(table));
+        instructions.Add(new FromInstruction(table, alias));
     }
 
-    public void Project(string table, string attr, string? alias = null)
+    public void Project(string table, string attr, string? alias = null, string? function = null)
     {
-        instructions.Add(new ProjectInstruction(table, attr, alias));
+        instructions.Add(new ProjectInstruction(table, attr, alias, function));
     }
 
-    public void Select(string expr)
+    public void Select(
+        string? leftTable, string? leftProperty, string? leftConstant, 
+        BooleanOperator op, 
+        string? rightTable, string? rightProperty, string? rightConstant)
     {
-        instructions.Add(new SelectInstruction(expr));
+        instructions.Add(new SelectInstruction(leftTable, leftProperty, leftConstant, op, rightTable, rightProperty, rightConstant));
     }
 
-    public void Join(string left, string right, JoinKind kind, string on)
+    public void Join(JoinKind kind, string left, string right, string leftProperty, string rightProperty, string? rightTableAlias = null)
     {
-        instructions.Add(new JoinInstruction(left, right, kind, on));
+        instructions.Add(new JoinInstruction(kind, left, right, rightTableAlias, leftProperty, rightProperty));
     }
 
-    public void Aggregate(string table, string[] attrs, string fn)
+    public void GroupBy(string table, string attr)
     {
-        instructions.Add(new AggregateInstruction(table, attrs, fn));
+        instructions.Add(new GroupByInstruction(table, attr));
     }
 
-    public void OrderBy(string table, string[] attrs, bool desc = false)
+    public void OrderBy(string? table, string attributeOrAlias, bool asc = true)
     {
-        instructions.Add(new OrderByInstruction(table, attrs, desc));
+        instructions.Add(new OrderByInstruction(table, attributeOrAlias, asc));
+    }
+
+    public void Having(
+        string? leftTable, string? leftProperty, string? leftConstant, string? leftFunction,
+        BooleanOperator op,
+        string? rightTable, string? rightProperty, string? rightConstant, string? rightFunction
+    )
+    {
+        instructions.Add(new HavingInstruction(leftTable, leftProperty, leftConstant, leftFunction, op, rightTable, rightProperty, rightConstant, rightFunction));
     }
 
     public abstract string Build();

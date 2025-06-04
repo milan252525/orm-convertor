@@ -1,10 +1,10 @@
 ﻿namespace Model.QueryInstructions;
 
 public sealed record OrderByInstruction(
-    string Table,
-    string[] Attributes,
-    bool Desc
+    string? Table,
+    string Attribute,
+    bool Asc = true
 ) : QueryInstruction
 {
-    public override void Accept(IQueryVisitor visitor) => visitor.Visit(this);
+    public override string Accept(IQueryVisitor visitor) => visitor.Visit(this);
 }

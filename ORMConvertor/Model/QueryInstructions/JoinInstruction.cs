@@ -3,11 +3,13 @@
 namespace Model.QueryInstructions;
 
 public sealed record JoinInstruction(
+    JoinKind Kind,
     string LeftTable,
     string RightTable,
-    JoinKind Kind,
-    string Condition
+    string? RightTableAlias,
+    string LeftProperty,
+    string RightProperty
 ) : QueryInstruction
 {
-    public override void Accept(IQueryVisitor visitor) => visitor.Visit(this);
+    public override string Accept(IQueryVisitor visitor) => visitor.Visit(this);
 }

@@ -2,11 +2,14 @@
 
 public sealed record SubQueryInstruction(IReadOnlyList<QueryInstruction> Body) : QueryInstruction
 {
-    public override void Accept(IQueryVisitor v)
+    public override string Accept(IQueryVisitor v)
     {
         foreach (var instr in Body)
         {
             instr.Accept(v);
         }
+
+        // TODO
+        return string.Empty;
     }
 }

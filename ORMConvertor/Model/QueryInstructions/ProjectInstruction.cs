@@ -3,8 +3,9 @@
 public sealed record ProjectInstruction(
     string Table,
     string Attribute,
-    string? Alias
+    string? Alias = null,
+    string? Function = null
 ) : QueryInstruction
 {
-    public override void Accept(IQueryVisitor visitor) => visitor.Visit(this);
+    public override string Accept(IQueryVisitor visitor) => visitor.Visit(this);
 }

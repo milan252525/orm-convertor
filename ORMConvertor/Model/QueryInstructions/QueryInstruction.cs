@@ -2,5 +2,5 @@
 
 public abstract record QueryInstruction
 {
-    public abstract void Accept(IQueryVisitor visitor);
+    public abstract string Accept(IQueryVisitor visitor);
 }
