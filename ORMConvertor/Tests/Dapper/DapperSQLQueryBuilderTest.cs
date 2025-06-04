@@ -24,18 +24,23 @@ public class DapperSQLQueryBuilderTest
         builder.Having("ord", "TotalPrice", null, "SUM", BooleanOperator.GreaterThan, null, null, "1000", null);
         var sql = builder.Build();
 
-        string expected = """
-        SELECT c.CustomerName AS Name, COUNT(ord.Id) AS OrderCount, SUM(ord.TotalPrice) AS TotalSpent
-        FROM Sales.Customer AS c
-        INNER JOIN Sales.Orders ord ON c.Id = ord.CustomerId
-        WHERE c.Id <> 25
-            AND ord.TotalPrice >= c.MaxOrderLimit
-        GROUP BY c.CustomerName 
-        HAVING SUM(ord.TotalPrice) > 1000
-        ORDER BY Name DESC, TotalSpent ASC
+        string expected = """"
+        public List<Customer> Query() {
+            return connection.Query<Customer>(
+                """
+                SELECT c.CustomerName AS Name, COUNT(ord.Id) AS OrderCount, SUM(ord.TotalPrice) AS TotalSpent
+                FROM Sales.Customer AS c
+                INNER JOIN Sales.Orders ord ON c.Id = ord.CustomerId
+                WHERE c.Id <> 25
+                	AND ord.TotalPrice >= c.MaxOrderLimit
+                GROUP BY c.CustomerName
+                HAVING SUM(ord.TotalPrice) > 1000
+                ORDER BY Name DESC, TotalSpent ASC
+                """,    
+            ).ToList();
+        }
+        """";
 
-        """;
-
-        Assert.Equal(expected, sql, ignoreWhiteSpaceDifferences: true, ignoreLineEndingDifferences: true);
+        Assert.Equal(expected, sql, ignoreAllWhiteSpace: true, ignoreLineEndingDifferences: true);
     }
 }

@@ -29,13 +29,18 @@ public class EFCoreLingToDapperSqlTest
         parser.Parse(linqSource);
         string sql = builder.Build();
 
-        string expected = """
-        SELECT c.CustomerName AS Name
-        FROM Sales.Customers AS c
-        WHERE c.Id <> 25
-        ORDER BY c.Name DESC
-
-        """;
+        string expected = """"
+        public List<Customers> Query() {
+            return connection.Query<Customers>(
+                """
+                SELECT c.CustomerName AS Name
+                FROM Sales.Customers AS c
+                WHERE c.Id <> 25
+                ORDER BY c.Name DESC
+                """,    
+            ).ToList();
+        }
+        """";
 
         Assert.Equal(expected, sql, ignoreWhiteSpaceDifferences: true, ignoreLineEndingDifferences: true);
     }

@@ -9,9 +9,27 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
 {
     private readonly IQueryVisitor visitor = new DapperSQLQueryVisitor();
 
+    private string? sourceEntity;
+    private string sourceName = "connection";
+
     public override string Build()
     {
-        return BuildSelectQuery();
+        var query = BuildSelectQuery().Trim();
+        var indent = new string(' ', 8);
+        var indentedQuery = string.Join("\n", query.Split('\n').Select(line => indent + line));
+
+        // Indentation fix :(
+        var template =
+@"public List<{0}> Query() {{
+    return {2}.Query<{0}>(
+        """"""
+        {1}
+        """""",    
+    ).ToList();
+}}
+"; ;
+
+        return string.Format(template.Trim(), sourceEntity, indentedQuery.TrimStart(), sourceName);
     }
 
     private string BuildSelectQuery()
@@ -65,6 +83,8 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
             throw new QueryBuilderException("None or too many query sources.");
         }
 
+        sourceEntity = fromInstructions.First().Table.Split('.').Last();
+
         sqlBuilder.Append("FROM ");
         sqlBuilder.Append(fromInstructions.First().Accept(visitor));
         sqlBuilder.AppendLine();
@@ -83,7 +103,7 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
     private void BuildWherePart(StringBuilder sqlBuilder)
     {
         var selectInstructions = instructions.OfType<SelectInstruction>().ToList();
-        
+
         if (selectInstructions.Count == 0)
         {
             return;
@@ -106,7 +126,7 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
     private void BuildOrderByPart(StringBuilder sqlBuilder)
     {
         var orderByInstructions = instructions.OfType<OrderByInstruction>().ToList();
-        
+
         if (orderByInstructions.Count == 0)
         {
             return;
@@ -124,7 +144,7 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
     private void BuildGroupByPart(StringBuilder sqlBuilder)
     {
         var groupByInstructions = instructions.OfType<GroupByInstruction>().ToList();
-        
+
         if (groupByInstructions.Count == 0)
         {
             return;
