@@ -513,88 +513,89 @@ Notable result files include:
 \subsection{Results interpretation}
 Results are accompanied by tables showing results across all test cases. 
 
-\autoref{tab:feature_comp} summarizes feature test outcomes. The base part of the result shows if the query could be expressed in the framework, Y means yes and N means no. Further detail is then clarified. The categories for successful results are, sorted from the most ideal to the least:
+\autoref{tab:feature_comp} summarizes feature test outcomes. The base result indicates if the query could be expressed within each framework (Y = yes, N = no). Outcomes are categorized as:
 \begin{itemize}
-    \item \textbf{Y LINQ} - The query could be written in LINQ with no issue.
-    \item \textbf{Y lambda expr.} - The query could be written with a lambda expression. Similar to LINQ but less expressive.
-    \item \textbf{Y raw SQL} - No statically typed language feature could be used and the query had to be written in SQL. Either in string or using SQL builder.
-    \item \textbf{N manually in memory} - A different or limited query had to be used and the result had to be modified or computed in memory.
-    \item \textbf{N custom JSON parsing/converter} - JSON could not be queried directly and had to be parsed in memory.
-    \item \textbf{N error} - The query threw an exception and there was no possible fix. 
+    \item \textbf{Y LINQ}: LINQ fully supported.
+    \item \textbf{Y lambda expr.}: Supported using lambda expressions, less expressive than LINQ.
+    \item \textbf{Y raw SQL}: Query had to be written directly in SQL, either in string or using a builder.
+    \item \textbf{N manually in memory}: Query required manual post-computation in memory.
+    \item \textbf{N custom JSON parsing/converter}: JSON could not be queried and had to be parsed in memory.
+    \item \textbf{N error}: Query failed with exception that could not be fixed. 
 \end{itemize}
-The negative results are explained further in the text.
+The negative results are discussed in detail further in the text.
 
-\autoref{tab:benchmark_results_time} shows measured benchmark time in microseconds (one millionth of a second). And \autoref{tab:benchmark_results_memory} shows allocated memory during the run of the benchmark method. The results presented in text will be rounded to the nearest integer.
+\autoref{tab:benchmark_results_time} presents measured execution time (in microseconds). \autoref{tab:benchmark_results_memory} presents allocated memory during the run of the benchmark. Reported numbers in text will be rounded to the nearest integer.
 
-Performance tests have to be considered in the context of the feature test results. It was not possible to write all tests in the same way across all frameworks. In a few cases, it was not possible to do the query using the framework at all. In those cases, to have a passing test, pure ADO.NET query was used. 
+Performance tests have to be considered in the context of the feature test results. It was not possible to write all tests in the same way across all frameworks. In some cases, pure ADO.NET queries were used when the framework failed entirely. Additionally, some queries required additional processing in memory, significantly affecting memory usage. These anomalies will be explicitly noted.
 
-In some cases it was not possible to get the desired result purely as a result of a query. Some relations or calculations had to be done in memory. That, of course, majorly affects measured memory consumption. Such anomalies will always be described in the corresponding test results.
+Certain frameworks cannot log generated SQL statements to console or file. For those, SQL Server Profiler\cite{sqlProfiler} was used. It allows capturing of any event happening in the SQL Server database, including incoming SQL queries. That makes us able to inspect the raw query after it leaves our application and the frameworks can make no further edits to it.
 
-Certain frameworks do not allow logging of generated SQL statements to console or file. We can work around this using SQL Server Profiler\cite{sqlProfiler}. It is a tool integrated into SQL Server Management Studio. It allows for the capturing of any event happening in the SQL Server database, including incoming SQL queries. That makes us able to inspect the raw query after it leaves our application and the frameworks can make no further edit to it.
-
-\subsubsection{Benchmark execution}
-The final performance benchmark run was executed on a PC with the highest performance power plan while being constantly plugged in. Screen saving was turned off. The only applications running were those essential to the benchmark (database in Docker container and Visual Studio project). No other work was being done. Data further present are a result of that run and are available as an attachment.
-
-The exact PC and runtime specifications are available below. This information comes directly from the benchmark run log. 
-\begin{lstlisting}
-BenchmarkDotNet v0.14.0, Windows 11 (10.0.22631.4890/23H2/2023Update/SunValley3)
-AMD Ryzen 5 5600H with Radeon Graphics, 1 CPU, 12 logical and 6 physical cores
-.NET SDK 9.0.101
-  [Host]     : .NET 8.0.11 (8.0.1124.51707), X64 RyuJIT AVX2
-  DefaultJob : .NET 8.0.11 (8.0.1124.51707), X64 RyuJIT AVX2
-\end{lstlisting}
+\subsubsection{Benchmark execution environment}
+Performance benchmarks were executed on a single computer configured for the highest performance:
+\begin{itemize}
+    \item Windows 11, AMD Ryzen 5 5600H CPU (6 physical cores, 12 logical)
+    \item .NET SDK version: 9.0.101
+    \item Execution framework: BenchmarkDotNet v0.14.0
+    \item Runtime: .NET 8.0.11, X64 architecture, RyuJIT AVX2
+\end{itemize}
 
 \subsubsection{A - Entity projection}
-The first three queries \hyperref[query:a1]{A1}, \hyperref[query:a2]{A2} and \hyperref[query:a3]{A3} fetched one database record and shaped it in different ways. All ORMs were capable of this task without any issue. It was a matter of having an entity with the chosen columns and shaping a query. The macro frameworks like EF and NHibernate allowed us to set the shape using \texttt{Select} LINQ method. In the micro ones, we had to choose the columns through \texttt{SELECT} part of the SQL statement. 
-There are no major differences in the measured time, just a slight increase for the macro ORMs as would be expected. When looking at allocated memory, we can see a 2-10$\times$ increase for NHibernate  and especially EF6. EF Core is clearly optimized in this area and the increase in allocated memory is not major. 
+The first three queries \hyperref[query:a1]{A1}, \hyperref[query:a2]{A2} and \hyperref[query:a3]{A3} fetched and reshaped one database record successfully across all frameworks. Macro ORMs (EF, NHibernate) used LINQ \texttt{Select} method. Micro ORMs utilized projection in SQL query directly.
+Minor performance differences appeared, macro ORMs were slightly slower. Notably, NHibernate and EF6 showed significant 2 to 10 times memory allocation spikes. EF Core is clearly optimized in this area.
 
-We encounter a first issue at the \hyperref[query:a4]{A4} query which loads the result of a stored procedure. The stored procedure in our test data returns columns with spaces in their names. While it's not a usual naming convention, it was not expected to make some frameworks completely fail.
+Query \hyperref[query:a4]{A4} tested loading results of a stored procedure. The volume of data is approximately 60,000 rows. The stored procedure in our test dataset returns column names with spaces. Which is definitely unusual, but we would not expect a framework to completely fail. Dapper, PetaPoco, RepoDB, linq2db, and EF Core succeeded using raw SQL. Memory allocation varied significantly for those (16 MB to 29 MB). No major difference in the executed query was found using SQL Server Profiler.
 
-Dapper, PetaPoco, RepoDB, linq2db and EF Core had no issue. All of those had to use a raw SQL to specify the query name, there was no way to map it to for example an object. For the context, over 60,000 results were returned. Measured time has no significant difference, but allocated memory differs by a huge margin. PetaPoco, RepoDB and linq2db allocated 16-17 MB, while Dapper and EF Core allocated 24 and 29 MB respectively. After checking with SQL Server Profiler\cite{sqlProfiler}, there is no major difference in the executed query. It always returns the same columns. And our assertions made sure all properties are filled in.
+NHibernate failed on an internal error. The error message \texttt{Could not find a setter for property 'WWI Order ID' in class 'System.RuntimeType'} suggests the framework failed to fill an internal memory representation of the entity. A workaround using a hash table increased both time and memory significantly.
 
-NHibernate was failing on an internal error when converting the stored procedure result.
-The error was \lstinline{NHibernate.PropertyNotFoundException : Could not find a setter for property 'WWI Order ID' in class 'System.RuntimeType'}.
-It suggests its internal representation of the entity could not be filled due to the white space. The only fix we could find was converting the result into a hash table instead of a list of entities. As seen in the measurements, it increased both time and allocated memory significantly compared to others.
-
-And finally, EF6 had the same issue with spaces, except we could not find any workaround in this case. There is no similar feature to load the result into a hash table, or dynamic objects. So the test uses a pure ADO.NET connection, with no EF6 features whatsoever. We consider the test failed and the measurements are not relevant for our comparison.
+EF6 completely failed, with no viable workaround this time. The test uses a pure ADO.NET connection, with no EF6 features whatsoever. We consider the test failed and the measurements are not relevant for our comparison.
 
 \subsubsection{B - Selection}
-This group tests different types of conditions. Feature-wise, all tests pass. There is no exception or difference. As expected, queries in Dapper and PetaPoco have to be written in SQL. While in the other frameworks, we can utilize LINQ (or lambda expressions) to have statically typed queries. 
+All selection queries \hyperref[query:b1]{B1} - \hyperref[query:b6]{B6} passed in terms of features. As expected, Dapper and PetaPoco required explicit SQL, while macro ORMs supported LINQ. Memory usage varied significantly, particularly for NHibernate and EF6.
 
-While the tests do pass, measurements differ a lot per ORM and query. Let us examine the queries one by one.
+Query \hyperref[query:b1]{B1}, which returns 5 records, showed macro ORMs allocating significantly more memory (NHibernate 49 KB, EF6 102 KB) compared to Dapper (9 KB) or PetaPoco (14 KB). Query \hyperref[query:b2]{B2}, returning thousands of records, again showed NHibernate and E6 taking drastically more time and memory (7 and 16 times more), even though generated SQL queries were identical.
 
-As we have discussed when defining the queries, it is not relevant for ORM comparison using the same relational database if a column is indexed or not. We will therefore not compare query B1 and B2 in this sense. However, the first query only returns 5 rows, while the second over thirteen thousand.
+Query \hyperref[query:b3]{B3} showed unexpectedly slower performance from Dapper, PetaPoco, and RepoDB. There is a difference in the query. In Dapper and PetaPoco, where SQL is written by us, we used \texttt{BETWEEN} condition for selecting a date range. Other ORMs broke this condition down into two operators ($\leq$ and $\geq$). But RepoDB does not use \texttt{BETWEEN}, hinting that this had no impact.
 
-Query \hyperref[query:b1]{B1} has relatively little difference in terms of measured time. The macro ORMs again show a small increase. But the big difference is in the memory consumption. EF6 allocated 102 KB and NHibernate 49 KB. The other frameworks allocated in the range of 8 to 15 KB.
-Especially interesting is the memory consumption between Dapper (9 KB) and PetaPoco (14 KB). While taking almost the same time, PetaPoco allocated two times more memory. 
-% TODO profile memory
-
-The second query \hyperref[query:b2]{B2} shows unusual results in measured time, NHibernate took 2 times more and EF6 3 times more time than other frameworks. After checking with SQL profiler, there is no difference in SQL queries that would affect performance or the amount of data returned.
-
-In terms of memory, we can again see the spike for NHibernate and EF6, allocating 7 and 16 times more respectively. If we compare Dapper and PetaPoco, this time Dapper allocated approximately two times more memory. 
-This might suggest PetaPoco has a bigger framework overhead, which shows at small results. But for bigger amounts of objects, it has better memory optimization. 
-
-The third query \hyperref[query:b3]{B3} took about 22 milliseconds for most frameworks. Dapper, PetaPoco and RepoDB, the three smaller ORMs, took about 30 milliseconds. There is an interesting difference in the query. In Dapper and PetaPoco, where SQL is written by us, we used \texttt{BETWEEN} condition for selecting a date range. Other ORMs broke this condition down into two operators (less than or equal to and greater than or equal to). This could hint at what the reason for slower execution might be. But RepoDB does not use \texttt{BETWEEN} making this assumption invalid. Profiler tool shows no other difference in the generated query. As for memory consumption, we can see a significant spike for NHibernate and EF6.
-
-The query \hyperref[query:b4]{B4} fetched 15 results from a table with over 231,000 rows using the IN statement on the primary key. The measured time and memory allocation were similar across the results, with NHibernate and EF6 showing memory allocation spikes again. 
-
-The differences in measured time for queries \hyperref[query:b5]{B5} and \hyperref[query:b6]{B6} are almost negligible. The generated queries had no difference. Surprising results are in memory allocation, where Dapper consumed more memory than PetaPoco while running the same query and returning the same number of columns and rows.
-
-Throughout this category, we have seen a higher memory consumption in NHibernate and EF6. The generated queries had only syntactic and naming differences. Structurally and logically, they were identical. This suggests these two frameworks might be less memory efficient. We will explore this further in the following categories.
+Queries \hyperref[query:b4]{B4}, \hyperref[query:b5]{B5}, and \hyperref[query:b6]{B6} had generally consistent execution times across all frameworks. But NHibernate and EF6 showed consistently elevated memory allocation. Interestingly, in some cases, Dapper showed higher memory usage compared to PetaPoco, indicating differences in internal memory optimization. 
 
 \subsubsection{C - Aggregation}
-The following three queries tested different aggregation functions over different data. The first one \hyperref[query:c1]{C1} performed a combination of group by and count over the same column. RepoDB has no support for \texttt{group by} operation, so it failed this test. The measured times are almost identical for other frameworks. NHibernate and EF6 have approximately a 4 and 10 times memory consumption increase respectively.
+Aggregation tests \hyperref[query:c1]{C1} - \hyperref[query:c3]{C3} tested handling of groupings and aggregate functions. RepoDB lacked support for \texttt{group by} operation in query C, failing the test entirely. NHibernate and EF6 have approximately a 4 and 10 times memory consumption increase, respectively, although execution times remain comparable. 
 
-All frameworks were able to perform query \hyperref[query:c2]{C2} without any unexpected differences.
+\hyperref[query:c2]{C2} showed consistent performance and memory usage across frameworks. However, in \hyperref[query:c3]{C3}, RepoDB incorrectly handled a multiplication when using its \texttt{Sum} function. It omitted part of the multiplication inside the \texttt{sum} aggregation function, returning incorrect results. We had to use a raw SQL query instead. The measured time is consistent across all frameworks. The returned result is just one number and we can see some slight increase in memory consumption for the macro ORMs.
 
-In the query \hyperref[query:c3]{C3}, we have used the \texttt{sum} aggregation function, but with a multiplication inside of it. For all order lines we have asked for sum of quantity multiplied by unit price. While RepoDB supports the Sum function, it returned incorrect results when multiplication is inside of it. When checking profiled query, it dropped the multiplication and only summed over unit price. So this is another failed test for RepoDB.
-The operation went through an entire table. The measured time is consistent across all frameworks. The returned result is just one number and we can see some slight increase in memory consumption for the bigger ORMs.
+In summary, RepoDB did not handle aggregation functions well. EF Core is showing its optimization by approaching the results of micro ORMs.
 
-In summary, RepoDB did not handle aggregation functions very well. EF Core is quite optimized, returning similar results to macro ORMs. On the other hand, NHibernate and EF6 have increased memory usage again.
+\subsubsection{D - Relations}
+This group evaluates how effectively ORMs handle relational data - specifically one-to-many, many-to-many, and optional one-to-many relationships. Macro ORMs managed to automatically retrieve related entities once mapping was correctly defined. On the other hand, micro ORMs generally required raw SQL data fetching and in-memory grouping. Parent-child pairs were fetched individually before grouping them using dictionaries.
 
+In query \hyperref[query:d1]{D1} one parent with a few children was fetched. NHibernate and EF6 again showed increased memory usage, around 4 to 6 times higher.
 
-% possible TODO find sources comparing SELECT * vs listing all columns 
-% TODO profiled queries as attachment?
+Query \hyperref[query:d2]{D2} examined a dense many-to-many relationship involving 227 entities on one side and 10 on the other. RepoDB passed the other two queries, but this one had to be done in memory. linq2db required an explicit join entity, while the other macro ORMs directly mapped child collections within parent entities.
+
+Query \hyperref[query:d3]{D3} tested an optional one-to-many relationship. Linq2db had the best results, using separate queries for parents and children without any optimization enabled. Surprisingly, EF Core performed the worst, taking 2548 ms compared to Dapper's 187 ms. This inefficiency remained even after experimenting with different tracking settings and the split query feature. When running the raw generated query directly, it was executed in less than 200 ms.
+
+We could see EF Core performing well among the previous categories, but it is really slow when it comes to relationships. Raw SQL combined with manual memory grouping or using linq2db seems to be the best option for queries over relationships.
+
+\subsubsection{E - Result modification}
+Queries \hyperref[query:e1]{E1} and \hyperref[query:e2]{E2} tested column sorting and distinct results. All ORMs passed these tests with no significant difference. Only NHibernate and EF6 showed increased memory consumption. 
+
+\subsubsection{F - Querying JSON}
+These tests targeted JSON querying capabilities within a string column. Only EF Core provides full LINQ integration. Other frameworks required raw SQL with MSSQL JSON functions and subsequent manual JSON parsing.
+
+Both queries \hyperref[query:f1]{F1} and \hyperref[query:f2]{F2} showed similar execution times. Allocated memory differs slightly, mainly for NHibernate and EF6 once again. Interestingly, PetaPoco consumed over twice the memory of Dapper despite identical queries.
+
+\subsubsection{G - Set operations}
+Query \hyperref[query:g1]{G1} tested union and \hyperref[query:g2]{G2} intersection. Macro ORMs took roughly double the time. However, considering the small result set ($<$ 10), the variation can likely be attributed to framework overhead.
+
+\subsubsection{H - Querying metadata}
+The final test \hyperref[query:h1]{H1} queried table metadata, specifically the data type of a single column. No ORM had native support, requiring a raw SQL query to \texttt{INFORMATION\_SCHEMA.COLUMNS} table. There are small differences, we can likely attribute them to framework overhead.
+
+\subsubsection{Summary of findings}
+Performance and feature test results clearly differ between micro and macro ORMs. Macro ORMs (NHibernate, EF6, EF Core) offer richer features and better abstractions. But that comes at the cost of increased execution time and memory overhead, particularly noticeable in the older EF6 and NHibernate. EF Core consistently demonstrates strong optimizations, often competing with micro ORMs. However, it notably struggles with relational queries. 
+
+Micro ORMs (Dapper and PetaPoco) require manual SQL handling, resulting in minimal time and memory overhead. They generally handle their limited features well. Linq2db strikes a good balance between speed and abstraction over SQL. It handles complex relationships notably well. Lastly, RepoDB stands at a strange middle ground, neither being best in any category nor offering a wide range of features.
+
+Considering our test results alongside other factors---our previous findings about popularity, update frequency and overall functionality---EF Core emerges as the best choice for most applications. It has the widest feature set with solid optimizations. However, when performance is the critical factor, choosing raw queries with Dapper might be a better alternative.
 
 %\clearpage
 \afterpage{
@@ -653,26 +654,6 @@ H1\_Metadata &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &
 %\end{adjustwidth}
 \end{landscape}
 }
-
-
-
-% \begin{center}
-%     \captionof{table}{A1\_EntityIdenticalToTable}
-%     \sisetup{table-format=4.1, separate-uncertainty}
-%     \begin{tabular}{l S S S S S}
-%         \hline
-%         ORM & {Mean (\si{\micro\second})} & {Allocated (KB)} & {Gen0} & {Gen1} & {Gen2} \\
-%         \hline
-%         Dapper    & 750.2  & 6.24  & 0.0    & 0.0    & 0.0    \\
-%         PetaPoco  & 721.8  & 7.99  & 0.9766 & 0.0    & 0.0    \\
-%         RepoDB    & 747.5  & 8.77  & 0.9766 & 0.9766 & 0.0    \\
-%         Linq2db   & 839.2  & 12.74 & 0.9766 & 0.0    & 0.0    \\
-%         NHibernate & 742.1 & 36.06 & 3.9063 & 0.0    & 0.0    \\
-%         EF6       & 854.1  & 90.43 & 9.7656 & 0.0    & 0.0    \\
-%         EFCore    & 809.1  & 14.49 & 0.9766 & 0.0    & 0.0    \\
-%         \hline
-%     \end{tabular}
-% \end{center}
 
 
 \clearpage
