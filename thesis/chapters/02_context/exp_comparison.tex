@@ -1,4 +1,4 @@
-\chapter{Experimental comparison}
+\section{Experimental performance comparison}
 
 This chapter presents an experimental comparison of the 7 selected ORM frameworks. 
 The primary goals are to assert the correctness of results, measure performance, and assess how effectively each framework integrates into the .NET through its supported query language.
@@ -7,7 +7,7 @@ For each framework, we will create a set of unit tests performing pre-selected q
 
 We will only test read (SELECT) queries. Those cover a sufficiently large area of features and provide us with enough information to get some insight on capabilities and performance. Other non-read operations, including insert, update, and delete queries, could be explored in future work.
 
-\section{Dataset}\label{sec:dataset}
+\subsection{Dataset}\label{sec:dataset}
 % https://learn.microsoft.com/en-us/sql/samples/wide-world-importers-what-is?view=sql-server-ver16
 To adequately test performance, we need a sufficiently large data set. Microsoft offers pre-made open source datasets.
 For this comparison, the Wide World Importers sample database \cite{microsoftWWI} has been selected.
@@ -15,14 +15,14 @@ It contains a diverse set of fictional data about a company Wide World Importers
 
 The database contains over thirty tables split into four schemas: Application, Purchasing, Sales, Warehouse. For each query, we will select a suitable table and columns that can best showcase the desired feature.
 
-\section{Database}\label{sec:database}
+\subsection{Database}\label{sec:database}
 % database, docker, test project, .net
 The dataset is made for Microsoft SQL Server (MSSQL). It is the third most popular database management system as of March 2025 according to DB-Engines Ranking\cite{DBEngines2025Ranking}. With a score of 788.14, it is behind Oracle (1253.08) and MySQL (988.13). The score takes into account number of mentions on websites, frequency of technical discussions, number of job offers mentioning the system, relevance in social networks and other parameters.\cite{DBEnginesRankingMetrics} 
 Microsoft SQL Server is commonly used in .NET applications with EF Core ORM as the three products are all developed by Microsoft.  
 
 Unit tests should be easy to set up and run. Configuring a database can turn into a complicated task. We will create a Docker container running MSSQL. The dataset will be loaded on startup. Execution of unit tests will be just a matter of starting the Docker container and running the \texttt{dotnet test} command (or alternatively using Visual Studio Test Explorer). 
 
-\section{Testing approach}\label{sec:testing_approach}
+\subsection{Testing approach}\label{sec:testing_approach}
 We will prefer to use LINQ where possible as it is tightly integrated into the .NET environment. 
 If LINQ integration is not available, we will use any suitable alternative. And if there are no other possibilities, we will default to raw SQL queries. 
 
@@ -34,12 +34,12 @@ A feature related to caching is change tracking. For example, EF Core tracks cha
 Logging will be turned off for performance tests. In feature tests, we might want to compare generated SQL. So, we will enable SQL logging into the test output window where possible.
 
 
-\section{Selected queries}\label{sec:selected_queries}
+\subsection{Selected queries}\label{sec:selected_queries}
 Our goal is to test the query capabilities as broadly as possible. We want to create queries that use different conditions, result modifications, aggregations, relationships between tables, etc. The queries are grouped into categories A-H by the type of features they test.
 
 Each query type will contain an example of what the query should look like in raw SQL. The example can be used to directly query the test database to preview results. The example might be simplified for this text. Unit tests might use a different query language where available.
 
-\subsection{A - Entity projection}
+\subsubsection{}{A - Entity projection}
 This group will test how well ORM can handle projecting table columns onto a user-defined entity or entities.
 
 \subsubsection*{A1 Entity identical to a table} \label{query:a1}
@@ -89,7 +89,7 @@ EXEC WideWorldImporters.Integration.GetOrderUpdates
 \subsubsection*{A Summary}
 Queries \textbf{A1}, \textbf{A2}, and \textbf{A3} will fetch one row based on its ID. The measured time and memory allocation will then show the overhead of the ORM framework when mapping data to the resulting entities. Query \textbf{A4} returns a large number of results, so it is a first query that shows us the performance with high-volume data.
 
-\subsection{B - Selection}
+\subsubsection{B - Selection}
 Probably the most common query operation is limiting results based on a condition. This set of queries will query table \texttt{Sales.OrderLines} with varied conditions.
 
 \subsubsection*{B1 Selection over indexed column} \label{query:b1}
@@ -144,7 +144,7 @@ ORDER BY OrderLineID
 OFFSET 1000 ROWS FETCH NEXT 50 ROWS ONLY
 \end{lstlisting}
 
-\subsection{C - Aggregation} \label{query:}
+\subsubsection{C - Aggregation} \label{query:}
 Aggregation functions are often used when performing calculations on data. We will test a select few.
 
 \subsubsection*{C1 Count} \label{query:c1}
@@ -170,7 +170,7 @@ Aggregation functions also allow performing operations. In this test, we will co
 SELECT SUM(Quantity * UnitPrice) FROM Sales.OrderLines
 \end{lstlisting}
 
-\subsection{D - Relations}
+\subsubsection{D - Relations}
 An important feature of ORM should be mapping relations. Our domain entities are often connected, representing relations in real life.
 However, as we found out in our previous analysis, not all the selected frameworks support mapping relations. 
 
@@ -228,7 +228,7 @@ LEFT JOIN Sales.CustomerTransactions ct
 ORDER BY c.CustomerID
 \end{lstlisting}
 
-\subsection{E - Result modification}
+\subsubsection{E - Result modification}
 This category will test modifying the result set. We will test sorting by a column and filtering distinct result values.
 
 \subsubsection*{E1 Column sorting} \label{query:e1}
@@ -248,7 +248,7 @@ SELECT DISTINCT SupplierReference
 FROM Purchasing.PurchaseOrders
 \end{lstlisting}
 
-\subsection{F - Querying JSON}
+\subsubsection{F - Querying JSON}
 Microsoft SQL Server supports storing and querying JSON data\cite{mssqljson}. It is worth testing if our selected ORMs support constructing queries into the stored JSON.
 Table \texttt{Application.People} contains text columns storing JSON values.
 
@@ -278,7 +278,7 @@ WHERE EXISTS (
 )
 \end{lstlisting}
 
-\subsection{G - Set operations}
+\subsubsection{G - Set operations}
 
 In the last group we will test common set operations. Those are useful when having to combine two sets of data.
 
@@ -308,7 +308,7 @@ SELECT SupplierID FROM Purchasing.Suppliers
 ORDER BY SupplierID
 \end{lstlisting}
 
-\subsection{H - Querying metadata}
+\subsubsection{H - Querying metadata}
 In the last section, we will briefly test the ORM framework's ability to query information about the database itself. While not commonly used in applications, such data can be required in specific cases.
 
 \subsubsection*{H1 Column data type} \label{query:h1}
@@ -321,7 +321,7 @@ WHERE TABLE_SCHEMA = 'Purchasing'
     AND COLUMN_NAME = 'SupplierReference'
 \end{lstlisting}
 
-\section{Summary of the selected queries}
+\subsubsection{Summary of the selected queries}
 We tried to pick as broad a selection of features as possible. 
 We certainly did not cover all of them, but our set should be representative enough to give us a fair idea of how different ORMs perform. 
 
@@ -332,7 +332,7 @@ But we will be able to compare identical test cases across different ORMs.
 We can expect to see a difference in time performance between micro frameworks made to be efficient and feature-rich macro frameworks.
 The micro frameworks utilize raw SQL and have very little overhead. When using a macro framework, the LINQ query has to be compiled into SQL. Rich mapping capabilities may also cause significant slowdown. And extra features may even cause higher memory consumption.
 
-\section{Implementation}
+\subsection{Implementation}
 The comparison was implemented in the form of a Visual Studio solution, containing a project folder for each framework. Each project folder contains three projects - entities, feature tests, and performance benchmark. 
 
 
@@ -361,12 +361,12 @@ The comparison was implemented in the form of a Visual Studio solution, containi
 
 Common project is also included. It contains a single class handling loading the database connection string from a configuration file. There is no dependency between feature tests and performance tests. It could be argued that the code for queries could be extracted to a separate class to avoid duplication. But we have kept it duplicated to isolate unit tests from performance benchmarks. This structure is repeated for each of the seven frameworks we are examining. There is again no dependency between the different frameworks for isolation purposes.
 
-\subsection{Technology overview}
+\subsubsection{Technology overview}
 As we have decided before implementation in \autoref{sec:database}, we are using Microsoft SQL Server database with World Wide Importers data set. The database is running in a Docker container. Base image used is \texttt{mssql/server:2022-latest}\cite{mssqlDocker} provided by Microsoft. The image imports our dataset and waits until it is ready.
 
 The .NET tests are structured in .NET projects grouped in one solution. .NET version 8 was chosen as it is the latest LTS (long term support) version at the time of writing.\cite{netversions} Tests were developed and run using Microsoft Visual Studio 2022, but \texttt{dotnet} CLI commands will be provided as well.
 
-\subsection{Installation instructions}
+\subsubsection{Installation instructions}
 The container was tested both in Docker and Podman. A Dockerfile is provided in benchmarks/Dockerfile. Container image can be built and started using the two commands below. Replace `docker` with `podman` if needed. The database will be exposed on port 1444, under username SA and password \texttt{Testingorms123}.
 The third command can be used to test connection. The sqlcmd utility is available only if you have MSSQL installed locally. Otherwise, use any database management tool of your choice.
 
@@ -385,7 +385,7 @@ To run performance benchmarks, set \texttt{BenchmarkMain} as a startup project. 
 Console command for running benchmarks is \lstinline{dotnet run --configuration Release --project BenchmarkMain\BenchmarkMain.csproj}. To run with shorter test configuration append \lstinline{-- --testb} at the end of the command.
 
 
-\subsection{Entities}
+\subsubsection{Entities}
 Set of classes either mirroring a database table or containing a necessary subset of properties. The columns mapped always depend on the test they are being used in. The entities are POCOs (plain old CLR objects). The term is derived from POJO (plain old Java objects). \cite{Fowler2003POJO} It refers to classes that don't inherit from any base class or interface. And they are not tied to any specific framework.
 
 Below is an example of a POCO class for a purchase order. Visibility modifiers and some properties were omitted for readability. 
@@ -438,7 +438,7 @@ class PurchaseOrder
 </hibernate-mapping>
 \end{lstlisting}
 
-\subsection{Feature tests}
+\subsubsection{Feature tests}
 
 For each query defined in \autoref{sec:selected_queries}, a unit test in the form of an isolated method was implemented. Connection and other configuration are created outside of the test in a setup part. The method executes the query and correct results are asserted. Assertion checks the amount of results and their order. Each property is tested to contain correct data to ensure mapping was done correctly.
 
@@ -465,7 +465,7 @@ public void A1_EntityIdenticalToTable()
 As decided in \autoref{sec:testing_approach} we have attempted to use LINQ query language. Where not supported we have used any available alternative that did not involve just writing raw SQL. And finally, where nothing else was possible we have used the raw alternative to have a passing test.  
 %TODO mention the table that will have feature comparison
 
-\subsection{Performance benchmarks}
+\subsubsection{Performance benchmarks}
 Feature tests can assert the correctness of returned results and overall functionality. But their execution time can greatly vary. There can be some overhead, coming from test initialization or assertions. The system the benchmarks are running on can also impact results.
 
 To solve these problems we have used BenchmarkDotNet library\cite{BenchmarkDotNet}. It allows writing benchmark methods very similar to unit tests. In fact, they are completely identical to unit tests, the only differences are missing assertions and a different method attribute. It allows us to ``transform methods into benchmarks, track their performance, and share reproducible measurement experiments`` \cite{BenchmarkDotNet}. Work with the library was quite easy, it is very configurable and easy to run. 
@@ -510,32 +510,32 @@ Notable result files include:
     Detailed measurements of every single iteration of each benchmark.
 \end{itemize}
 
-\section{Results}
+\subsection{Results interpretation}
 Results are accompanied by tables showing results across all test cases. 
 
-\autoref{tab:feature_comp} showcases feature test results. The base part of the result shows if the query could be expressed in the framework, Y means yes and N means no. Further detail is then clarified. The categories for successful results are, sorted from the most ideal to the least:
+\autoref{tab:feature_comp} summarizes feature test outcomes. The base part of the result shows if the query could be expressed in the framework, Y means yes and N means no. Further detail is then clarified. The categories for successful results are, sorted from the most ideal to the least:
 \begin{itemize}
     \item \textbf{Y LINQ} - The query could be written in LINQ with no issue.
-    \item \textbf{Y lambda expr.} - The query could be written with a lambda expression. Similar to LINQ but can express less.
+    \item \textbf{Y lambda expr.} - The query could be written with a lambda expression. Similar to LINQ but less expressive.
     \item \textbf{Y raw SQL} - No statically typed language feature could be used and the query had to be written in SQL. Either in string or using SQL builder.
     \item \textbf{N manually in memory} - A different or limited query had to be used and the result had to be modified or computed in memory.
-    \item \textbf{N custom JSON parsing/converter} - JSON could not be queried directly.
-    \item \textbf{N error} - The query threw an exception and it was not possible to fix. 
+    \item \textbf{N custom JSON parsing/converter} - JSON could not be queried directly and had to be parsed in memory.
+    \item \textbf{N error} - The query threw an exception and there was no possible fix. 
 \end{itemize}
-The negative results are further described in the text.
+The negative results are explained further in the text.
 
 \autoref{tab:benchmark_results_time} shows measured benchmark time in microseconds (one millionth of a second). And \autoref{tab:benchmark_results_memory} shows allocated memory during the run of the benchmark method. The results presented in text will be rounded to the nearest integer.
 
-Performance tests have to be considered in the context of the feature test results. It was not possible to always write the test in the same way across all frameworks. In a few cases, it was not possible to do the query using the framework at all. In those cases, to have a passing test, pure ADO.NET query was used. 
+Performance tests have to be considered in the context of the feature test results. It was not possible to write all tests in the same way across all frameworks. In a few cases, it was not possible to do the query using the framework at all. In those cases, to have a passing test, pure ADO.NET query was used. 
 
 In some cases it was not possible to get the desired result purely as a result of a query. Some relations or calculations had to be done in memory. That, of course, majorly affects measured memory consumption. Such anomalies will always be described in the corresponding test results.
 
 Certain frameworks do not allow logging of generated SQL statements to console or file. We can work around this using SQL Server Profiler\cite{sqlProfiler}. It is a tool integrated into SQL Server Management Studio. It allows for the capturing of any event happening in the SQL Server database, including incoming SQL queries. That makes us able to inspect the raw query after it leaves our application and the frameworks can make no further edit to it.
 
-\subsection{Benchmark execution}
+\subsubsection{Benchmark execution}
 The final performance benchmark run was executed on a PC with the highest performance power plan while being constantly plugged in. Screen saving was turned off. The only applications running were those essential to the benchmark (database in Docker container and Visual Studio project). No other work was being done. Data further present are a result of that run and are available as an attachment.
 
-The exact PC and runtime specifications are available below. This information is comes directly from the benchmark run log. 
+The exact PC and runtime specifications are available below. This information comes directly from the benchmark run log. 
 \begin{lstlisting}
 BenchmarkDotNet v0.14.0, Windows 11 (10.0.22631.4890/23H2/2023Update/SunValley3)
 AMD Ryzen 5 5600H with Radeon Graphics, 1 CPU, 12 logical and 6 physical cores
@@ -544,13 +544,13 @@ AMD Ryzen 5 5600H with Radeon Graphics, 1 CPU, 12 logical and 6 physical cores
   DefaultJob : .NET 8.0.11 (8.0.1124.51707), X64 RyuJIT AVX2
 \end{lstlisting}
 
-\subsection{A - Entity projection}
-The first three queries \hyperref[query:a1]{A1}, \hyperref[query:a2]{A2} and \hyperref[query:a3]{A3} fetched one database record and shaped it in different ways. All ORMs were capable of this task without any issue. It was a matter or having an entity with the chosen columns and shaping a query. The macro frameworks like EF and NHibernate allowed us to set the shape using \texttt{Select} LINQ method. In the micro ones, we had to choose the columns through \texttt{SELECT} part of the SQL statement. 
+\subsubsection{A - Entity projection}
+The first three queries \hyperref[query:a1]{A1}, \hyperref[query:a2]{A2} and \hyperref[query:a3]{A3} fetched one database record and shaped it in different ways. All ORMs were capable of this task without any issue. It was a matter of having an entity with the chosen columns and shaping a query. The macro frameworks like EF and NHibernate allowed us to set the shape using \texttt{Select} LINQ method. In the micro ones, we had to choose the columns through \texttt{SELECT} part of the SQL statement. 
 There are no major differences in the measured time, just a slight increase for the macro ORMs as would be expected. When looking at allocated memory, we can see a 2-10$\times$ increase for NHibernate  and especially EF6. EF Core is clearly optimized in this area and the increase in allocated memory is not major. 
 
 We encounter a first issue at the \hyperref[query:a4]{A4} query which loads the result of a stored procedure. The stored procedure in our test data returns columns with spaces in their names. While it's not a usual naming convention, it was not expected to make some frameworks completely fail.
 
-Dapper, PetaPoco, RepoDB, linq2db and EF Core had no issue. All of those had to use a raw SQL to specify the query name, there was no way to map it to for example an object. For the context, over 60 000 results were returned. Measured time has no significant difference, but allocated memory differs by a huge margin. PetaPoco, RepoDB and linq2db allocated 16-17 MB, while Dapper and EF Core allocated 24 and 29 MB respectively. After checking with SQL Server Profiler\cite{sqlProfiler}, there is no major difference in the executed query. It always returns the same columns. And our assertions made sure all properties are filled in.
+Dapper, PetaPoco, RepoDB, linq2db and EF Core had no issue. All of those had to use a raw SQL to specify the query name, there was no way to map it to for example an object. For the context, over 60,000 results were returned. Measured time has no significant difference, but allocated memory differs by a huge margin. PetaPoco, RepoDB and linq2db allocated 16-17 MB, while Dapper and EF Core allocated 24 and 29 MB respectively. After checking with SQL Server Profiler\cite{sqlProfiler}, there is no major difference in the executed query. It always returns the same columns. And our assertions made sure all properties are filled in.
 
 NHibernate was failing on an internal error when converting the stored procedure result.
 The error was \lstinline{NHibernate.PropertyNotFoundException : Could not find a setter for property 'WWI Order ID' in class 'System.RuntimeType'}.
@@ -558,7 +558,7 @@ It suggests its internal representation of the entity could not be filled due to
 
 And finally, EF6 had the same issue with spaces, except we could not find any workaround in this case. There is no similar feature to load the result into a hash table, or dynamic objects. So the test uses a pure ADO.NET connection, with no EF6 features whatsoever. We consider the test failed and the measurements are not relevant for our comparison.
 
-\subsection{B - Selection}
+\subsubsection{B - Selection}
 This group tests different types of conditions. Feature-wise, all tests pass. There is no exception or difference. As expected, queries in Dapper and PetaPoco have to be written in SQL. While in the other frameworks, we can utilize LINQ (or lambda expressions) to have statically typed queries. 
 
 While the tests do pass, measurements differ a lot per ORM and query. Let us examine the queries one by one.
@@ -578,11 +578,11 @@ The third query \hyperref[query:b3]{B3} took about 22 milliseconds for most fram
 
 The query \hyperref[query:b4]{B4} fetched 15 results from a table with over 231,000 rows using the IN statement on the primary key. The measured time and memory allocation were similar across the results, with NHibernate and EF6 showing memory allocation spikes again. 
 
-The differences in measured time for queries \hyperref[query:b5]{B5} and \hyperref[query:b6]{B6} are almost negligible. The generated queries had no difference. Surprising results are in memory allocation, where Dapper consumed more memory than PetaPoco while running the same query and returning the same amount of columns and rows.
+The differences in measured time for queries \hyperref[query:b5]{B5} and \hyperref[query:b6]{B6} are almost negligible. The generated queries had no difference. Surprising results are in memory allocation, where Dapper consumed more memory than PetaPoco while running the same query and returning the same number of columns and rows.
 
 Throughout this category, we have seen a higher memory consumption in NHibernate and EF6. The generated queries had only syntactic and naming differences. Structurally and logically, they were identical. This suggests these two frameworks might be less memory efficient. We will explore this further in the following categories.
 
-\subsection{C - Aggregation}
+\subsubsection{C - Aggregation}
 The following three queries tested different aggregation functions over different data. The first one \hyperref[query:c1]{C1} performed a combination of group by and count over the same column. RepoDB has no support for \texttt{group by} operation, so it failed this test. The measured times are almost identical for other frameworks. NHibernate and EF6 have approximately a 4 and 10 times memory consumption increase respectively.
 
 All frameworks were able to perform query \hyperref[query:c2]{C2} without any unexpected differences.
