@@ -1,13 +1,13 @@
-\section{Experimental performance comparison}
+\section{Performance evaluation}
 
-This chapter presents an experimental comparison of the 7 selected ORM frameworks. 
-The primary goals are to assert the correctness of results, measure performance, and assess how effectively each framework integrates into the .NET through its supported query language.
+This chapter presents an experimental comparison of the seven selected ORM frameworks. 
+The primary goals are to assert the correctness of our previous comparison, measure performance, and assess how effectively each framework integrates into the .NET through its supported query language.
 
 For each framework, we will create a set of unit tests performing pre-selected queries. They should cover different areas of querying through ORMs, such as entity mapping, relationships, result modification, and aggregation.
 
 We will only test read (SELECT) queries. Those cover a sufficiently large area of features and provide us with enough information to get some insight on capabilities and performance. Other non-read operations, including insert, update, and delete queries, could be explored in future work.
 
-\subsection{Dataset}\label{sec:dataset}
+\subsection{Dataset and database}\label{sec:dataset_database}
 % https://learn.microsoft.com/en-us/sql/samples/wide-world-importers-what-is?view=sql-server-ver16
 To adequately test performance, we need a sufficiently large data set. Microsoft offers pre-made open source datasets.
 For this comparison, the Wide World Importers sample database \cite{microsoftWWI} has been selected.
@@ -15,9 +15,8 @@ It contains a diverse set of fictional data about a company Wide World Importers
 
 The database contains over thirty tables split into four schemas: Application, Purchasing, Sales, Warehouse. For each query, we will select a suitable table and columns that can best showcase the desired feature.
 
-\subsection{Database}\label{sec:database}
 % database, docker, test project, .net
-The dataset is made for Microsoft SQL Server (MSSQL). It is the third most popular database management system as of March 2025 according to DB-Engines Ranking\cite{DBEngines2025Ranking}. With a score of 788.14, it is behind Oracle (1253.08) and MySQL (988.13). The score takes into account number of mentions on websites, frequency of technical discussions, number of job offers mentioning the system, relevance in social networks and other parameters.\cite{DBEnginesRankingMetrics} 
+The dataset is made for Microsoft SQL Server (MSSQL). It is the third most popular database management system as of March 2025 according to DB-Engines Ranking\cite{DBEngines2025Ranking}. With a score of 788.14, it is behind Oracle (1253.08) and MySQL (988.13). The score takes into account the number of mentions on websites, frequency of technical discussions, number of job offers mentioning the system, relevance in social networks, and other parameters.\cite{DBEnginesRankingMetrics} 
 Microsoft SQL Server is commonly used in .NET applications with EF Core ORM as the three products are all developed by Microsoft.  
 
 Unit tests should be easy to set up and run. Configuring a database can turn into a complicated task. We will create a Docker container running MSSQL. The dataset will be loaded on startup. Execution of unit tests will be just a matter of starting the Docker container and running the \texttt{dotnet test} command (or alternatively using Visual Studio Test Explorer). 
@@ -362,9 +361,9 @@ The comparison was implemented in the form of a Visual Studio solution, containi
 Common project is also included. It contains a single class handling loading the database connection string from a configuration file. There is no dependency between feature tests and performance tests. It could be argued that the code for queries could be extracted to a separate class to avoid duplication. But we have kept it duplicated to isolate unit tests from performance benchmarks. This structure is repeated for each of the seven frameworks we are examining. There is again no dependency between the different frameworks for isolation purposes.
 
 \subsubsection{Technology overview}
-As we have decided before implementation in \autoref{sec:database}, we are using Microsoft SQL Server database with World Wide Importers data set. The database is running in a Docker container. Base image used is \texttt{mssql/server:2022-latest}\cite{mssqlDocker} provided by Microsoft. The image imports our dataset and waits until it is ready.
+As we have decided before implementation in \autoref{sec:dataset_database}, we are using Microsoft SQL Server database with World Wide Importers data set. The database is running in a Docker container. Base image used is \texttt{mssql/server:2022-latest}\cite{mssqlDocker} provided by Microsoft. The image imports our dataset and waits until it is ready.
 
-The .NET tests are structured in .NET projects grouped in one solution. .NET version 8 was chosen as it is the latest LTS (long term support) version at the time of writing.\cite{netversions} Tests were developed and run using Microsoft Visual Studio 2022, but \texttt{dotnet} CLI commands will be provided as well.
+The .NET tests are structured in .NET projects grouped in one solution. .NET version 8 was chosen as it is the latest LTS (long term support) version at the time of writing\cite{NETversions}. Tests were developed and run using Microsoft Visual Studio 2022, but \texttt{dotnet} CLI commands will be provided as well.
 
 \subsubsection{Installation instructions}
 The container was tested both in Docker and Podman. A Dockerfile is provided in benchmarks/Dockerfile. Container image can be built and started using the two commands below. Replace `docker` with `podman` if needed. The database will be exposed on port 1444, under username SA and password \texttt{Testingorms123}.

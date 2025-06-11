@@ -1,0 +1,54 @@
+\section{ORMs and important concepts}
+
+We will briefly touch on how data is managed in .NET applications and how Object-Relational Mappers (ORMs) simplify this process.
+At the most basic level, we can manually compose an SQL query, create a database connection, execute the query, and parse the results. We can achieve this with the help of standard .NET libraries, particularly ADO.NET. However, by directly using SQL, we introduce dependencies on a query language that lacks static typing in the context of C\#, forcing us to deal with raw strings. This can potentially lead to vulnerabilities, unnecessary dependencies, and additional complexity.
+
+Nevertheless, ADO.NET remains crucial, and most .NET applications use it internally. Many ORM frameworks we will talk rely on it for communication with databases. We will briefly introduce ADO.NET and its core concepts.
+
+To lower complexity related to database communication and data persistence, we use abstraction provided by ORMs. We will refer to those as ORMs or simply frameworks.
+
+The level of abstraction varies depending on the specific framework. There are generally two categories, micro and macro ORMs. On one end of the spectrum, we have lightweight, usually performance-oriented frameworks. They offer a narrow set of features, some simple abstraction over ADO.NET. Some of those might not even be full ORMs, omitting the "relational" part entirely, as is the case with Dapper\cite{Dapper}. On the opposite end, we have full fledged frameworks that completely abstract away database communication, providing abstraction over SQL and an extensive set of features to simplify work of developers. \cite{Dapper}
+
+\subsection{ADO.NET}
+"ADO.NET provides consistent access to data sources such as SQL Server and XML" \cite{ADONET}. It provides components and models for connecting to those sources, executing commands, and retrieving results. All this functionality is built into \texttt{System.Data} library.
+
+Let us look at a concrete code example, taken from Microsoft documentation \cite{ADONET}, adapted and shortened for the purposes of this text.
+We can see the usage of key ADO.NET objects here, namely \texttt{SqlConnection}, \texttt{SqlCommand} and \texttt{SqlDataReader}. Managing the connection, building the query command and reading introduces a fair amount of overhead and manual control. The indexed access to \texttt{SqlDataReader} inside the \texttt{while} loop can end up being error-prone and increase the rosk of runtime exceptions. 
+
+\begin{lstlisting}[language=CSharp]
+const string connectionString = "...";
+
+const string queryString =
+    "SELECT ProductID, UnitPrice, ProductName from dbo.products "
+    + "WHERE UnitPrice > @pricePoint "
+    + "ORDER BY UnitPrice DESC;";
+
+const int paramValue = 5;
+
+using (SqlConnection connection = new(connectionString))
+{
+    SqlCommand command = new(queryString, connection);
+    command.Parameters.AddWithValue("@pricePoint", paramValue);
+
+    connection.Open();
+    SqlDataReader reader = command.ExecuteReader();
+    while (reader.Read())
+    {
+        Console.WriteLine($"{reader[0]}\t{reader[1]} ...");
+    }
+    reader.Close();
+}
+\end{lstlisting}
+
+Although this approach is functional, it highlights why abstractions like ORMs are more desirable and popular.
+
+\subsection{Entities and mapping}
+
+TODO: briefly explain entities and mapping
+- entity, domain model,
+- mapping to tables
+
+\subsection{Querying}
+
+TODO: explain querying based on entities
+- introduce LINQ as an alternative to SQL
