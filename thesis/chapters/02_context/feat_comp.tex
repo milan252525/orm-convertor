@@ -1,7 +1,123 @@
 \section{Feature comparison}
+We will first introduce the methodology of our comparison, deciding what properties and information to look for.
+
 \subsection{Methodology}
 
-\subsection{Dapper}
+We will start with gathering sources for each ORM, that includes links to documentation, repository, and a NuGet distribution. We will continue with a brief introduction, mainly based on what each framework's documentation or repository README file promises. We will follow with distribution, licensing, and version info. To get an idea of relevancy, we will check development cycles, community forums, and tool support. Then we will move onto more technical areas. We are interested in database system support and configuration, as well as how each ORM handles entity mapping and various aspects of database operations. And finally, we will summarize our findings, comparing them with initial promises and discussing best use cases for each ORM.
+
+The following will serve as a template for the subsequent sections and an explanation of each criterion.
+
+% TEMPLATE FOR ORM COMPARISON SECTIONS
+TODO
+
+\subsection{Dapper}\label{sec:feat_dapper}
+\subsubsection*{Sources}
+\begin{tabular}{@{}ll}
+\textbf{GitHub}   & \url{https://github.com/DapperLib/Dapper}    \\
+\textbf{NuGet}         & \url{https://www.nuget.org/packages/Dapper}  \\
+\textbf{Documentation} & \url{https://www.learndapper.com}  \\
+\end{tabular}
+
+The main source for this section will be Dapper's repository \texttt{README} file\cite{DapperRepo} and the Learn Dapper website\cite{Dapper}.
+
+\subsubsection*{Overview}
+Open source micro ORM, with low latency and high performance. Works as an ADO.NET wrapper, adding extension methods to its \texttt{DbConnection} object. It focuses on object mapping, relations are not supported. It should be lightweight and simple to use. It was originally created by developers at Stack Overflow. They were using LINQ to SQL, the predecessor of Entity Framework (not to be confused with linq2db). It was shown to be inefficient for increased traffic.
+
+\subsubsection*{Distribution}
+\begin{description}
+    \item[\textbf{License}] Open source, Apache 2.0.\footnote{\url{https://www.apache.org/licenses/LICENSE-2.0}}
+    \item[\textbf{Cost}] Free, Dapper Plus - an extension library for 999\$ yearly per developer.
+    \item[\textbf{Availability}] Source code on GitHub, package on NuGet.
+    \item[\textbf{Downloads}] Total 395M, last year 120M.
+    \item[\textbf{Release cycle}] Not fixed. Releases based on patches and new features. Semantic versioning. The latest version 2.1.66, released in February 2025. 
+    \item[\textbf{.NET versions}] .NET Framework, .NET Standard, .NET 8
+\end{description}
+
+\subsubsection*{Community and support}
+\begin{description}
+    \item[\textbf{Project upkeep}] 429 active issues, 897 closed. The maintainers actively comment on and resolve issues.
+    \item[\textbf{Support}] Answers to GitHub issues are not fast. There are many answers on Stack Overflow. Surprisingly, the author responds to a great deal of them.
+    \item[\textbf{Documentation}] External site Learn Dapper, made by a project sponsor. The sponsor maintains the extension, adding it to the documentation. Despite that, the base framework is well documented as well. The project has a great amount of tests that can be used for reference. 
+    \item\textbf{Official extensions}
+    \begin{itemize}
+      \item \textbf{Dapper.EntityFramework} – extension methods for Entity Framework, undocumented
+      \item \textbf{Dapper.Rainbow} – allows simple CRUD methods without SQL
+      \item \textbf{Dapper.SqlBuilder} – builder pattern for SQL generation
+    \end{itemize}
+    \item\textbf{Community extensions}
+    \begin{itemize}
+      \item \textbf{Dapper Plus (paid)} – mapping, bulk operation support\footnote{\url{https://dapper-plus.net/}}
+      \item \textbf{Dapper.Transaction} – transaction support\footnote{\url{https://github.com/zzzprojects/Dapper.Transaction}}
+    \end{itemize}
+    \item[\textbf{Development tools}] No tools available.
+\end{description}
+
+\subsubsection*{Database support}
+\begin{description}
+    \item[\textbf{Supported systems}] Any ADO.NET is compatible with Microsoft SQL Server, Oracle, SqLite, PostgreSQL, and more.
+    \item[\textbf{DB specific features}] Developer controls SQL, possible to utilise specific SQL dialect features.
+\end{description}
+
+\subsubsection*{Configuration, schema, mapping}
+\begin{description}
+    \item[\textbf{Configuration}] Database connection string is passed when creating a connection. No other configuration options.
+    \item[\textbf{DB schema}] Schema can only be in the database. SQL queries need to be adjusted after schema changes.
+    \item[\textbf{Migrations and versioning}] No support.
+    \item[\textbf{Entity mapping}] Automatic result mapping to an entity passed as generic parameter to the query. Entity properties must explicitly match the result columns. There is no option to map aliases or use conventions. Possible with unofficial extensions, we do not consider here.
+    \begin{lstlisting}[language=CSharp]
+    public class Dog
+    {
+        public int? Age { get; set; }
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public float? Weight { get; set; }
+    
+        public int IgnoredProperty { get { return 1; } }
+    }
+    
+    var guid = Guid.NewGuid();
+    var dog = connection.Query<Dog>("select Age = @Age, Id = @Id", new { Age = (int?)null, Id = guid });
+    \end{lstlisting}
+    This code example\cite{DapperRepo} showcases an entity and a query returning one instance. Properties are matched and filled by names, the rest remain empty. 
+    \item[\textbf{Relationship mapping}] As already mentioned, relationships cannot be mapped. However, it is possible to write a JOIN query and then split the results into multiple objects. The framework has helper methods for handling splitting and grouping.
+    \begin{lstlisting}[language=CSharp]
+    var sql =
+    @"select * from #Posts p
+    left join #Users u on u.Id = p.OwnerId
+    Order by p.Id";
+    
+    var data = connection.Query<Post, User, Post>(sql, (post, user) => { post.Owner = user; return post;});
+    var post = data.First();
+    \end{lstlisting}
+    In this example, each post is connected to its owner. The lambda function in \texttt{Query} methods specifies how to connect the entities. Users are likely duplicated for each post. Overall, this is just a simplification of manual handling of the data and overhead is still present. Real use cases could be more complex and inefficient.
+    
+    \item[\textbf{Data types and formats}] No focus on data type serialization, supports common .NET types. Data format parsing for JSON or XML is not supported. They could be queried into if the underlying SQL dialect supports it and the user writes appropriate SQL query.
+    
+    \item[\textbf{Collections}] Not supported.
+\end{description}
+
+\subsubsection*{Querying and database operations}
+\begin{description}
+    \item[\textbf{Query support}] The user writes and controls SQL queries. Theoretically, any SQL dialect and query is supported. Possible to use SQL/JSON or SQL/XML if the database system supports it. No support for LINQ or any other query language. 
+    \item[\textbf{DDL and DML}] Possible to execute any SQL using the \texttt{connection.Execute} method. No direct support without extensions.
+    \item[\textbf{Batch operations}] Batch operations are supported. Bulk operations only with paid extension.
+    \item[\textbf{Change tracking}] Not supported.
+    \item[\textbf{Data seeding}] Not supported.
+    \item[\textbf{Transaction support}] Indirectly through the ADO.NET connection. Or with an extension.
+    \item[\textbf{Fetch strategies}] Relationship mapping not supported - irrelevant.
+    \item[\textbf{Caching}] Data caching not supported. Caches entity mapping operations for speed-up.
+    \item[\textbf{Asynchronous operations}] All methods have an asynchronous variant.
+    \item[\textbf{Query logging}] Not supported
+\end{description}
+
+\subsubsection*{Use cases}
+Dapper is clearly performance-oriented. This comes at the cost of not supporting all the features expected from an ORM. That is not an issue, in the end, because there are other frameworks for that. According to a comparison made by the Dapper team, available in the project README file\cite{DapperRepo}, the querying should be very fast.
+
+It is worth using Dapper over ADO.NET mainly for the ease of receiving result data in a static form. Writing SQL queries manually can be an advantage or a disadvantage based on the developer's experience, application scale, and situation. For effective querying, it is necessary to be familiar with SQL and the underlying database system.
+
+Dapper is suitable for applications requiring highly efficient data reading. And tinkering with SQL queries might be necessary to do that. It is also possible to combine Dapper with another ORM and use it only where performance is a bottleneck.
+
+
 \subsection{PetaPoco}
 \subsection{LINQ to DB}
 \subsection{RepoDB}
