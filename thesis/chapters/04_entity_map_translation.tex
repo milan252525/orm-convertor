@@ -1,4 +1,85 @@
 \chapter{Entity and mapping translation}
-what is all needed (+table comparison)
-abstraction and wrappers (generally)
-special cases
+% what is all needed (+table comparison)
+% abstraction and wrappers (generally)
+% special cases
+
+We will focus on entities and database mapping first. We will examine common patterns across frameworks and build an abstraction that any framework should be translatable to. We will be using feature comparison from previous chapters along with our code for feature tests.
+
+\section{Building abstraction}
+
+Let us start with the entity. The base of it is a plain C\# class with properties. Most commonly, the class represents one table and each property a directly loaded or transformed column value. The mapping must express this connection. Either the class/property name is taken as the default value or an alias must be defined. Data types in .NET do not tightly reflect database ones. Type and nullability can be guessed from property type, but when it comes to constraints like length, encoding, etc. they usually require more detailed configuration.
+
+And of course, the table is not isolated in a relational database, it will likely be connected through relationships. We need to at least map primary and foreign keys for identification. More complex relationships might require more configuration. ORM might need to know which side controls the relationship, what happens when the parent is deleted, and more.
+
+Features operating on the server side, like indexes and triggers, are commonly not mapped.
+
+\autoref{tab:entity_mapping} shows a way to configure each major property we just discussed. EF6 was excluded because it is very similar to EF Core and would not bring any additional value. We have not selected all mapping types available, and instead pick varied options. For example, NHibernate supports mapping by fluent API, attributes, or XML files. And we have opted to use the XML mapping because it is the only ORM capable of it.
+
+
+After our examination of ORMs, we can come up with these main parts of mapping:
+\begin{itemize}
+    \item Table and schema
+    \item Primary key and strategy
+    \item Foreign key with cardinality
+    \item Column name, type, nullability
+    \item Column constraints (length, scale, precision, \ldots)
+\end{itemize}
+
+
+
+\clearpage
+\begin{landscape}
+\begin{table}
+\centering
+\caption{Entity mapping overview}
+\label{tab:entity_mapping}
+\scriptsize
+\def\arraystretch{1.35}
+\begin{tabular}{
+>{\raggedright\arraybackslash}p{20.00mm}
+>{\arraybackslash}p{30.00mm}
+>{\arraybackslash}p{30.00mm}
+>{\arraybackslash}p{30.00mm}
+>{\arraybackslash}p{30.00mm}
+>{\arraybackslash}p{30.00mm}
+>{\arraybackslash}p{40.00mm}
+>{\arraybackslash}p{40.00mm}
+}
+\toprule
+  &    \textbf{Dapper} &  \textbf{PetaPoco} &    \textbf{RepoDB} &   \textbf{Linq2db} & \textbf{NHibernate}  &    \textbf{EF Core} \\
+\midrule
+Primary key  & - & \texttt{[PrimaryKey]} on class & \texttt{[Primary]} on property & \texttt{[PrimaryKey]} and \texttt{[Identity]} on property \newline HasPrimaryKey() in fluent & \texttt{<id name="OrderID" column="" type="">\ldots</id>} & \texttt{[Key]} on property \\
+
+\midrule
+Foreign key & – & – & – & \texttt{[Association]} on property \newline Association() in fluent  & in \texttt{one-to-many} & \texttt{[ForeignKey]} \\
+
+\midrule
+Table and schema &
+– &
+\texttt{[TableName("x.y")]} &
+\texttt{[Table("y", Schema="x")]} &
+\texttt{Table(Schema="x", Name="y")}\newline\newline \texttt{HasSchemaName("x")} \newline \texttt{HasTableName("y")} &
+\texttt{<class table="y" schema="x">} &
+\texttt{[Table("y", Schema="x")]} \\
+
+\midrule
+Database type & derived from property & derived from property & \texttt{[DbType]} & \texttt{[DataType]}\newline\newline\texttt{.HasDbType()} & \texttt{type="decimal"} & \texttt{[Column(TypeName="")]} \\
+
+\midrule
+Precision & – & – & \texttt{[Precision]} & in \texttt{[Column]}\newline\newline\texttt{.HasPrecision()} & \texttt{precision="18" scale="2"} & \texttt{[Precision(18,2)]} \\
+
+\midrule
+Nullability & derived from property & derived from property & \texttt{[IsNullable(true)]} & \texttt{[Nullable]}\newline\newline\texttt{.IsNullable()} & \texttt{not-null="false"} & derived from property \\
+
+\midrule
+One-to-one & – \newline (join + \texttt{splitOn}) & – \newline (join + \texttt{Fetch<T1,T2>}) & – \newline (\texttt{QueryMultiple}) & \texttt{[Association]} and mapped keys & same as below with one-to-one & mapped keys and derived from property type \\
+
+\midrule
+One-to-many & – \newline (join + \texttt{splitOn}) & – \newline (join + \texttt{Fetch<T1,T2>}) & – \newline (\texttt{QueryMultiple}) & \texttt{[Association]} and mapped keys & \texttt{<bag> <key column=""/> <one-to-many class="" column=""/> </bag>} & mapped keys and derived from property type \\
+
+\midrule
+Many-to-many & – \newline (join + \texttt{splitOn}) & – \newline (join + \texttt{Fetch<T1,T2>}) & – \newline (raw SQL + in memory) & \texttt{[Association]} and mapped keys  & \texttt{<bag> <key column=""/> <many-to-many class="" column=""/> </bag>} & fluent join-table definition:\newline\texttt{UsingEntity("", l => l.$\cdots$, r => r.$\cdots$)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{landscape}
