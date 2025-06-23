@@ -1,0 +1,127 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/27.0.9 Chrome/134.0.6998.205 Electron/35.4.0 Safari/537.36" version="27.0.9">
+  <diagram name="diagram" id="xa2-bfLG4NFff1P7d80x">
+    <mxGraphModel dx="1042" dy="626" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="hopylSu6kimWQgtTDceS-67" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="72.5" y="7" width="683" height="256" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-64" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;arcSize=7;dashed=1;dashPattern=8 8;" vertex="1" parent="hopylSu6kimWQgtTDceS-67">
+          <mxGeometry width="683" height="256" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-2" value="[Table(&quot;Customers&quot;)]&lt;br&gt;class Customer&lt;br&gt;{&lt;br&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;[Key]&lt;br&gt;&amp;nbsp; &amp;nbsp; int CustomerID { get; set; }&lt;br&gt;&lt;br&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;[MaxLength(200)]&lt;br&gt;&amp;nbsp; &amp;nbsp; string CustomerName { get; set; }&lt;br&gt;&lt;br&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;[Precision(18, 2)]&lt;br&gt;&amp;nbsp; &amp;nbsp; decimal? CreditLimit { get; set; }&lt;br&gt;}" style="text;whiteSpace=wrap;fillColor=none;strokeColor=#6c8ebf;rounded=0;arcSize=16;spacingLeft=15;spacingTop=5;fontSize=14;html=1;strokeWidth=4;" vertex="1" parent="hopylSu6kimWQgtTDceS-67">
+          <mxGeometry x="18" y="13" width="270" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-3" value="var result = context.Customers&lt;br&gt;&amp;nbsp; &amp;nbsp; .Where(c =&amp;gt; c.CreditLimit &amp;gt; 100)&lt;div&gt;&amp;nbsp; &amp;nbsp; .Where(c =&amp;gt; c.CreditLimit &amp;lt;= 500)&lt;br&gt;&amp;nbsp; &amp;nbsp; .OrderBy(c =&amp;gt; c.CustomerName)&lt;br&gt;&amp;nbsp; &amp;nbsp; .Select(c =&amp;gt; c.CustomerID)&lt;br&gt;&amp;nbsp; &amp;nbsp; .ToList();&lt;/div&gt;" style="text;whiteSpace=wrap;fillColor=none;strokeColor=#d79b00;rounded=0;arcSize=16;spacingLeft=15;spacingTop=5;fontSize=14;textShadow=0;labelBorderColor=none;labelBackgroundColor=none;html=1;strokeWidth=3;" vertex="1" parent="hopylSu6kimWQgtTDceS-67">
+          <mxGeometry x="399.5" y="63" width="270" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-71" value="" style="html=1;shadow=0;dashed=0;align=center;verticalAlign=middle;shape=mxgraph.arrows2.arrow;dy=0;dx=30;notch=30;flipH=0;flipV=0;direction=south;" vertex="1" parent="1">
+          <mxGeometry x="366.5" y="275" width="95" height="59" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-72" value="" style="html=1;shadow=0;dashed=0;align=center;verticalAlign=middle;shape=mxgraph.arrows2.arrow;dy=0;dx=30;notch=30;flipH=0;flipV=0;direction=south;" vertex="1" parent="1">
+          <mxGeometry x="366.5" y="499" width="95" height="59" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-74" value="" style="html=1;shadow=0;dashed=0;align=center;verticalAlign=middle;shape=mxgraph.arrows2.arrow;dy=0;dx=30;notch=30;flipH=0;flipV=0;direction=south;" vertex="1" parent="1">
+          <mxGeometry x="366" y="964" width="95" height="59" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-82" value="" style="rounded=0;whiteSpace=wrap;html=1;container=0;flipV=0;" vertex="1" parent="1">
+          <mxGeometry x="279" y="351" width="270" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-83" value="" style="text;whiteSpace=wrap;fillColor=#6C8EBF;strokeColor=#6c8ebf;rounded=1;arcSize=16;spacingLeft=15;spacingTop=5;fontSize=14;html=1;container=0;" vertex="1" parent="1">
+          <mxGeometry x="299" y="361" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-84" value="" style="text;whiteSpace=wrap;fillColor=#D79B00;strokeColor=#d79b00;rounded=1;arcSize=16;spacingLeft=15;spacingTop=5;fontSize=14;textShadow=0;labelBorderColor=none;labelBackgroundColor=none;html=1;container=0;" vertex="1" parent="1">
+          <mxGeometry x="299" y="401" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-85" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;TRANSLATE&lt;/font&gt;" style="rounded=1;fillColor=#0057D8;strokeColor=none;html=1;whiteSpace=wrap;fontColor=#ffffff;align=center;verticalAlign=middle;fontStyle=0;fontSize=12;sketch=0;container=0;" vertex="1" parent="1">
+          <mxGeometry x="369" y="441" width="94" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-89" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="279" y="1039" width="270" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-76" value="" style="rounded=0;whiteSpace=wrap;html=1;container=0;flipV=0;" vertex="1" parent="hopylSu6kimWQgtTDceS-89">
+          <mxGeometry width="270" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-77" value="" style="text;whiteSpace=wrap;fillColor=#6C8EBF;strokeColor=#6c8ebf;rounded=1;arcSize=16;spacingLeft=15;spacingTop=5;fontSize=14;html=1;container=0;opacity=30;" vertex="1" parent="hopylSu6kimWQgtTDceS-89">
+          <mxGeometry x="20" y="10" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-78" value="" style="text;whiteSpace=wrap;fillColor=#D79B00;strokeColor=#d79b00;rounded=1;arcSize=16;spacingLeft=15;spacingTop=5;fontSize=14;textShadow=0;labelBorderColor=none;labelBackgroundColor=none;html=1;container=0;opacity=30;" vertex="1" parent="hopylSu6kimWQgtTDceS-89">
+          <mxGeometry x="20" y="50" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-79" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;TRANSLATE&lt;/span&gt;" style="rounded=1;fillColor=#0057D8;strokeColor=none;html=1;whiteSpace=wrap;fontColor=#ffffff;align=center;verticalAlign=middle;fontStyle=0;fontSize=12;sketch=0;container=0;" vertex="1" parent="hopylSu6kimWQgtTDceS-89">
+          <mxGeometry x="88" y="90" width="98" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-80" value="" style="text;whiteSpace=wrap;fillColor=#6C8EBF;strokeColor=#6c8ebf;rounded=1;arcSize=16;spacingLeft=15;spacingTop=5;fontSize=14;html=1;container=0;" vertex="1" parent="hopylSu6kimWQgtTDceS-89">
+          <mxGeometry x="174" y="10" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-81" value="" style="text;whiteSpace=wrap;fillColor=#D79B00;strokeColor=#d79b00;rounded=1;arcSize=16;spacingLeft=15;spacingTop=5;fontSize=14;textShadow=0;labelBorderColor=none;labelBackgroundColor=none;html=1;container=0;" vertex="1" parent="hopylSu6kimWQgtTDceS-89">
+          <mxGeometry x="174" y="50" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-65" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;arcSize=7;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
+          <mxGeometry x="38" y="581" width="752" height="372" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-31" value="&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;FROM Customers, alias: c&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;SELECT&amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;font-size: 14px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;{&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp; &amp;nbsp; AND&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp; &amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-size: 14px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-size: 14px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp; &amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-size: 14px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 14px;&quot;&gt;c.CreditLimit&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 14px;&quot;&gt;&amp;gt;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 14px;&quot;&gt;100&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp; &amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-size: 14px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-size: 14px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp; &amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-size: 14px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 14px;&quot;&gt;c.CreditLimit&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 14px;&quot;&gt;&amp;lt;=&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 14px;&quot;&gt;500&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 14px;&quot;&gt;}&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;ORDER_BY c.CustomerName, asc: true&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;PROJECT c.CustomerID&lt;/font&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#d79b00;align=left;spacingLeft=15;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="493" y="659.5" width="273" height="213" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-63" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="83" y="596" width="330" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="hopylSu6kimWQgtTDceS-63" source="hopylSu6kimWQgtTDceS-15" target="hopylSu6kimWQgtTDceS-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="hopylSu6kimWQgtTDceS-63" source="hopylSu6kimWQgtTDceS-16" target="hopylSu6kimWQgtTDceS-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="hopylSu6kimWQgtTDceS-63" source="hopylSu6kimWQgtTDceS-18" target="hopylSu6kimWQgtTDceS-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="hopylSu6kimWQgtTDceS-63" source="hopylSu6kimWQgtTDceS-17" target="hopylSu6kimWQgtTDceS-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="hopylSu6kimWQgtTDceS-63" source="hopylSu6kimWQgtTDceS-14" target="hopylSu6kimWQgtTDceS-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="hopylSu6kimWQgtTDceS-63" source="hopylSu6kimWQgtTDceS-13" target="hopylSu6kimWQgtTDceS-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-12" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;em&lt;/b&gt;&lt;b style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;: EntityMap&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;table = Customers&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=none;strokeColor=#6c8ebf;strokeWidth=3;spacingLeft=1;" vertex="1" parent="hopylSu6kimWQgtTDceS-63">
+          <mxGeometry y="10" width="130" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-15" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;pm1: PropertyMap&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;nullable = false&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;primaryKey = true&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;strategy = Identity&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=none;strokeColor=#6c8ebf;strokeWidth=3;spacingLeft=1;" vertex="1" parent="hopylSu6kimWQgtTDceS-63">
+          <mxGeometry y="85" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-16" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;pm2: PropertyMap&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;nullable = false&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;length = 200&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=none;strokeColor=#6c8ebf;strokeWidth=3;spacingLeft=1;" vertex="1" parent="hopylSu6kimWQgtTDceS-63">
+          <mxGeometry y="178" width="130" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-18" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;pm3: PropertyMap&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;nullable = true&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;precision = 18&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;scale = 2&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=none;strokeColor=#6c8ebf;strokeWidth=3;spacingLeft=1;" vertex="1" parent="hopylSu6kimWQgtTDceS-63">
+          <mxGeometry y="260" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="hopylSu6kimWQgtTDceS-63" source="hopylSu6kimWQgtTDceS-20" target="hopylSu6kimWQgtTDceS-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="hopylSu6kimWQgtTDceS-63" source="hopylSu6kimWQgtTDceS-14" target="hopylSu6kimWQgtTDceS-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="hopylSu6kimWQgtTDceS-63" source="hopylSu6kimWQgtTDceS-17" target="hopylSu6kimWQgtTDceS-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="hopylSu6kimWQgtTDceS-63" source="hopylSu6kimWQgtTDceS-20" target="hopylSu6kimWQgtTDceS-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-20" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;p3: Property&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;name = CreditLimit&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;type = decimal&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;nullable = true&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=none;strokeColor=#6c8ebf;strokeWidth=3;spacingLeft=1;" vertex="1" parent="hopylSu6kimWQgtTDceS-63">
+          <mxGeometry x="170" y="260" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-17" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;p2: Property&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;name = CustomerName&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;type = string&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;otherModifiers = [required]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=none;strokeColor=#6c8ebf;strokeWidth=3;spacingLeft=1;" vertex="1" parent="hopylSu6kimWQgtTDceS-63">
+          <mxGeometry x="170" y="173" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-14" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;p1: Property&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;name = CustomerID&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;type = int&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=none;strokeColor=#6c8ebf;strokeWidth=3;spacingLeft=1;" vertex="1" parent="hopylSu6kimWQgtTDceS-63">
+          <mxGeometry x="170" y="90" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="hopylSu6kimWQgtTDceS-13" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;e: Entity&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;name = Customer&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;modifier = internal&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=none;strokeColor=#6c8ebf;strokeWidth=3;spacingLeft=1;" vertex="1" parent="hopylSu6kimWQgtTDceS-63">
+          <mxGeometry x="170" width="160" height="75" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
