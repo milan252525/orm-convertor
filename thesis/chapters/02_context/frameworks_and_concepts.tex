@@ -7,7 +7,7 @@ Nevertheless, ADO.NET remains crucial, and most .NET applications use it interna
 
 To lower complexity related to database communication and data persistence, we use abstraction provided by ORMs. We will refer to those as ORMs or simply frameworks.
 
-The level of abstraction varies depending on the specific framework. There are generally two categories, micro and macro ORMs. On one end of the spectrum, we have lightweight, usually performance-oriented frameworks. They offer a narrow set of features, some simple abstraction over ADO.NET. Some of those might not even be full ORMs, omitting the "relational" part entirely, as is the case with Dapper\cite{Dapper}. On the opposite end, we have full fledged frameworks that completely abstract away database communication, providing abstraction over SQL and an extensive set of features to simplify work of developers. \cite{Dapper}
+The level of abstraction varies depending on the specific framework. There are generally two categories, micro and macro ORMs. On one end of the spectrum, we have lightweight, usually performance-oriented frameworks. They offer a narrow set of features, some simple abstraction over ADO.NET. Some of those might not even be full ORMs, omitting the "relational" part entirely, as is the case with Dapper\cite{Dapper}. On the opposite end, we have full-fledged frameworks that completely abstract away database communication, providing abstraction over SQL and an extensive set of features to simplify the work of developers. \cite{Dapper}
 
 \subsection{ADO.NET}
 "ADO.NET provides consistent access to data sources such as SQL Server and XML" \cite{ADONET}. It provides components and models for connecting to those sources, executing commands, and retrieving results. All this functionality is built into \texttt{System.Data} library.
@@ -52,3 +52,4 @@ TODO: briefly explain entities and mapping
 
 TODO: explain querying based on entities
 - introduce LINQ as an alternative to SQL
+- difference query vs method LINQ

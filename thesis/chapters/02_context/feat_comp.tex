@@ -3,6 +3,8 @@ We will first introduce the methodology of our comparison, deciding what propert
 
 We will start with gathering sources for each ORM, that includes links to documentation, repository, and a NuGet distribution. We will continue with a brief introduction, mainly based on what each framework's documentation or repository README file promises. We will follow with distribution, licensing, and version info. To get an idea of relevancy, we will check development cycles, community forums, and tool support. Then we will move onto more technical areas. We are interested in database system support and configuration, as well as how each ORM handles entity mapping and various aspects of database operations. And finally, we will compare our findings with initial promises and discuss best use cases.
 
+When mentioning supported .NET versions, we will only list versions specifically targeted by the package. But as we have already discussed, .NET packages are usually backwards and forward compatible. And the .NET Standard allows targeting both .NET Framework and Core.
+
 \subsection{Dapper}\label{sec:feat_dapper}
 
 Dapper~\cite{Dapper,DapperRepo} is an open-source micro ORM framework, originally developed by the team at Stack Overflow. It was created in response to the inefficiencies observed with LINQ to SQL -- an ORM that preceded the Entity Framework -- particularly under increasing traffic loads. Designed for performance and simplicity, Dapper functions as a lightweight wrapper around ADO.NET\footnote{\url{https://learn.microsoft.com/en-gb/dotnet/framework/data/adonet/}}, extending the \texttt{DbConnection} object with a set of additional methods to facilitate object mapping. Its primary focus lies in mapping SQL query results to .NET objects, and it does not offer built-in support for modelling relationships or managing database schemas.
@@ -93,7 +95,7 @@ In terms of community support, Dapper exhibits a healthy level of maintenance wi
 
 \subsection{PetaPoco}\label{sec:feat_petapoco}
 
-PetaPoco\cite{PetaPoco} is our second chosen micro ORM. Although it changed recently --- it used to have a single-file code base with no dependencies. It is focused on performance and simplicity. Internally it uses ADO.NET like Dapper, yet it provides its own abstractions over it. The framework is configurable through a builder, resulting in \texttt{IDatabase} interface, on which methods are called. With a focus on mapping query results to objects, it does not provide any support for relationships. It provides full control over SQL with an inbuilt SQL builder to make composing it easier. 
+PetaPoco\cite{PetaPoco} is the second chosen micro ORM. Although it changed recently --- it used to have a single-file code base with no dependencies. It is focused on performance and simplicity. Internally it uses ADO.NET like Dapper, yet it provides its own abstractions over it. The framework is configurable through a builder, resulting in \texttt{IDatabase} interface, on which methods are called. With a focus on mapping query results to objects, it does not provide any support for relationships. It provides full control over SQL with an inbuilt SQL builder to make composing it easier. 
 
 Its small feature set and zero dependencies enable compatibility with a wide selection of database systems, including Microsoft SQL Server, MS Access\footnote{\url{https://support.microsoft.com/en-us/access}}, SQLite, MySQL\footnote{\url{https://www.mysql.com/}}, MariaDB\footnote{\url{https://mariadb.org/}}, and Oracle. Schema management is left to the developer. Templates for entity generation out of a database schema were provided, but were deprecated in the last major version.
 
@@ -208,7 +210,7 @@ The project is open-source and distributed under Apache 2.0 license\footnote{\ur
 \textbf{License} & Apache 2.0 \\
 \textbf{Cost} & Free \\
 \textbf{Sources} & \url{https://repodb.net/}, \url{https://github.com/mikependon/RepoDB}, \url{https://www.nuget.org/packages/repodb}  \\
-\textbf{Latest version} & .13.1  (March 2023) \\
+\textbf{Latest version} & 1.13.1  (March 2023) \\
 \textbf{Supported .NET} & .NET Standard, .NET 7 \\
 \textbf{ORM features} & Object mapping only; no relationship or collection support \\
 \textbf{Query support} & Limited lambda expression support, QueryField and QueryGroup objects \\
@@ -222,7 +224,7 @@ The project is open-source and distributed under Apache 2.0 license\footnote{\ur
 \textbf{Bulk operations} & Supported for Microsoft SQL and PostgreSQL \\
 \textbf{Async support} & Supported, undocumented \\
 \textbf{Caching} & Application-level caching \\
-\textbf{Community} & Maintained on GitHub; questions and issues responded to; development curr. paused \\
+\textbf{Community} & Maintained on GitHub; questions and issues responded to; development currently paused \\
 \textbf{Documentation} & Separate website; repository includes integration and unit tests\\
 \textbf{Extensions (official)} & Database support extensions \\
 \textbf{Extensions (community)} & None \\
@@ -234,7 +236,83 @@ The project is open-source and distributed under Apache 2.0 license\footnote{\ur
 \end{table}
 
 
-\subsection{Linq2db}
+\subsection{LINQ to DB}
+
+LINQ to DB \cite{linq2db, linq2dbRepo}, alternatively linq2db, is an ORM that focuses primarily on offering a type-safe layer above SQL through LINQ. Statically typed, compiler-checked queries are a huge benefit for bigger projects and allow easier refactoring. It supports extensive entity and relationship mapping and should offer the best performance in terms of querying through LINQ. Relative to that focus, it does not offer features expected from full-fledged macro ORMs. There is no change tracking or caching with this framework.
+
+LINQ to DB is compatible with a big range of database systems, for example, Microsoft SQL Server, MySQL, Oracle, PostgreSQL, MS Access, SQLite, and even less common ones like SAP HANA\footnote{\url{https://www.sap.com/cz/products/data-cloud/hana/what-is-sap-hana.html}}, ClickHouse\footnote{\url{https://clickhouse.com/}}, and more. Database schema must be handled by the developer, but entity generation from the database is available. Configuration is fairly simple through the \texttt{DataConnection} object. This object can be inherited from, allowing us to configure a wide set of options, including entity mapping. Mapping can be done using fluent methods using the aforementioned object. Another option is attributes on the entity class and properties. Convention-based and automatic mapping is also an option. All multiplicities of relationships are configurable, although the documentation provides limited information on this topic. 
+
+\begin{example}
+\small
+This example demonstrates the mapping of one-to-many relationships. Collection on the parent entity is referenced, along with references to primary and foreign keys in the relationship, and finally nullability.
+
+\begin{lstlisting}[language=CSharp]
+builder.Entity<OrderLine>()
+    .HasSchemaName("Sales")
+    .HasTableName("OrderLines");
+
+builder.Entity<Order>()
+    .HasSchemaName("Sales")
+    .HasTableName("Orders")
+    .HasPrimaryKey(x => x.OrderID)
+    .Association(o => o.OrderLines, o => o.OrderID, ol => ol.OrderID, canBeNull: false);
+\end{lstlisting}
+
+\small With the mapping defined, querying the parent entity along with its associated child entities becomes straightforward. The example below demonstrates eager loading of related entities into a collection.
+
+\begin{lstlisting}[language=CSharp]
+var order = db.Orders
+    .LoadWith(o => o.OrderLines)
+    .Single(o => o.OrderID == 530);
+\end{lstlisting}
+\qed
+\end{example}
+
+While the LINQ support is extensive, querying into data types like JSON or XML is not supported. 
+Database can be manipulated through exposed DDL methods like \texttt{CreateTable} and \texttt{DropTable}, but documentation provides no explanation. Data modification is possible through \texttt{Insert}, \texttt{Update} and \texttt{Delete} methods. Bulk data operations are available for selected database systems.
+Advanced SQL constructs like transactions, CTE (common table expressions), \texttt{MERGE}, and window analytic functions are supported. Of course, any raw SQL can be executed too, but it is not the concern of this ORM. Asynchronous variants of all methods are exposed.
+
+Some additional tooling is provided. Scaffolding database schema to generate entities and mapping is possible with a CLI tool. The library offers extendibility through exposed interceptor interfaces, which allow modifying behaviour in different stages of querying. Support for profiling using MiniProfiler\footnote{\url{https://github.com/MiniProfiler/dotnet}} is also explicitly provided and described.
+LINQ to DB can be used alongside Entity Framework Core to extend its LINQ to SQL translation capabilities. This is enabled using an official extension built into this library.
+
+The ORM is open-source and provided under the MIT license\footnote{\url{https://github.com/linq2db/linq2db/blob/master/MIT-LICENSE.txt}}. It is distributed via GitHub\footnote{\url{https://github.com/linq2db/linq2db}} and NuGet\footnote{\url{https://www.nuget.org/packages/linq2db}}. The last released version is 5.4.1 in April 2024, although major version 6 is currently being released under previews. The package was downloaded 14 million times in total, with almost 5 million downloads this year. Project issues receive attention from contributors and are resolved relatively quickly. Documentation is provided on a separate page; it is quite extensive and covers a lot of areas. Examples along with tests are available in the repository. The framework supports multiple .NET versions, including .NET Framework, .NET Standard, and .NET 6.
+
+\begin{table}[H]
+\centering
+\caption{Comparison overview of ORM framework: LINQ to DB}
+\begin{tabular}{|l|l|}
+\toprule
+\textbf{Property} & \textbf{LINQ to DB} \\
+\midrule
+\textbf{Type} & ORM for .NET \\
+\textbf{License} & MIT \\
+\textbf{Cost} & Free \\
+\textbf{Sources} & \url{https://linq2db.github.io/index.html}, \url{https://github.com/linq2db/linq2db}, \url{https://www.nuget.org/packages/linq2db}  \\
+\textbf{Latest version} & 5.4.1 (April 2024) \\
+\textbf{Supported .NET} & .NET Framework, Standard, 7 \\
+\textbf{ORM features} & Object and relationship mapping \\
+\textbf{Query support} & Extensive LINQ support \\
+\textbf{Mapping} & Attributes and fluent interface \\
+\textbf{Relationship mapping} & All types supported \\
+\textbf{Schema handling} & No migrations; schema scaffolding from DB \\
+\textbf{Change tracking} & Not supported \\
+\textbf{Data seeding} & Not supported \\
+\textbf{Query logging} & Extensible interceptors+ must be implemented \\
+\textbf{Transactions} & Supported \\
+\textbf{Bulk operations} & Supported for some DBs\\
+\textbf{Async support} & Supported \\
+\textbf{Caching} & Not supported \\
+\textbf{Community} & Maintained on GitHub; questions and issues responded to \\
+\textbf{Documentation} & Separate website; repository includes tests and examples\\
+\textbf{Extensions (official)} & EF Core extension \\
+\textbf{Extensions (community)} & None \\
+\textbf{Tooling} & MiniProfiler integration, CLI scaffolding tool \\
+\textbf{Supported databases} & Microsoft SQL Server, MySQL, Oracle, PostgreSQL, SQLite, MS Access, SAP HANA, ClickHouse and more  \\
+\textbf{Ideal use cases} & Little SQL knowledge, any project size, complex queries \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 
 \subsection{NHibernate}
 
