@@ -1,126 +1,179 @@
 \section{Feature comparison}
-We will first introduce the methodology of our comparison, deciding what properties and information to look for.
+We will first introduce the methodology of our comparison, deciding what properties and information to look for. Then we will follow with an overview of each framework, finishing with an overall comparison.
 
-\subsection{Methodology}
-
-We will start with gathering sources for each ORM, that includes links to documentation, repository, and a NuGet distribution. We will continue with a brief introduction, mainly based on what each framework's documentation or repository README file promises. We will follow with distribution, licensing, and version info. To get an idea of relevancy, we will check development cycles, community forums, and tool support. Then we will move onto more technical areas. We are interested in database system support and configuration, as well as how each ORM handles entity mapping and various aspects of database operations. And finally, we will summarize our findings, comparing them with initial promises and discussing best use cases for each ORM.
-
-The following will serve as a template for the subsequent sections and an explanation of each criterion.
-
-% TEMPLATE FOR ORM COMPARISON SECTIONS
-TODO
+We will start with gathering sources for each ORM, that includes links to documentation, repository, and a NuGet distribution. We will continue with a brief introduction, mainly based on what each framework's documentation or repository README file promises. We will follow with distribution, licensing, and version info. To get an idea of relevancy, we will check development cycles, community forums, and tool support. Then we will move onto more technical areas. We are interested in database system support and configuration, as well as how each ORM handles entity mapping and various aspects of database operations. And finally, we will compare our findings with initial promises and discuss best use cases.
 
 \subsection{Dapper}\label{sec:feat_dapper}
-\subsubsection*{Sources}
-\begin{tabular}{@{}ll}
-\textbf{GitHub}   & \url{https://github.com/DapperLib/Dapper}    \\
-\textbf{NuGet}         & \url{https://www.nuget.org/packages/Dapper}  \\
-\textbf{Documentation} & \url{https://www.learndapper.com}  \\
+
+Dapper~\cite{Dapper,DapperRepo} is an open-source micro ORM framework for .NET, originally developed by the team at Stack Overflow. It was created in response to the inefficiencies observed with LINQ to SQL -- an ORM that preceded the Entity Framework -- particularly under increasing traffic loads. Designed for performance and simplicity, Dapper functions as a lightweight wrapper around ADO.NET\footnote{\url{https://learn.microsoft.com/en-gb/dotnet/framework/data/adonet/}}, extending the \texttt{DbConnection} object with a set of additional methods to facilitate object mapping. Its primary focus lies in mapping SQL query results to .NET objects, and it does not offer built-in support for modelling relationships or managing database schemas.
+
+The core strength of Dapper lies in its minimal abstraction and high execution speed. Developers retain full control over SQL queries, which allows precise use of SQL dialect features specific to a given database system. Dapper is compatible with all database engines supported by ADO.NET, including Microsoft SQL Server\footnote{\url{https://www.microsoft.com/en-gb/sql-server}}, Oracle\footnote{\url{https://www.oracle.com/database/}}, PostgreSQL\footnote{\url{https://www.postgresql.org/}}, and SQLite\footnote{\url{https://sqlite.org/}}. However, it delegates schema management entirely to the developer, as it does not provide mechanisms for schema versioning or migrations. Consequently, any changes to the database schema must be manually reflected in the SQL queries and the corresponding C\# entities.
+
+Entity mapping in Dapper is handled by matching the names of query result columns with the properties of a specified .NET class. Only exact name matches are recognized, and aliases or naming conventions are not supported without relying on unofficial extensions. Relationships between entities are not automatically resolved, though the framework offers helper methods that enable manual mapping of joined queries using lambda expressions. This process still entails a non-negligible performance overhead and potential duplication, making it a practical but suboptimal alternative to proper relationship management. Moreover, Dapper does not support collection mapping or advanced data format serialization such as JSON or XML, unless the underlying SQL engine supports it natively and the developer writes custom SQL logic to handle it.
+
+\begin{example}
+\small
+This code example\cite{DapperRepo} showcases an entity and a query returning one instance. Properties are matched and filled by names, the rest remain empty.
+
+\begin{lstlisting}[language=CSharp]
+public class Dog
+{
+    public int? Age { get; set; }
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public float? Weight { get; set; }
+
+    public int IgnoredProperty { get { return 1; } }
+}
+
+var guid = Guid.NewGuid();
+var dog = connection.Query<Dog>("select Age = @Age, Id = @Id", new { Age = (int?)null, Id = guid });
+\end{lstlisting}
+\qed
+\end{example}
+
+\begin{example}
+\small
+In this example, each post is connected to its owner. The lambda function in \texttt{Query} methods specifies how to connect the entities. Users are likely duplicated for each post. Overall, this is just a simplification of manual handling of the data, and overhead is still present. Real use cases could be more complex and inefficient.
+
+\begin{lstlisting}[language=CSharp]
+var sql =
+@"select * from #Posts p
+left join #Users u on u.Id = p.OwnerId
+Order by p.Id";
+
+var data = connection.Query<Post, User, Post>(
+    sql, (post, user) => { post.Owner = user; return post;});
+var post = data.First();
+\end{lstlisting}
+\qed
+\end{example}
+
+Dapper does not include capabilities such as change tracking, data seeding, or query logging. Batch operations are supported natively, while bulk operations require the use of a commercial extension (Dapper Plus)\footnote{\url{https://dapper-plus.net/}}. Transaction handling is available indirectly through ADO.NET or via community-supported extensions. All major methods have asynchronous counterparts, ensuring compatibility with modern asynchronous programming models in .NET. Despite the lack of official development tools, Dapper benefits from a variety of extensions, both official and community-driven. Notable examples include \texttt{Dapper.SqlBuilder}\footnote{\url{https://github.com/DapperLib/Dapper/tree/main/Dapper.SqlBuilder}} for SQL generation, \texttt{Dapper.Rainbow}\footnote{\url{https://github.com/DapperLib/Dapper/tree/main/Dapper.Rainbow}} for simplified CRUD operations, and \texttt{Dapper.EntityFramework}\footnote{\url{https://github.com/DapperLib/Dapper/tree/main/Dapper.EntityFramework}} for integrating with Entity Framework -- although the latter remains largely undocumented.
+
+The project is distributed under the Apache 2.0 License\footnote{\url{https://github.com/DapperLib/Dapper/blob/main/License.txt}} and is freely available via GitHub\footnote{\url{https://github.com/DapperLib/Dapper}} and NuGet\footnote{\url{https://www.nuget.org/packages/dapper/}}. As of the latest release (version 2.1.66 in February 2025), Dapper has amassed over 395 million total downloads, with 120 million downloads in the past year alone\footnote{\url{TODO...}}. While the release cycle is not fixed, updates follow semantic versioning and are typically introduced in response to patches or new feature demands. The framework supports multiple .NET versions, including .NET Framework, .NET Standard, and .NET~8.
+
+In terms of community support, Dapper exhibits a healthy level of maintenance with active issue tracking and contributions. Although responses to GitHub issues may be delayed, many questions receive attention either from maintainers or the broader community, including the original authors. Documentation is primarily hosted on an external website, Learn Dapper\footnote{\url{https://www.learndapper.com/}}, which is maintained by a sponsor responsible for developing the commercial extension Dapper Plus.
+
+\begin{table}[H]
+\centering
+\caption{Comparison overview of ORM framework: Dapper}
+\begin{tabular}{|l|l|}
+\toprule
+\textbf{Property} & \textbf{Dapper} \\
+\midrule
+\textbf{Type} & Micro ORM for .NET \\
+\textbf{License} & Apache 2.0 \\
+\textbf{Cost} & Free; Dapper Plus extension costs \$999/year/developer \\
+\textbf{Sources} & \url{https://github.com/DapperLib/Dapper}, \url{https://www.nuget.org/packages/Dapper}, \url{https://www.learndapper.com} \\
+\textbf{Latest version} & 2.1.66 (February 2025) \\
+\textbf{Supported .NET} & .NET Framework, .NET Standard, .NET 8 \\
+\textbf{ORM features} & Object mapping only; no relationship or collection support \\
+\textbf{Query support} & Raw SQL; any dialect via ADO.NET; no LINQ support \\
+\textbf{Mapping} & Maps result columns to entity properties by exact name; no aliases or conventions \\
+\textbf{Relationship mapping} & Not supported directly; JOINs and result splitting possible manually \\
+\textbf{Schema handling} & No migrations; schema defined in DB; SQL must be adjusted manually \\
+\textbf{Change tracking} & Not supported \\
+\textbf{Data seeding} & Not supported \\
+\textbf{Query logging} & Not supported \\
+\textbf{Transactions} & Supported via ADO.NET; extensions available \\
+\textbf{Bulk operations} & Requires paid extension \\
+\textbf{Async support} & Fully supported \\
+\textbf{Caching} & Entity mapping cached internally; no data caching \\
+\textbf{Community} & Maintained actively on GitHub; many questions on Stack Overflow, often answered by the author \\
+\textbf{Documentation} & External site (Learn Dapper), maintained by extension sponsor; repository includes tests and examples \\
+\textbf{Extensions (official)} & Dapper.SqlBuilder, Dapper.Rainbow, Dapper.EntityFramework \\
+\textbf{Extensions (community)} & Dapper Plus (paid), Dapper.Transaction \\
+\textbf{Tooling} & None available \\
+\textbf{Supported databases} & All ADO.NET-compatible DBs: SQL Server, Oracle, SQLite, PostgreSQL, etc. \\
+\textbf{Ideal use cases} & High-performance data reading, performance bottleneck zones, apps requiring full SQL control \\
+\bottomrule
 \end{tabular}
+\end{table}
 
-The main source for this section will be Dapper's repository \texttt{README} file\cite{DapperRepo} and the Learn Dapper website\cite{Dapper}.
+\subsection{PetaPoco}\label{sec:feat_petapoco}
 
-\subsubsection*{Overview}
-Open source micro ORM, with low latency and high performance. Works as an ADO.NET wrapper, adding extension methods to its \texttt{DbConnection} object. It focuses on object mapping, relations are not supported. It should be lightweight and simple to use. It was originally created by developers at Stack Overflow. They were using LINQ to SQL, the predecessor of Entity Framework (not to be confused with linq2db). It was shown to be inefficient for increased traffic.
+PetaPoco\cite{PetaPoco} is our second chosen micro ORM. Although it changed recently --- it used to have a single-file code base with no dependencies. It is focused on performance and simplicity. Internally it uses ADO.NET like Dapper, yet it provides its own abstractions over it. The framework is configurable through a builder, resulting in \texttt{IDatabase} interface, on which methods are called. With a focus on mapping query results to objects, it does not provide any support for relationships. It provides full control over SQL with an inbuilt SQL builder to make composing it easier. 
 
-\subsubsection*{Distribution}
-\begin{description}
-    \item[\textbf{License}] Open source, Apache 2.0.\footnote{\url{https://www.apache.org/licenses/LICENSE-2.0}}
-    \item[\textbf{Cost}] Free, Dapper Plus - an extension library for 999\$ yearly per developer.
-    \item[\textbf{Availability}] Source code on GitHub, package on NuGet.
-    \item[\textbf{Downloads}] Total 395M, last year 120M.
-    \item[\textbf{Release cycle}] Not fixed. Releases based on patches and new features. Semantic versioning. The latest version 2.1.66, released in February 2025. 
-    \item[\textbf{.NET versions}] .NET Framework, .NET Standard, .NET 8
-\end{description}
+Its small feature set and zero dependencies enable compatibility with a wide selection of database systems, including Microsoft SQL Server, MS Access\footnote{\url{https://support.microsoft.com/en-us/access}}, SQLite, MySQL\footnote{\url{https://www.mysql.com/}}, MariaDB\footnote{\url{https://mariadb.org/}}, and Oracle. Schema management is left to the developer. Templates for entity generation out of a database schema were provided, but were deprecated in the last major version.
 
-\subsubsection*{Community and support}
-\begin{description}
-    \item[\textbf{Project upkeep}] 429 active issues, 897 closed. The maintainers actively comment on and resolve issues.
-    \item[\textbf{Support}] Answers to GitHub issues are not fast. There are many answers on Stack Overflow. Surprisingly, the author responds to a great deal of them.
-    \item[\textbf{Documentation}] External site Learn Dapper, made by a project sponsor. The sponsor maintains the extension, adding it to the documentation. Despite that, the base framework is well documented as well. The project has a great amount of tests that can be used for reference. 
-    \item\textbf{Official extensions}
-    \begin{itemize}
-      \item \textbf{Dapper.EntityFramework} – extension methods for Entity Framework, undocumented
-      \item \textbf{Dapper.Rainbow} – allows simple CRUD methods without SQL
-      \item \textbf{Dapper.SqlBuilder} – builder pattern for SQL generation
-    \end{itemize}
-    \item\textbf{Community extensions}
-    \begin{itemize}
-      \item \textbf{Dapper Plus (paid)} – mapping, bulk operation support\footnote{\url{https://dapper-plus.net/}}
-      \item \textbf{Dapper.Transaction} – transaction support\footnote{\url{https://github.com/zzzprojects/Dapper.Transaction}}
-    \end{itemize}
-    \item[\textbf{Development tools}] No tools available.
-\end{description}
+Entity mapping supports automatic configuration through naming conventions---such as pluralizing property names to match database columns. A limited set of mapping attributes is offered. These can be used to map table and column names, primary keys, and ignore class properties. Like Dapper, it does not automatically handle relationships but provides helper methods for manual JOINs management.
 
-\subsubsection*{Database support}
-\begin{description}
-    \item[\textbf{Supported systems}] Any ADO.NET is compatible with Microsoft SQL Server, Oracle, SqLite, PostgreSQL, and more.
-    \item[\textbf{DB specific features}] Developer controls SQL, possible to utilise specific SQL dialect features.
-\end{description}
+\begin{example}
+\small
+In the following example, the table name and primary key are explicitly defined using attributes, while other properties rely on automatic mapping. The use of the SQL query builder is demonstrated. The projection and source table components in the query builder can be omitted when they can be inferred from the source entity.
 
-\subsubsection*{Configuration, schema, mapping}
-\begin{description}
-    \item[\textbf{Configuration}] Database connection string is passed when creating a connection. No other configuration options.
-    \item[\textbf{DB schema}] Schema can only be in the database. SQL queries need to be adjusted after schema changes.
-    \item[\textbf{Migrations and versioning}] No support.
-    \item[\textbf{Entity mapping}] Automatic result mapping to an entity passed as generic parameter to the query. Entity properties must explicitly match the result columns. There is no option to map aliases or use conventions. Possible with unofficial extensions, we do not consider here.
-    \begin{lstlisting}[language=CSharp]
-    public class Dog
-    {
-        public int? Age { get; set; }
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public float? Weight { get; set; }
-    
-        public int IgnoredProperty { get { return 1; } }
-    }
-    
-    var guid = Guid.NewGuid();
-    var dog = connection.Query<Dog>("select Age = @Age, Id = @Id", new { Age = (int?)null, Id = guid });
-    \end{lstlisting}
-    This code example\cite{DapperRepo} showcases an entity and a query returning one instance. Properties are matched and filled by names, the rest remain empty. 
-    \item[\textbf{Relationship mapping}] As already mentioned, relationships cannot be mapped. However, it is possible to write a JOIN query and then split the results into multiple objects. The framework has helper methods for handling splitting and grouping.
-    \begin{lstlisting}[language=CSharp]
-    var sql =
-    @"select * from #Posts p
-    left join #Users u on u.Id = p.OwnerId
-    Order by p.Id";
-    
-    var data = connection.Query<Post, User, Post>(sql, (post, user) => { post.Owner = user; return post;});
-    var post = data.First();
-    \end{lstlisting}
-    In this example, each post is connected to its owner. The lambda function in \texttt{Query} methods specifies how to connect the entities. Users are likely duplicated for each post. Overall, this is just a simplification of manual handling of the data and overhead is still present. Real use cases could be more complex and inefficient.
-    
-    \item[\textbf{Data types and formats}] No focus on data type serialization, supports common .NET types. Data format parsing for JSON or XML is not supported. They could be queried into if the underlying SQL dialect supports it and the user writes appropriate SQL query.
-    
-    \item[\textbf{Collections}] Not supported.
-\end{description}
+\begin{lstlisting}[language=CSharp]
+using PetaPoco;
 
-\subsubsection*{Querying and database operations}
-\begin{description}
-    \item[\textbf{Query support}] The user writes and controls SQL queries. Theoretically, any SQL dialect and query is supported. Possible to use SQL/JSON or SQL/XML if the database system supports it. No support for LINQ or any other query language. 
-    \item[\textbf{DDL and DML}] Possible to execute any SQL using the \texttt{connection.Execute} method. No direct support without extensions.
-    \item[\textbf{Batch operations}] Batch operations are supported. Bulk operations only with paid extension.
-    \item[\textbf{Change tracking}] Not supported.
-    \item[\textbf{Data seeding}] Not supported.
-    \item[\textbf{Transaction support}] Indirectly through the ADO.NET connection. Or with an extension.
-    \item[\textbf{Fetch strategies}] Relationship mapping not supported - irrelevant.
-    \item[\textbf{Caching}] Data caching not supported. Caches entity mapping operations for speed-up.
-    \item[\textbf{Asynchronous operations}] All methods have an asynchronous variant.
-    \item[\textbf{Query logging}] Not supported
-\end{description}
+[TableName("Sales.OrderLines")]
+[PrimaryKey("OrderLineID")]
+public class OrderLine
+{
+    public int OrderID { get; set; }
+    public int OrderLineID { get; set; }
+    public decimal? UnitPrice { get; set; }
+}
 
-\subsubsection*{Use cases}
-Dapper is clearly performance-oriented. This comes at the cost of not supporting all the features expected from an ORM. That is not an issue, in the end, because there are other frameworks for that. According to a comparison made by the Dapper team, available in the project README file\cite{DapperRepo}, the querying should be very fast.
+decimal unitPrice = 25m;
+var orderLines = db.Fetch<OrderLine>(
+    Sql.Builder.Where("UnitPrice = @0", unitPrice)
+);
+\end{lstlisting}
+\qed
+\end{example}
 
-It is worth using Dapper over ADO.NET mainly for the ease of receiving result data in a static form. Writing SQL queries manually can be an advantage or a disadvantage based on the developer's experience, application scale, and situation. For effective querying, it is necessary to be familiar with SQL and the underlying database system.
+No support for advanced data formats of collections is provided, with the exception of writing native SQL that can work with these structures. LINQ is not supported. Unofficial extension \texttt{StaTypPocoQueries.PetaPoco}\footnote{\url{https://github.com/asherber/StaTypPocoQueries.PetaPoco}} provides result modification methods such as \texttt{First}, \texttt{Single}, \texttt{Page}, and \texttt{Delete} with some selection capabilities. For data manipulation operations (DML), strongly-typed methods like \texttt{Insert}, \texttt{Save}, \texttt{Update}, and \texttt{Delete} are provided. 
 
-Dapper is suitable for applications requiring highly efficient data reading. And tinkering with SQL queries might be necessary to do that. It is also possible to combine Dapper with another ORM and use it only where performance is a bottleneck.
+Queries executed by the framework can be inspected during debugging. Transactions are supported, including nested transactions if the underlying database system allows. However, bulk operations are not available. Asynchronous versions of all methods are also provided. Advanced capabilities such as versioning, change tracking, and data seeding are not provided. The only notable extension is an unofficial \texttt{PetaPoco.SqlKata}\footnote{\url{https://github.com/asherber/PetaPoco.SqlKata}}, which is a more extensive SQL builder than the native one.
+
+The library is distributed under the Apache 2.0 License\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/blob/development/LICENSE.txt}} and is open-sourced on GitHub\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco}} and NuGet\footnote{\url{https://www.nuget.org/packages/PetaPoco.Compiled/}}. PetaPoco was downloaded 1.3 million times in total, with half a million in the last year. PetaPoco has been stagnating on major version 6 (6.0.683 in September 2024) for the past few years, with minor patches being done every few months in response to security patches or new feature demands. The library targets .NET Framework and Standard.
+
+This ORM does not benefit from an extensive community support, with the only extensive source of information being its GitHub wiki\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/wiki}}. Integration tests for most database systems are available and could be used for reference.
 
 
-\subsection{PetaPoco}
-\subsection{LINQ to DB}
+\begin{table}[H]
+\centering
+\caption{Comparison overview of ORM framework: PetaPoco}
+\begin{tabular}{|l|l|}
+\toprule
+\textbf{Property} & \textbf{PetaPoco} \\
+\midrule
+\textbf{Type} & Micro ORM for .NET \\
+\textbf{License} & Apache 2.0 \\
+\textbf{Cost} & Free \\
+\textbf{Sources} & \url{https://github.com/CollaboratingPlatypus/PetaPoco}, \url{https://www.nuget.org/packages/PetaPoco.Compiled}  \\
+\textbf{Latest version} & 6.0.683 (September 2024) \\
+\textbf{Supported .NET} & .NET Framework, .NET Standard \\
+\textbf{ORM features} & Object mapping only; no relationship or collection support \\
+\textbf{Query support} & Raw SQL; wide DB support; limited LINQ through extension \\
+\textbf{Mapping} & Maps automatically by exact name; conventions and some attributed available \\
+\textbf{Relationship mapping} & Not supported directly; JOINs and result splitting possible manually \\
+\textbf{Schema handling} & No migrations; schema defined in DB; SQL must be adjusted manually \\
+\textbf{Change tracking} & Not supported \\
+\textbf{Data seeding} & Not supported \\
+\textbf{Query logging} & Accessible while debugging \\
+\textbf{Transactions} & Supported; with nesting \\
+\textbf{Bulk operations} & Not supported \\
+\textbf{Async support} & Fully supported \\
+\textbf{Caching} & No caching \\
+\textbf{Community} & Maintained actively on GitHub; questions and issues not frequently responded to \\
+\textbf{Documentation} & GitHub wiki; repository includes integration and unit tests\\
+\textbf{Extensions (official)} & None \\
+\textbf{Extensions (community)} & PetaPoco.SqlKata, StaTypPocoQueries.PetaPoco \\
+\textbf{Tooling} & None available \\
+\textbf{Supported databases} & Microsoft SQL Server, MS Access, SQLite, MySQL, MariaDB, Oracle, etc. \\
+\textbf{Ideal use cases} & High-performance data reading, performance bottleneck zones, apps requiring full SQL control \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
 \subsection{RepoDB}
+
+\subsection{LINQ to DB}
+
 \subsection{NHibernate}
 \subsection{EF Core}
 \subsection{EF 6}
