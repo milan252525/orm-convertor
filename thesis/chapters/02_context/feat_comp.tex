@@ -5,7 +5,7 @@ We will start with gathering sources for each ORM, that includes links to docume
 
 \subsection{Dapper}\label{sec:feat_dapper}
 
-Dapper~\cite{Dapper,DapperRepo} is an open-source micro ORM framework for .NET, originally developed by the team at Stack Overflow. It was created in response to the inefficiencies observed with LINQ to SQL -- an ORM that preceded the Entity Framework -- particularly under increasing traffic loads. Designed for performance and simplicity, Dapper functions as a lightweight wrapper around ADO.NET\footnote{\url{https://learn.microsoft.com/en-gb/dotnet/framework/data/adonet/}}, extending the \texttt{DbConnection} object with a set of additional methods to facilitate object mapping. Its primary focus lies in mapping SQL query results to .NET objects, and it does not offer built-in support for modelling relationships or managing database schemas.
+Dapper~\cite{Dapper,DapperRepo} is an open-source micro ORM framework, originally developed by the team at Stack Overflow. It was created in response to the inefficiencies observed with LINQ to SQL -- an ORM that preceded the Entity Framework -- particularly under increasing traffic loads. Designed for performance and simplicity, Dapper functions as a lightweight wrapper around ADO.NET\footnote{\url{https://learn.microsoft.com/en-gb/dotnet/framework/data/adonet/}}, extending the \texttt{DbConnection} object with a set of additional methods to facilitate object mapping. Its primary focus lies in mapping SQL query results to .NET objects, and it does not offer built-in support for modelling relationships or managing database schemas.
 
 The core strength of Dapper lies in its minimal abstraction and high execution speed. Developers retain full control over SQL queries, which allows precise use of SQL dialect features specific to a given database system. Dapper is compatible with all database engines supported by ADO.NET, including Microsoft SQL Server\footnote{\url{https://www.microsoft.com/en-gb/sql-server}}, Oracle\footnote{\url{https://www.oracle.com/database/}}, PostgreSQL\footnote{\url{https://www.postgresql.org/}}, and SQLite\footnote{\url{https://sqlite.org/}}. However, it delegates schema management entirely to the developer, as it does not provide mechanisms for schema versioning or migrations. Consequently, any changes to the database schema must be manually reflected in the SQL queries and the corresponding C\# entities.
 
@@ -97,7 +97,7 @@ PetaPoco\cite{PetaPoco} is our second chosen micro ORM. Although it changed rece
 
 Its small feature set and zero dependencies enable compatibility with a wide selection of database systems, including Microsoft SQL Server, MS Access\footnote{\url{https://support.microsoft.com/en-us/access}}, SQLite, MySQL\footnote{\url{https://www.mysql.com/}}, MariaDB\footnote{\url{https://mariadb.org/}}, and Oracle. Schema management is left to the developer. Templates for entity generation out of a database schema were provided, but were deprecated in the last major version.
 
-Entity mapping supports automatic configuration through naming conventions---such as pluralizing property names to match database columns. A limited set of mapping attributes is offered. These can be used to map table and column names, primary keys, and ignore class properties. Like Dapper, it does not automatically handle relationships but provides helper methods for manual JOINs management.
+Entity mapping supports automatic configuration through naming conventions, such as pluralizing property names to match database columns. A limited set of mapping attributes is offered. These can be used to map table and column names, primary keys, and ignore class properties. Like Dapper, it does not automatically handle relationships but provides helper methods for manual JOINs management.
 
 \begin{example}
 \small
@@ -129,7 +129,7 @@ Queries executed by the framework can be inspected during debugging. Transaction
 
 The library is distributed under the Apache 2.0 License\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/blob/development/LICENSE.txt}} and is open-sourced on GitHub\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco}} and NuGet\footnote{\url{https://www.nuget.org/packages/PetaPoco.Compiled/}}. PetaPoco was downloaded 1.3 million times in total, with half a million in the last year. PetaPoco has been stagnating on major version 6 (6.0.683 in September 2024) for the past few years, with minor patches being done every few months in response to security patches or new feature demands. The library targets .NET Framework and Standard.
 
-This ORM does not benefit from an extensive community support, with the only extensive source of information being its GitHub wiki\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/wiki}}. Integration tests for most database systems are available and could be used for reference.
+This ORM does not benefit from extensive community support, with the only extensive source of information being its GitHub wiki\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/wiki}}. Integration tests for most database systems are available and could be used for reference.
 
 
 \begin{table}[H]
@@ -171,9 +171,73 @@ This ORM does not benefit from an extensive community support, with the only ext
 
 
 \subsection{RepoDB}
+RepoDB~\cite{RepoDB, RepoDBRepo} is an ORM for .NET bridging the gap between micro and macro ORMs. It supposedly focuses on improving the developer experience, while maintaining the speed of macro ORMs. It requires only a connection string and should work "out of the box". Developed by Michael Camara Pendon, it is one of the more recent libraries, starting development in 2018. It provides a set of extension methods over \texttt{Microsoft.Data.SqlClient.SqlConnection} object. 
 
-\subsection{LINQ to DB}
+The core package supports any database system through ADO.NET, limiting querying through raw SQL. To utilize strongly typed queries, database-specific extension package is required. The developer can select from Microsoft SQL Server, SQLite, MySQL, and PostgreSQL. Schema management or entity generation is not offered. Automatic entity mapping to a result can be extended using property and class attributes or a fluent mapping interface. Relationship mapping is not supported, an interface for querying multiple results at once can be utilized. Raw join SQL query with manual handling is another option.
+
+\begin{example}
+\small
+In the example\cite{RepoDB} below, the fluent mapping interface can be seen on a Customer entity. The main advantages here are separation from the entity and more programmatic configuration.
+
+\begin{lstlisting}[language=CSharp]
+FluentMapper
+.Entity<Customer>()
+.Table("[sales].[Customer]")
+.Primary(e => e.Id)
+.Column(e => e.FirstName, "[FName]")
+.DbType(e => e.DateOfBirth, DbType.DateTime2);
+\end{lstlisting}
+\qed
+\end{example}
+
+The main focus of RepoDB is abstracting SQL. However, LINQ is not supported, and queries have to be performed through one of the following options. The main interface is type-safe expressions. As an example, \lstinline{connection.Query<Customer>(e => e.Id == 25)} queries one customer by id. The second option is QueryField and QueryGroup objects. As you can see in \lstinline{connection.Query<Customer>(new QueryField("Id", Operation.Equal, 25))}, this option is not type-safe, but should be more expressive as operator support for the first option is limited. In addition, there are more provided functions over the connection, such as \texttt{Sum}, \texttt{Max}, \texttt{Exists} functions. Data manipulation is possible using \texttt{Insert}, \texttt{Update} and \texttt{Delete} functions. Both batch and bulk operations are supported, though the latter only for Microsoft SQL Server and PostgreSQL.
+
+Transactions are supported through ADO.NET. Application-level cache is supported in-memory, with options for custom providers. Database schema and queries are also cached, speeding up subsequent queries. The library offers a wide variety of interfaces for extension. One example can be query tracing and logging, which is provided by default but can be easily added. While the library provides asynchronous methods, there is no mention of them in the documentation. More advanced features such as change tracking, data seeding, or migration support are not provided. The ORM also focuses on providing the user with the implementation of common repository and unit of work patterns.
+
+The project is open-source and distributed under Apache 2.0 license\footnote{\url{https://github.com/mikependon/RepoDB/blob/master/LICENSE.txt}} on GitHub\footnote{\url{https://github.com/mikependon/RepoDB}} and NuGet\footnote{\url{https://www.nuget.org/packages/repodb}}. With the latest version 1.13.1 released in March 2023, the updates are infrequent. The development is currently paused as per the author's comment\cite{PendonRepoDBComment}. The project has 1.6 million total downloads, half a million of those gained in the past year. .NET versions 7 and Standard are targeted. The documentation is hosted on a separate website\cite{RepoDB}. It provides several tutorials and widely describes available classes and APIs. However, it mostly reads as developer documentation; contextual explanations and longer examples are missing. Missing examples can be substituted by extensive unit and integration tests available in the repository. No extensions are provided, except those for specific database systems we have already discussed.
+
+
+\begin{table}[H]
+\centering
+\caption{Comparison overview of ORM framework: RepoDB}
+\begin{tabular}{|l|l|}
+\toprule
+\textbf{Property} & \textbf{RepoDB} \\
+\midrule
+\textbf{Type} & ORM for .NET \\
+\textbf{License} & Apache 2.0 \\
+\textbf{Cost} & Free \\
+\textbf{Sources} & \url{https://repodb.net/}, \url{https://github.com/mikependon/RepoDB}, \url{https://www.nuget.org/packages/repodb}  \\
+\textbf{Latest version} & .13.1  (March 2023) \\
+\textbf{Supported .NET} & .NET Standard, .NET 7 \\
+\textbf{ORM features} & Object mapping only; no relationship or collection support \\
+\textbf{Query support} & Limited lambda expression support, QueryField and QueryGroup objects \\
+\textbf{Mapping} & Attributes and fluent interface \\
+\textbf{Relationship mapping} & Not supported directly; JOINs and result splitting possible manually \\
+\textbf{Schema handling} & No migrations; schema defined in DB; queries must be adjusted manually \\
+\textbf{Change tracking} & Not supported \\
+\textbf{Data seeding} & Not supported \\
+\textbf{Query logging} & Extensible tracing interface; must be implemented \\
+\textbf{Transactions} & Supported \\
+\textbf{Bulk operations} & Supported for Microsoft SQL and PostgreSQL \\
+\textbf{Async support} & Supported, undocumented \\
+\textbf{Caching} & Application-level caching \\
+\textbf{Community} & Maintained on GitHub; questions and issues responded to; development curr. paused \\
+\textbf{Documentation} & Separate website; repository includes integration and unit tests\\
+\textbf{Extensions (official)} & Database support extensions \\
+\textbf{Extensions (community)} & None \\
+\textbf{Tooling} & None available \\
+\textbf{Supported databases} & Microsoft SQL Server, SQLite, MySQL, and PostgreSQL \\
+\textbf{Ideal use cases} & Simple applications, beginner developers, performance-dependent applications possible \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Linq2db}
 
 \subsection{NHibernate}
-\subsection{EF Core}
-\subsection{EF 6}
+
+\subsection{Entity Framework Core}
+
+\subsection{Entity Framework 6}
