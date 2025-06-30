@@ -3,7 +3,9 @@ We will first introduce the methodology of our comparison, deciding what propert
 
 We will start with gathering sources for each ORM, that includes links to documentation, repository, and a NuGet distribution. We will continue with a brief introduction, mainly based on what each framework's documentation or repository README file promises. We will follow with distribution, licensing, and version info. To get an idea of relevancy, we will check development cycles, community forums, and tool support. Then we will move onto more technical areas. We are interested in database system support and configuration, as well as how each ORM handles entity mapping and various aspects of database operations. And finally, we will compare our findings with initial promises and discuss best use cases.
 
-When mentioning supported .NET versions, we will only list versions specifically targeted by the package. But as we have already discussed, .NET packages are usually backwards and forward compatible. And the .NET Standard allows targeting both .NET Framework and Core.
+When mentioning supported .NET versions, we will only list versions specifically targeted by the package. But as we have already discussed, .NET packages are usually backward and forward compatible. And the .NET Standard allows targeting both .NET Framework and Core.
+
+
 
 \subsection{Dapper}\label{sec:feat_dapper}
 
@@ -240,7 +242,7 @@ The project is open-source and distributed under Apache 2.0 license\footnote{\ur
 
 LINQ to DB \cite{linq2db, linq2dbRepo}, alternatively linq2db, is an ORM that focuses primarily on offering a type-safe layer above SQL through LINQ. Statically typed, compiler-checked queries are a huge benefit for bigger projects and allow easier refactoring. It supports extensive entity and relationship mapping and should offer the best performance in terms of querying through LINQ. Relative to that focus, it does not offer features expected from full-fledged macro ORMs. There is no change tracking or caching with this framework.
 
-LINQ to DB is compatible with a big range of database systems, for example, Microsoft SQL Server, MySQL, Oracle, PostgreSQL, MS Access, SQLite, and even less common ones like SAP HANA\footnote{\url{https://www.sap.com/cz/products/data-cloud/hana/what-is-sap-hana.html}}, ClickHouse\footnote{\url{https://clickhouse.com/}}, and more. Database schema must be handled by the developer, but entity generation from the database is available. Configuration is fairly simple through the \texttt{DataConnection} object. This object can be inherited from, allowing us to configure a wide set of options, including entity mapping. Mapping can be done using fluent methods using the aforementioned object. Another option is attributes on the entity class and properties. Convention-based and automatic mapping is also an option. All multiplicities of relationships are configurable, although the documentation provides limited information on this topic. 
+LINQ to DB is compatible with a big range of database systems, for example, Microsoft SQL Server, MySQL, Oracle, PostgreSQL, MS Access, SQLite, and even less common ones like SAP HANA\footnote{\url{https://www.sap.com/products/data-cloud/hana/what-is-sap-hana.html}}, ClickHouse\footnote{\url{https://clickhouse.com/}}, and more. Database schema must be handled by the developer, but entity generation from the database is available. Configuration is fairly simple through the \texttt{DataConnection} object. This object can be inherited from, allowing us to configure a wide set of options, including entity mapping. Mapping can be done using fluent methods using the aforementioned object. Another option is attributes on the entity class and properties. Convention-based and automatic mapping is also an option. All multiplicities of relationships are configurable, although the documentation provides limited information on this topic. 
 
 \begin{example}
 \small
@@ -315,6 +317,123 @@ The ORM is open-source and provided under the MIT license\footnote{\url{https://
 
 
 \subsection{NHibernate}
+
+
+NHibernate \cite{nhibernate, nhibernateRepo} started development around 2003, making it the oldest ORM on our list. Originally a port of Java Hibernate\footnote{\url{https://hibernate.org/}}, it eventually started diverging and became a community-developed .NET ORM. It is designed to be feature complete and "to relieve the developer from 95 percent of common data persistence related programming tasks" \cite{nhibernate}. 
+It is highly configurable, offers various forms of entity and relationship mapping, and multiple ways to query a database. Supported database systems include Microsoft SQL Server, Oracle, MySQL, PostgreSQL, SQLite, and more.
+
+The configuration can be done using XML files or directly in code using \texttt{NHibernate.Cfg.Configuration} object. 
+Schema must be managed in the database by a developer. Exporting entities from schema is possible with a provided tool, but it is not recommended to be used in production. Migrations and versioning are not supported. Entities can be mapped with attributes or fluent configuration. Fluent mapping has been supported through an external extension FluentNHibernate\footnote{\url{https://github.com/nhibernate/fluent-nhibernate}} for a long time. In-library support was added later on, but it lacks any proper documentation. Another type of mapping, taken over from the Java world, is XML configuration files. This mapping is completely detached from ORM code, making refactoring quite complicated.
+
+
+\begin{example}
+\small
+Let us look at two examples\cite{fluentNH} of mapping supported by NHibernate. 
+
+\begin{lstlisting}[language=xml]
+<?xml version="1.0" encoding="utf-8" ?>  
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">  
+  <class name="Cat" table="Cat">  
+    <id name="Id"><generator class="identity" /></id>  
+    <property name="Name">  
+      <column name="Name" length="16" not-null="true" />  
+    </property> 
+    <property name="Sex" /> 
+    <many-to-one name="Mate" />  
+    <bag name="Kittens">  
+      <key column="mother_id" />  
+      <one-to-many class="Cat" />  
+    </bag>  
+  </class>  
+</hibernate-mapping> 
+\end{lstlisting}
+
+The same mapping converted to fluent code is much more compact, readable, and, most importantly, statically typed. 
+
+\begin{lstlisting}[language=CSharp]
+public class CatMap : ClassMap<Cat>
+{
+    public CatMap()
+    {
+        Id(x => x.Id);
+        Map(x => x.Name)
+            .Length(16)
+            .Not.Nullable();
+        Map(x => x.Sex);
+        References(x => x.Mate);
+        HasMany(x => x.Kittens);
+    }
+}
+\end{lstlisting}
+\qed
+\end{example}
+
+Relationship mapping can be done into various forms of collections - list, set, hash map and all multiplicities are supported. Even class inheritance on entities can be mapped into the database. Different loading strategies are configurable. Entities can be loaded eagerly on query execution or lazily, where the loading occurs only on accessing the associated collection. To allow this, NHibernate requires every property to be \texttt{virtual},
+
+As both NHibernate and .NET developed over the years, new forms of querying could be introduced, leading to the eventual adoption of LINQ. Predecessors to NHibernate's LINQ are still present (Criteria and QueryOver APIs), although rarely used. Those were used before the addition of lambda expressions and extension methods into the language. Another available query language is Hibernate Query Language (HQL)\footnote{\url{https://nhibernate.info/doc/nhibernate-reference/queryhql.html}}. HQL is very similar to SQL but object-oriented. It is not commonly used in the .NET world, and the queries are not statically typed as is the case with LINQ. And lastly, raw SQL queries can be executed with a lot of helper methods. SQL queries can also be stored in XML mapping files to avoid duplication. DML is fully supported along with transactions but not in bulk operations. Logging of generated SQL can be enabled. NHibernate supports XML type columns, but no querying capabilities inside it.
+
+\begin{example}
+\small
+This example\cite{nhibernate} shows a difference between Criteria and LINQ queries. Criteria queries were introduced before .NET had support for LINQ. We can see the evolution from building a query object using expression builders to extension functions that retain the entity type information and statically typed lambda expressions over them. 
+
+\begin{lstlisting}[language=CSharp]
+session.CreateCriteria<Cat>()
+    .Add( Expression.Like("Name", "Fritz%") )
+    .Add( Expression.Between("Weight", minWeight, maxWeight) )
+    .List<Cat>();
+
+session.Query<Cat>()
+    .Where(c => c.Name.StartsWith("Fritz"))
+    .Where(c => c.Weight >= minWeight && c.Weight <= maxWeight)
+    .ToList();
+\end{lstlisting}
+\qed
+\end{example}
+
+Caching is available both on session and application level. Session cache speeds up repeated queries. Application-wide cache stores separate entities and shares them across sessions. The caches are highly configurable and different providers like memcached or Redis can be utilized.
+The framework offers change tracking capabilities, keeping track of all loaded entities and then saving all changes on transaction commit.
+
+Despite being the oldest, it still receives maintenance and new features. The latest version 5.5.2 was released in July 2024. The projection is open source under GNU Lesser General Public License v2.1\footnote{\url{https://github.com/nhibernate/nhibernate-core/blob/master/LICENSE.txt}}. It is distributed on GitHub\footnote{\url{https://github.com/nhibernate}}, NuGet\footnote{\url{https://www.nuget.org/packages/nhibernate}} and SourceForge\footnote{\url{https://sourceforge.net/projects/nhibernate/}}. GitHub issues are responded to sparingly. However, the collection of questions on forums like Stack Overflow has grown large. NHibernate manages to keep up with new .NET versions, targeting Framework, Standard, and .NET 6.
+
+The documentation is published in both PDF and HTML formats. It is comprehensive, offering detailed explanations of numerous concepts. However, many sections are outdated, referencing tools and features that are no longer available. Some areas are undocumented, like the mentioned change tracking or mapping by code.
+
+Notable official extensions include the already mentioned FluentNHibernate, {NHibernate.Spatial}\footnote{\url{https://github.com/nhibernate/NHibernate.Spatial}} for working with spatial data and NHibernate-Search\footnote{\url{https://github.com/nhibernate/NHibernate-Search}} for full-text searching. NHibernate Profiler\footnote{\url{https://hibernatingrhinos.com/products/nhprof}} offers query profiling and analysis, but unfortunately, it is a paid unofficial tool. 
+
+\begin{table}[H]
+\centering
+\caption{Comparison overview of ORM framework: NHibernate}
+\begin{tabular}{|l|l|}
+\toprule
+\textbf{Property} & \textbf{NHibernate} \\
+\midrule
+\textbf{Type} & macro ORM for .NET \\
+\textbf{License} & GNU Lesser General Public License v2.1 only \\
+\textbf{Cost} & Free \\
+\textbf{Sources} & \url{https://nhibernate.info/}, \url{https://github.com/nhibernate}, \url{https://www.nuget.org/packages/nhibernate}, \url{https://sourceforge.net/projects/nhibernate/}  \\
+\textbf{Latest version} & 5.5.2 (July 2024) \\
+\textbf{Supported .NET} & .NET Framework, Standard, 6 \\
+\textbf{ORM features} & Full object and relationship mapping \\
+\textbf{Query support} & Extensive LINQ support, HQL, Criteria and QueryOver (outdated) \\
+\textbf{Mapping} & Attributes, fluent, XML files \\
+\textbf{Relationship mapping} & All types supported \\
+\textbf{Schema handling} & No migrations; schema scaffolding from DB \\
+\textbf{Change tracking} & Supported in transaction scope; undocumented \\
+\textbf{Data seeding} & Not supported \\
+\textbf{Query logging} & Supported \\
+\textbf{Transactions} & Supported \\
+\textbf{Bulk operations} & Not supported \\
+\textbf{Async support} & Supported \\
+\textbf{Caching} & Application and session level cache \\
+\textbf{Community} & Maintained on GitHub; slow response to issues; wide range of questions on forums \\
+\textbf{Documentation} & Separate website; HTML or PDF; Not up-to-date\\
+\textbf{Extensions (official)} & FluentNHibernate, NHibernate.Spatial, NHibernate-Search  \\
+\textbf{Extensions (community)} & None \\
+\textbf{Tooling} & Paid profiler \\
+\textbf{Supported databases} & Microsoft SQL Server, Oracle, MySQL, PostgreSQL, SQLite and more  \\
+\textbf{Ideal use cases} & Complex, legacy applications; Performance with caching; Complex configurability \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Entity Framework Core}
 
