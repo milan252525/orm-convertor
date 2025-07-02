@@ -1,11 +1,9 @@
 \section{Feature comparison}
-We will first introduce the methodology of our comparison, deciding what properties and information to look for. Then we will follow with an overview of each framework, finishing with an overall comparison.
+We will start with gathering sources for each ORM - links to documentation, repository, and package managers. We will give each framework a short introduction, mainly based on what each framework's documentation promises. We will follow with distribution, licensing, and version info. To get an idea of relevancy, we will check development cycles, community forums, and tool support. Then we will move onto more technical areas. We are interested in database system support and configuration, as well as how each ORM handles entity and relationship mapping and various aspects of database operations.
 
-We will start with gathering sources for each ORM, that includes links to documentation, repository, and a NuGet distribution. We will continue with a brief introduction, mainly based on what each framework's documentation or repository README file promises. We will follow with distribution, licensing, and version info. To get an idea of relevancy, we will check development cycles, community forums, and tool support. Then we will move onto more technical areas. We are interested in database system support and configuration, as well as how each ORM handles entity mapping and various aspects of database operations. And finally, we will compare our findings with initial promises and discuss best use cases.
+In the context of the .NET ecosystem, we will be interested in supported versions. We will only list versions specifically targeted by the package. But as we have already discussed, .NET packages are usually backward and forward compatible. And the .NET Standard allows targeting both .NET Framework and Core.
 
-When mentioning supported .NET versions, we will only list versions specifically targeted by the package. But as we have already discussed, .NET packages are usually backward and forward compatible. And the .NET Standard allows targeting both .NET Framework and Core.
-
-
+Amount of downloads can help us assess usage. The amount of downloads will be obtained from the respective NuGet package page. Download counts are collected by NuGet Trends\footnote{\url{https://nugettrends.com/}} website. Yearly downloads will be from the period between 30th June 2024 and 29th June 2025.
 
 \subsection{Dapper}\label{sec:feat_dapper}
 
@@ -38,7 +36,7 @@ var dog = connection.Query<Dog>("select Age = @Age, Id = @Id", new { Age = (int?
 
 \begin{example}
 \small
-In this example, each post is connected to its owner. The lambda function in \texttt{Query} methods specifies how to connect the entities. Users are likely duplicated for each post. Overall, this is just a simplification of manual handling of the data, and overhead is still present. Real use cases could be more complex and inefficient.
+In this example, each post is connected to its owner. The lambda function in \texttt{Query} methods specifies how to connect the entities. Users are likely duplicated for each post. Overall, this is just a simplification of the manual handling of the data, and overhead is still present. Real use cases could be more complex and inefficient.
 
 \begin{lstlisting}[language=CSharp]
 var sql =
@@ -55,7 +53,7 @@ var post = data.First();
 
 Dapper does not include capabilities such as change tracking, data seeding, or query logging. Batch operations are supported natively, while bulk operations require the use of a commercial extension (Dapper Plus)\footnote{\url{https://dapper-plus.net/}}. Transaction handling is available indirectly through ADO.NET or via community-supported extensions. All major methods have asynchronous counterparts, ensuring compatibility with modern asynchronous programming models in .NET. Despite the lack of official development tools, Dapper benefits from a variety of extensions, both official and community-driven. Notable examples include \texttt{Dapper.SqlBuilder}\footnote{\url{https://github.com/DapperLib/Dapper/tree/main/Dapper.SqlBuilder}} for SQL generation, \texttt{Dapper.Rainbow}\footnote{\url{https://github.com/DapperLib/Dapper/tree/main/Dapper.Rainbow}} for simplified CRUD operations, and \texttt{Dapper.EntityFramework}\footnote{\url{https://github.com/DapperLib/Dapper/tree/main/Dapper.EntityFramework}} for integrating with Entity Framework -- although the latter remains largely undocumented.
 
-The project is distributed under the Apache 2.0 License\footnote{\url{https://github.com/DapperLib/Dapper/blob/main/License.txt}} and is freely available via GitHub\footnote{\url{https://github.com/DapperLib/Dapper}} and NuGet\footnote{\url{https://www.nuget.org/packages/dapper/}}. As of the latest release (version 2.1.66 in February 2025), Dapper has amassed over 395 million total downloads, with 120 million downloads in the past year alone\footnote{\url{TODO...}}. While the release cycle is not fixed, updates follow semantic versioning and are typically introduced in response to patches or new feature demands. The framework supports multiple .NET versions, including .NET Framework, .NET Standard, and .NET~8.
+The project is distributed under the Apache 2.0 License\footnote{\url{https://github.com/DapperLib/Dapper/blob/main/License.txt}} and is freely available via GitHub\footnote{\url{https://github.com/DapperLib/Dapper}} and NuGet\footnote{\url{https://www.nuget.org/packages/dapper/}}. As of the latest release (version 2.1.66 in February 2025), Dapper has amassed over 496 million total downloads, with 144 million downloads in the past year alone\footnote{\url{https://nugettrends.com/packages?months=72&ids=Dapper}}. While the release cycle is not fixed, updates follow semantic versioning and are typically introduced in response to patches or new feature demands. The framework supports multiple .NET versions, including .NET Framework, .NET Standard, and .NET~8.
 
 In terms of community support, Dapper exhibits a healthy level of maintenance with active issue tracking and contributions. Although responses to GitHub issues may be delayed, many questions receive attention either from maintainers or the broader community, including the original authors. Documentation is primarily hosted on an external website, Learn Dapper\footnote{\url{https://www.learndapper.com/}}, which is maintained by a sponsor responsible for developing the commercial extension Dapper Plus.
 
@@ -68,7 +66,7 @@ In terms of community support, Dapper exhibits a healthy level of maintenance wi
 \midrule
 \textbf{Type} & Micro ORM for .NET \\
 \textbf{License} & Apache 2.0 \\
-\textbf{Cost} & Free; Dapper Plus extension costs \$999/year/developer \\
+\textbf{Cost} & Free; Dapper Plus is paid extension  \\
 \textbf{Sources} & \url{https://github.com/DapperLib/Dapper}, \url{https://www.nuget.org/packages/Dapper}, \url{https://www.learndapper.com} \\
 \textbf{Latest version} & 2.1.66 (February 2025) \\
 \textbf{Supported .NET} & .NET Framework, .NET Standard, .NET 8 \\
@@ -81,7 +79,7 @@ In terms of community support, Dapper exhibits a healthy level of maintenance wi
 \textbf{Data seeding} & Not supported \\
 \textbf{Query logging} & Not supported \\
 \textbf{Transactions} & Supported via ADO.NET; extensions available \\
-\textbf{Bulk operations} & Requires paid extension \\
+\textbf{Bulk operations} & Paid extension required \\
 \textbf{Async support} & Fully supported \\
 \textbf{Caching} & Entity mapping cached internally; no data caching \\
 \textbf{Community} & Maintained actively on GitHub; many questions on Stack Overflow, often answered by the author \\
@@ -97,7 +95,7 @@ In terms of community support, Dapper exhibits a healthy level of maintenance wi
 
 \subsection{PetaPoco}\label{sec:feat_petapoco}
 
-PetaPoco\cite{PetaPoco} is the second chosen micro ORM. Although it changed recently --- it used to have a single-file code base with no dependencies. It is focused on performance and simplicity. Internally it uses ADO.NET like Dapper, yet it provides its own abstractions over it. The framework is configurable through a builder, resulting in \texttt{IDatabase} interface, on which methods are called. With a focus on mapping query results to objects, it does not provide any support for relationships. It provides full control over SQL with an inbuilt SQL builder to make composing it easier. 
+PetaPoco\cite{PetaPoco} is the second chosen micro ORM. Although it changed recently --- it used to have a single-file codebase with no dependencies. It is focused on performance and simplicity. Internally it uses ADO.NET like Dapper, yet it provides its own abstractions over it. The framework is configurable through a builder, resulting in \texttt{IDatabase} interface, on which methods are called. With a focus on mapping query results to objects, it does not provide any support for relationships. It provides full control over SQL with an inbuilt SQL builder to make composing it easier. 
 
 Its small feature set and zero dependencies enable compatibility with a wide selection of database systems, including Microsoft SQL Server, MS Access\footnote{\url{https://support.microsoft.com/en-us/access}}, SQLite, MySQL\footnote{\url{https://www.mysql.com/}}, MariaDB\footnote{\url{https://mariadb.org/}}, and Oracle. Schema management is left to the developer. Templates for entity generation out of a database schema were provided, but were deprecated in the last major version.
 
@@ -131,7 +129,7 @@ No support for advanced data formats of collections is provided, with the except
 
 Queries executed by the framework can be inspected during debugging. Transactions are supported, including nested transactions if the underlying database system allows. However, bulk operations are not available. Asynchronous versions of all methods are also provided. Advanced capabilities such as versioning, change tracking, and data seeding are not provided. The only notable extension is an unofficial \texttt{PetaPoco.SqlKata}\footnote{\url{https://github.com/asherber/PetaPoco.SqlKata}}, which is a more extensive SQL builder than the native one.
 
-The library is distributed under the Apache 2.0 License\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/blob/development/LICENSE.txt}} and is open-sourced on GitHub\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco}} and NuGet\footnote{\url{https://www.nuget.org/packages/PetaPoco.Compiled/}}. PetaPoco was downloaded 1.3 million times in total, with half a million in the last year. PetaPoco has been stagnating on major version 6 (6.0.683 in September 2024) for the past few years, with minor patches being done every few months in response to security patches or new feature demands. The library targets .NET Framework and Standard.
+The library is distributed under the Apache 2.0 License\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/blob/development/LICENSE.txt}} and is open-sourced on GitHub\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco}} and NuGet\footnote{\url{https://www.nuget.org/packages/PetaPoco.Compiled/}}. PetaPoco was downloaded 1.8 million times in total, with 600 thousands in the last year\footnote{\url{https://nugettrends.com/packages?months=72&ids=PetaPoco.Compiled}}. PetaPoco has been stagnating on major version 6 (6.0.683 in September 2024) for the past few years, with minor patches being done every few months in response to security patches or new feature demands. The library targets .NET Framework and Standard.
 
 This ORM does not benefit from extensive community support, with the only extensive source of information being its GitHub wiki\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/wiki}}. Integration tests for most database systems are available and could be used for reference.
 
@@ -150,7 +148,7 @@ This ORM does not benefit from extensive community support, with the only extens
 \textbf{Latest version} & 6.0.683 (September 2024) \\
 \textbf{Supported .NET} & .NET Framework, .NET Standard \\
 \textbf{ORM features} & Object mapping only; no relationship or collection support \\
-\textbf{Query support} & Raw SQL; wide DB support; limited LINQ through extension \\
+\textbf{Query support} & Raw SQL; wide DB support \\
 \textbf{Mapping} & Maps automatically by exact name; conventions and some attributed available \\
 \textbf{Relationship mapping} & Not supported directly; JOINs and result splitting possible manually \\
 \textbf{Schema handling} & No migrations; schema defined in DB; SQL must be adjusted manually \\
@@ -198,7 +196,7 @@ The main focus of RepoDB is abstracting SQL. However, LINQ is not supported, and
 
 Transactions are supported through ADO.NET. Application-level cache is supported in-memory, with options for custom providers. Database schema and queries are also cached, speeding up subsequent queries. The library offers a wide variety of interfaces for extension. One example can be query tracing and logging, which is provided by default but can be easily added. While the library provides asynchronous methods, there is no mention of them in the documentation. More advanced features such as change tracking, data seeding, or migration support are not provided. The ORM also focuses on providing the user with the implementation of common repository and unit of work patterns.
 
-The project is open-source and distributed under Apache 2.0 license\footnote{\url{https://github.com/mikependon/RepoDB/blob/master/LICENSE.txt}} on GitHub\footnote{\url{https://github.com/mikependon/RepoDB}} and NuGet\footnote{\url{https://www.nuget.org/packages/repodb}}. With the latest version 1.13.1 released in March 2023, the updates are infrequent. The development is currently paused as per the author's comment\cite{PendonRepoDBComment}. The project has 1.6 million total downloads, half a million of those gained in the past year. .NET versions 7 and Standard are targeted. The documentation is hosted on a separate website\cite{RepoDB}. It provides several tutorials and widely describes available classes and APIs. However, it mostly reads as developer documentation; contextual explanations and longer examples are missing. Missing examples can be substituted by extensive unit and integration tests available in the repository. No extensions are provided, except those for specific database systems we have already discussed.
+The project is open-source and distributed under Apache 2.0 license\footnote{\url{https://github.com/mikependon/RepoDB/blob/master/LICENSE.txt}} on GitHub\footnote{\url{https://github.com/mikependon/RepoDB}} and NuGet\footnote{\url{https://www.nuget.org/packages/repodb}}. With the latest version 1.13.1 released in March 2023, the updates are infrequent. The development is currently paused as per the author's comment\cite{PendonRepoDBComment}. The project has over 1.9 million total downloads, approximately half a million of those gained in the past year\footnote{\url{https://nugettrends.com/packages?months=72&ids=RepoDb}}. .NET versions 7 and Standard are targeted. The documentation is hosted on a separate website\cite{RepoDB}. It provides several tutorials and widely describes available classes and APIs. However, it mostly reads as developer documentation; contextual explanations and longer examples are missing. Missing examples can be substituted by extensive unit and integration tests available in the repository. No extensions are provided, except those for specific database systems we have already discussed.
 
 
 \begin{table}[H]
@@ -271,13 +269,13 @@ var order = db.Orders
 \end{example}
 
 While the LINQ support is extensive, querying into data types like JSON or XML is not supported. 
-Database can be manipulated through exposed DDL methods like \texttt{CreateTable} and \texttt{DropTable}, but documentation provides no explanation. Data modification is possible through \texttt{Insert}, \texttt{Update} and \texttt{Delete} methods. Bulk data operations are available for selected database systems.
+Database can be manipulated through exposed DDL methods like \texttt{CreateTable} and \texttt{DropTable}, but the documentation provides no explanation. Data modification is possible through \texttt{Insert}, \texttt{Update} and \texttt{Delete} methods. Bulk data operations are available for selected database systems.
 Advanced SQL constructs like transactions, CTE (common table expressions), \texttt{MERGE}, and window analytic functions are supported. Of course, any raw SQL can be executed too, but it is not the concern of this ORM. Asynchronous variants of all methods are exposed.
 
-Some additional tooling is provided. Scaffolding database schema to generate entities and mapping is possible with a CLI tool. The library offers extendibility through exposed interceptor interfaces, which allow modifying behaviour in different stages of querying. Support for profiling using MiniProfiler\footnote{\url{https://github.com/MiniProfiler/dotnet}} is also explicitly provided and described.
+Some additional tooling is provided. Scaffolding database schema to generate entities and mapping is possible with a CLI tool. The library offers extendibility through exposed interceptor interfaces, which allow modifying behavior in different stages of querying. Support for profiling using MiniProfiler\footnote{\url{https://github.com/MiniProfiler/dotnet}} is also explicitly provided and described.
 LINQ to DB can be used alongside Entity Framework Core to extend its LINQ to SQL translation capabilities. This is enabled using an official extension built into this library.
 
-The ORM is open-source and provided under the MIT license\footnote{\url{https://github.com/linq2db/linq2db/blob/master/MIT-LICENSE.txt}}. It is distributed via GitHub\footnote{\url{https://github.com/linq2db/linq2db}} and NuGet\footnote{\url{https://www.nuget.org/packages/linq2db}}. The last released version is 5.4.1 in April 2024, although major version 6 is currently being released under previews. The package was downloaded 14 million times in total, with almost 5 million downloads this year. Project issues receive attention from contributors and are resolved relatively quickly. Documentation is provided on a separate page; it is quite extensive and covers a lot of areas. Examples along with tests are available in the repository. The framework supports multiple .NET versions, including .NET Framework, .NET Standard, and .NET 6.
+The ORM is open-source and provided under the MIT license\footnote{\url{https://github.com/linq2db/linq2db/blob/master/MIT-LICENSE.txt}}. It is distributed via GitHub\footnote{\url{https://github.com/linq2db/linq2db}} and NuGet\footnote{\url{https://www.nuget.org/packages/linq2db}}. The last released version is 5.4.1 in April 2024, although major version 6 is currently being released under previews. The package was downloaded 17 million times in total, with almost 5 million downloads in the last year\footnote{\url{https://nugettrends.com/packages?months=72&ids=linq2db}}. Project issues receive attention from contributors and are resolved relatively quickly. Documentation is provided on a separate page; it is quite extensive and covers a lot of areas. Examples along with tests are available in the repository. The framework supports multiple .NET versions, including .NET Framework, .NET Standard, and .NET 6.
 
 \begin{table}[H]
 \centering
@@ -370,7 +368,7 @@ public class CatMap : ClassMap<Cat>
 
 Relationship mapping can be done into various forms of collections - list, set, hash map and all multiplicities are supported. Even class inheritance on entities can be mapped into the database. Different loading strategies are configurable. Entities can be loaded eagerly on query execution or lazily, where the loading occurs only on accessing the associated collection. To allow this, NHibernate requires every property to be \texttt{virtual},
 
-As both NHibernate and .NET developed over the years, new forms of querying could be introduced, leading to the eventual adoption of LINQ. Predecessors to NHibernate's LINQ are still present (Criteria and QueryOver APIs), although rarely used. Those were used before the addition of lambda expressions and extension methods into the language. Another available query language is Hibernate Query Language (HQL)\footnote{\url{https://nhibernate.info/doc/nhibernate-reference/queryhql.html}}. HQL is very similar to SQL but object-oriented. It is not commonly used in the .NET world, and the queries are not statically typed as is the case with LINQ. And lastly, raw SQL queries can be executed with a lot of helper methods. SQL queries can also be stored in XML mapping files to avoid duplication. DML is fully supported along with transactions but not in bulk operations. Logging of generated SQL can be enabled. NHibernate supports XML type columns, but no querying capabilities inside it.
+As both NHibernate and .NET developed over the years, new forms of querying could be introduced, leading to the eventual adoption of LINQ. Predecessors to NHibernate's LINQ are still present (Criteria and QueryOver APIs), although rarely used. Those were used before the addition of lambda expressions and extension methods into the language. Another available query language is Hibernate Query Language (HQL)\footnote{\url{https://nhibernate.info/doc/nhibernate-reference/queryhql.html}}. HQL is very similar to SQL but object-oriented. It is not commonly used in the .NET world, and the queries are not statically typed as is the case with LINQ. And lastly, raw SQL queries can be executed with a lot of helper methods. SQL queries can also be stored in XML mapping files to avoid duplication. DML is fully supported along with transactions but not in bulk operations. Logging of generated SQL can be enabled. NHibernate supports XML type columns, but no querying capabilities inside it. NHibernate operates using a session, an object responsible for managing interactions with the database. In typical web applications, a session is short-lived and scoped to a single HTTP request. That ensures all database operations with that request are isolated and consistent.
 
 \begin{example}
 \small
@@ -390,14 +388,14 @@ session.Query<Cat>()
 \qed
 \end{example}
 
-Caching is available both on session and application level. Session cache speeds up repeated queries. Application-wide cache stores separate entities and shares them across sessions. The caches are highly configurable and different providers like memcached or Redis can be utilized.
+Caching is available both on session and application levels. Session cache speeds up repeated queries. Application-wide cache stores separate entities and shares them across sessions. The caches are highly configurable and different providers like memcached or Redis can be utilized.
 The framework offers change tracking capabilities, keeping track of all loaded entities and then saving all changes on transaction commit.
 
-Despite being the oldest, it still receives maintenance and new features. The latest version 5.5.2 was released in July 2024. The projection is open source under GNU Lesser General Public License v2.1\footnote{\url{https://github.com/nhibernate/nhibernate-core/blob/master/LICENSE.txt}}. It is distributed on GitHub\footnote{\url{https://github.com/nhibernate}}, NuGet\footnote{\url{https://www.nuget.org/packages/nhibernate}} and SourceForge\footnote{\url{https://sourceforge.net/projects/nhibernate/}}. GitHub issues are responded to sparingly. However, the collection of questions on forums like Stack Overflow has grown large. NHibernate manages to keep up with new .NET versions, targeting Framework, Standard, and .NET 6.
+Despite being the oldest, it still receives maintenance and new features. It was downloaded 57 million times in total, with 14 million downloads in the last year\footnote{\url{https://nugettrends.com/packages?months=72&ids=NHibernate}}. The latest version 5.5.2 was released in July 2024. The project is open source under GNU Lesser General Public License v2.1\footnote{\url{https://github.com/nhibernate/nhibernate-core/blob/master/LICENSE.txt}}. It is distributed on GitHub\footnote{\url{https://github.com/nhibernate}}, NuGet\footnote{\url{https://www.nuget.org/packages/nhibernate}} and SourceForge\footnote{\url{https://sourceforge.net/projects/nhibernate/}}. GitHub issues are responded to sparingly. However, the collection of questions on forums like Stack Overflow has grown large. NHibernate manages to keep up with new .NET versions, targeting Framework, Standard, and .NET 6.
 
-The documentation is published in both PDF and HTML formats. It is comprehensive, offering detailed explanations of numerous concepts. However, many sections are outdated, referencing tools and features that are no longer available. Some areas are undocumented, like the mentioned change tracking or mapping by code.
+The documentation is published in both PDF and HTML formats. It is comprehensive, offering detailed explanations of numerous concepts. However, many sections are outdated, referencing tools and features that are no longer available. Some areas are undocumented, like the change tracking or mapping by code.
 
-Notable official extensions include the already mentioned FluentNHibernate, {NHibernate.Spatial}\footnote{\url{https://github.com/nhibernate/NHibernate.Spatial}} for working with spatial data and NHibernate-Search\footnote{\url{https://github.com/nhibernate/NHibernate-Search}} for full-text searching. NHibernate Profiler\footnote{\url{https://hibernatingrhinos.com/products/nhprof}} offers query profiling and analysis, but unfortunately, it is a paid unofficial tool. 
+Notable official extensions include the aforementioned FluentNHibernate, {NHibernate.Spatial}\footnote{\url{https://github.com/nhibernate/NHibernate.Spatial}} for working with spatial data and NHibernate-Search\footnote{\url{https://github.com/nhibernate/NHibernate-Search}} for full-text searching. NHibernate Profiler\footnote{\url{https://hibernatingrhinos.com/products/nhprof}} offers query profiling and analysis, but unfortunately, it is a paid unofficial tool. 
 
 \begin{table}[H]
 \centering
@@ -436,5 +434,152 @@ Notable official extensions include the already mentioned FluentNHibernate, {NHi
 \end{table}
 
 \subsection{Entity Framework Core}
+Entity Framework Core \cite{efcore, efcoreRepo} is a modern ORM backed by the .NET Foundation, a non-profit organization established by Microsoft. Despite Microsoft's involvement, EF Core remains community-driven and fully open source. It is a lighter, cross-platform version of the older Entity Framework 6. Release cycle aligns closely with the .NET ecosystem, resulting in simultaneous version releases. For example, EF Core 9 was launched alongside .NET 9. This guarantees integration with the most modern language features. However, this comes with a notable drawback---EF Core always supports only the most recent .NET version, limiting backward compatibility. Notable extensions include EFCoreSecondLevelCacheInterceptor\footnote{\url{https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor}}, which enables application-wide second-level caching, and Microsoft.EntityFrameworkCore.AutoHistory\footnote{\url{https://github.com/arch/AutoHistory}}, which provides automatic storage of audit data for entity changes.
+
+Wide range of database systems is supported including Microsoft SQL Server, MySQL, Oracle, PostgreSQL, SQLite, and Firebird. In-memory database is supported for testing purposes. Due to close relationship with Microsoft, EF Core integrates tightly with Microsoft SQL Server, supporting even its more specific features. In addition, some non-relational databases are supported, such as Azure Cosmos DB\footnote{\url{https://azure.microsoft.com/en-us/products/cosmos-db}} or MongoDB\footnote{\url{https://www.mongodb.com/docs/entity-framework/current/}}.
+
+EF Core operates with a DbContext object instead of a session. It represents a Unit of Work pattern. It keeps track of all changes to the data, and when the operations are done, it commits everything into the database at once. These changes should usually be related and a part of one business transaction. \cite{FowlerUOW} The developer actually inherits from the base DbContext, extending it with configuration, mappings, and access points to root entities. One application can contain multiple different DbContexts for different business domains. The context takes care of change tracking and per-context caching. Tracking can be toggled globally or per query; by default, it is enabled. Application-wide caching is not provided by default, but can be added via an extension. To save all changes, the \texttt{SaveChanges} method must be called and all changes will be propagated into the database within a transaction. Transactions can also be controlled manually. Save points can be created at any point, to which the transaction can be rolled back into.
+
+Entity mapping can be configured using global conventions, entity attributes, or fluent code. Relationship mapping is fully supported, and EF Core effectively infers relationships based on navigation properties and primary and foreign keys. In many-to-many relationships, the join table can be explicitly mapped or hidden. Different fetching strategies are available for relationships. By default navigation properties are not loaded; eager loading requires \texttt{.Include} call in the query. Lazy loading or explicit (later on demand) strategies are configurable. 
+
+Querying is done using LINQ with entities accessed through DbContext. Data manipulation methods are provided, data definition operations cannot be run through the framework. Database columns containing JSON can be mapped and queried into using LINQ. This is supported only for databases with JSON query capabilities, namely Microsoft SQL Server, SQLite, and PostgreSQL. Batch operations are supported; bulk operations require extensions such as EFCore.BulkExtensions\footnote{\url{https://github.com/borisdj/EFCore.BulkExtensions}}. Asynchronous method variants are provided, but parallel operations cannot be done within one context.
+
+\begin{example}
+\small
+The following example\cite{efcore} demonstrates a simple model created through DbContext. One entity, Blog, is accessible through an exposed property and configured to have a required URL.
+
+\begin{lstlisting}[language=CSharp]
+internal class MyContext : DbContext
+{
+    public DbSet<Blog> Blogs { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Blog>()
+            .Property(b => b.Url)
+            .IsRequired();
+    }
+}
+
+public class Blog
+{
+    public int BlogId { get; set; }
+    public string Url { get; set; }
+}
+\end{lstlisting}
+\qed
+\end{example}
+
+Database schema can be generated entirely from entities and is a recommended way to handle smaller applications. Subsequent changes can be handled with generated migrations. Migrations are generated through CLI. All changes to the schema are compared to the base migration and new statically typed C\# code is generated, which can be further edited and stored in source control. This allows not only upgrading to newer versions but also downgrading. Database first schema is also supported. And entities with mapping can be generated from an existing database. This process can be destructive unless partial classes are used. It is not recommended to be automated. Initial core data can be filled into the database using data seeding. That can be useful for necessary application data or enumerations.
+
+EF Core is highly extensible, benefiting from numerous community tools and extensions. One notable example is EF Core Power Tools\footnote{\url{https://marketplace.visualstudio.com/items?itemName=ErikEJ.EFCorePowerTools}}, a Visual Studio extension that allows reverse-engineering databases, generating DbContext classes, and visualizing entity diagrams. EF Core integrates well with MiniProfiler\footnote{\url{https://miniprofiler.com/}}, a free profiling tool useful for performance diagnostics. Multiple paid profiling solutions exist as well, though their use is often unnecessary since EF Core integrates effectively with the Visual Studio debugger, providing insight into executed SQL statements and other runtime details.
+
+
+The ORM is distributed under the MIT license\footnote{\url{https://github.com/dotnet/efcore/blob/main/LICENSE.txt}} via GitHub \footnote{\url{https://github.com/dotnet/efcore}} and NuGet\footnote{\url{https://www.nuget.org/packages/microsoft.entityframeworkcore}}. The latest stable version, 9.0.6, was released in June 2025. With over 1.56 billion total downloads and 446 million in the past year alone\footnote{\url{https://nugettrends.com/packages?months=72&ids=Microsoft.EntityFrameworkCore}}, it stands as the most widely used .NET ORM. New releases are published frequently, typically on a monthly basis. It is being very actively developed with thousands of GitHub issues which receive relatively quick responses. Extensive documentation is provided on the Microsoft Learn site\footnote{\url{https://learn.microsoft.com/en-gb/ef/core/}}.
+
+\begin{table}[H]
+\centering
+\caption{Comparison overview of ORM framework: Entity Framework Core}
+\begin{tabular}{|l|l|}
+\toprule
+\textbf{Property} & \textbf{Entity Framework Core} \\
+\midrule
+\textbf{Type} & macro ORM for .NET \\
+\textbf{License} & MIT \\
+\textbf{Cost} & Free \\
+\textbf{Sources} & \url{https://learn.microsoft.com/en-gb/ef/core/}, \url{https://github.com/dotnet/efcore}, \url{https://www.nuget.org/packages/microsoft.entityframeworkcore}  \\
+\textbf{Latest version} & 9.0.6 (June 2025) \\
+\textbf{Supported .NET} & the latest .NET version only \\
+\textbf{ORM features} & Full object and relationship mapping \\
+\textbf{Query support} & LINQ support \\
+\textbf{Mapping} & Attributes, fluent code \\
+\textbf{Relationship mapping} & All types supported \\
+\textbf{Schema handling} & Migrations project schema to DB; Scaffolding from DB;\\
+\textbf{Change tracking} & Supported \\
+\textbf{Data seeding} & Supported \\
+\textbf{Query logging} & Supported \\
+\textbf{Transactions} & Supported; save points \\
+\textbf{Bulk operations} & Free extension required \\
+\textbf{Async support} & Supported \\
+\textbf{Caching} & Session (DBContext) level cache; Application-wide with extension \\
+\textbf{Community} & Active development; Github Issues with quick response time \\
+\textbf{Documentation} & Microsoft Learn website\\
+\textbf{Extensions (official)} & None \\
+\textbf{Extensions (community)} & EFCore.BulkExtensions, EFCoreSecondLevelCacheInterceptor, Microsoft.EntityFrameworkCore.AutoHistory \\
+\textbf{Tooling} & EF Core Power Tools, MiniProfiler intergration \\
+\textbf{Supported databases} & Microsoft SQL Server, MySQL, Oracle, PostgreSQL, SQLite, and Firebird, Azure Cosmos DB, MongoDB, and more  \\
+\textbf{Ideal use cases} & Modern applications of any size; Performance optimized; Complex LINQ queries \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Entity Framework 6}
+Entity Framework 6 \cite{ef6, ef6Repo} is a stable ORM developed by Microsoft with a long history. While it continues to receive security updates, no new features are being added. Since EF Core builds upon EF6, we focus on highlighting notable differences only.
+
+EF6 is available under the MIT license\footnote{\url{https://github.com/dotnet/ef6/blob/main/LICENSE.txt}} and distributed via GitHub\footnote{\url{https://github.com/dotnet/ef6}} and NuGet\footnote{\url{https://www.nuget.org/packages/EntityFramework/}}. In earlier versions, it was directly integrated into the .NET standard library. Over its lifespan, it has accumulated over 336 million downloads, with 60 million in the past year alone\footnote{\url{https://nugettrends.com/packages?months=72&ids=EntityFramework}}. With the third highest download count, it indicates significant usage in legacy projects.
+
+Unlike EF Core, EF6 targets all versions of .NET including Framework, Standard, and .NET 6. Its most recent version, 6.5.1, was released in June 2024, while major version 6 itself dates back to 2013. Extensive documentation is available, including the official Microsoft Learn \footnote{\url{https://learn.microsoft.com/en-gb/ef/ef6/}} site, thousands of Stack Overflow questions, and discussions across various forums.
+
+Configuration in EF6 can be done either through code or XML files. Mapping and querying principles remain similar to EF Core, only the support is not as extensive. For instance, it does not support mapping non-nullable reference types, nor does it allow querying JSON or XML data.
+The database schema can be defined directly in the code and projected to the database using migrations. A distinguishing feature compared to EF Core is the presence of a visual schema designer \footnote{\url{https://learn.microsoft.com/en-us/ef/ef6/modeling/designer/relationships}}. Transactions are supported, but without save points. 
+
+EF6 defaults to lazy loading, unlike EF Core, which defaults to eager loading. While asynchronous methods are available, their coverage is incomplete. Additionally, unofficial paid tools such as Entity Framework Profiler\footnote{\url{https://entityframework-extensions.net/ef-profiler}} and the Z.EntityFramework.Extensions\footnote{\url{https://entityframework-extensions.net/}} for bulk operations extend its functionality.
+
+\begin{table}[H]
+\centering
+\caption{Comparison overview of ORM framework: Entity Framework 6}
+\begin{tabular}{|l|l|}
+\toprule
+\textbf{Property} & \textbf{Entity Framework 6} \\
+\midrule
+\textbf{Type} & macro ORM for .NET \\
+\textbf{License} & MIT \\
+\textbf{Cost} & Free \\
+\textbf{Sources} & \url{https://learn.microsoft.com/en-gb/ef/ef6/}, \url{https://github.com/dotnet/ef6}, \url{https://www.nuget.org/packages/EntityFramework/}  \\
+\textbf{Latest version} & 6.5.1 (June 2024) \\
+\textbf{Supported .NET} & .NET Framework, Standard, 6 \\
+\textbf{ORM features} & Full object and relationship mapping \\
+\textbf{Query support} & LINQ support \\
+\textbf{Mapping} & Attributes, fluent code \\
+\textbf{Relationship mapping} & All types supported \\
+\textbf{Schema handling} & Migrations project schema to DB; Scaffolding from DB; Visual designer \\
+\textbf{Change tracking} & Supported \\
+\textbf{Data seeding} & Not supported \\
+\textbf{Query logging} & Supported \\
+\textbf{Transactions} & Supported \\
+\textbf{Bulk operations} & Paid extension required \\
+\textbf{Async support} & Supported \\
+\textbf{Caching} & Session (DBContext) level cache \\
+\textbf{Community} & Development stopped; security patches; available on GitHub \\
+\textbf{Documentation} & Microsoft Learn website\\
+\textbf{Extensions (official)} & None  \\
+\textbf{Extensions (community)} & Paid Z.EntityFramework.Extensions \\
+\textbf{Tooling} & Paid profiler \\
+\textbf{Supported databases} & Microsoft SQL Server, Oracle, MySQL, PostgreSQL, SQLite and more  \\
+\textbf{Ideal use cases} & Complex, legacy applications; Performance with caching; Complex configurability \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Comparison}
+\begin{table}[h]
+  \centering
+  \sisetup{group-separator={,},group-minimum-digits=4}
+
+\begin{tabular}{l
+                S[table-format = 10.0, table-number-alignment = right]
+                S[table-format = 9.0 , table-number-alignment = right]}
+  \toprule
+  ORM & {Total downloads} & {Downloads last year} \\
+  \midrule
+  EF Core     & 1560303230 & 446541915 \\
+  Dapper      & 494249884  & 144500105 \\
+  EF6         & 336032064  & 60867734  \\
+  NHibernate  & 57169419   & 14396223  \\
+  LINQ To DB  & 17360418   & 4907706   \\
+  RepoDB      & 1956923    & 493507    \\
+  PetaPoco    & 1801676    & 609540    \\
+  \bottomrule
+\end{tabular}
+\caption{NuGet download counts, sorted by total downloads. Downloads collected 30 Jun 2024 – 29 Jun 2025 via NuGet Trends.}
+\end{table}

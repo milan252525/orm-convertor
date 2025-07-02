@@ -1,4 +1,20 @@
 \chapter*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
 
-Introduction + motivation
+Modern software systems are subject to continuous evolution driven by shifting user requirements. These changes often affect not only application logic but also the structure of the underlying data and the queries executed over it. Consequently, developers must adapt the data-access code in response to evolving schemas, altered query workloads, or even complete changes of the underlying database management system (DBMS). In the worst-case scenario, such changes require data migration across DBMS platforms and necessitate corresponding adaptations at the application level -- particularly in the mapping and querying logic embedded in object-relational mapping (ORM) frameworks.
+
+While the DBMS side of the problem has received considerable attention -- with numerous academic and commercial solutions~\cite{TODO} for data migration, query rewriting, and query synchronization -- less effort has been directed toward managing the consequences of such changes on application code. Existing approaches~\cite{TODO} support, for example, the rewriting of SQL queries for target DBMSs or synchronization within a logical data model. However, adapting the application-side ORM layers (entity mappings, repository classes, query logic) remains a largely manual and error-prone process. This gap becomes especially critical when the original ORM framework, once optimal for a given workload, becomes inefficient or incompatible due to backend changes. In such cases, memory overhead, runtime performance, or even functional compatibility can be severely affected.
+
+On the application side, the complexity is further amplified by the diversity of available ORM frameworks. Each framework offers different abstractions, feature sets, performance characteristics, and support for advanced mapping patterns. Developers typically commit to a single ORM framework, which can result in suboptimal performance if the selected framework does not align well with specific query workloads or with the target DBMS. In many scenarios, a hybrid approach -- utilizing different ORM frameworks for disjoint query subsets -- could yield significantly better runtime and memory efficiency.
+
+Large language models (LLMs) have recently been explored~\cite{TODO} for translating between ORM frameworks. While promising, current LLM-based solutions remain limited in practice: translations may be incomplete, semantically incorrect, or based on deprecated or insecure libraries. More critically, LLMs do not support optimization objectives: they lack mechanisms to reason about execution cost or to recommend optimal target ORM configurations under resource constraints (e.g., maximum memory usage per query or across a query workload).
+
+In this thesis... , we present \emph{ORMorpher}, a novel tool that supports both translation and optimization across ORM frameworks. Our contributions are as follows:
+\begin{itemize}
+    \item We introduce a translation framework for migrating entity and repository classes between ORM frameworks.
+    \item We propose an optimization framework to automatically select the most efficient (combination of) ORM framework(s), or combination of frameworks, for a given set of queries and resource constraints.
+    \item We demonstrate extensibility toward application-level migration strategies supporting DBMS transitions.
+    \item We provide a prototype implementation targeting prominent .NET ORM frameworks (NHibernate, Entity Framework Core, and Dapper) over Microsoft SQL Server.
+\end{itemize}
+
+\paragraph{Outline} The rest of the thesis is organised as follows...
