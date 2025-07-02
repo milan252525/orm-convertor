@@ -1,25 +1,31 @@
 \chapter{Core concepts}
 
-%core concepts
-%- myšlenka překládání - dotazy lze zrychlit použitím jiného ORM
-%- idea abstrakce - složitost 2N místo N\^2
-%- overview co je potřeba přeložit
-%- výběr 3 frameowrků pro překlad
+After analyzing several ORMs, we discovered significant differences among them, yet their core purpose remains identical. The primary objective is consistently retrieving data through queries and transforming database records into application objects based on a defined set of mapping rules.
 
-After analyzing several ORMs we have discovered differences between them, yet at their core their purpose remains identical. The primary objective is to retrieve data via querying using a defined set of rules for transforming database records into application objects.
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=1\textwidth]{thesis/img/thesis/03_orm_transformation.drawio.pdf}
+  \caption{The process of converting database records to application objects using ORM with defined rules.}
+  \label{fig:db_to_orm}
+\end{figure}
 
-Let us consider an example. In \autoref{sec:perf_eval}, specifically query \hyperref[query:d3]{D3}, we tested retrieving one-to-many optional relationship.
-EF Core took more than 2.5 seconds. Compare it to the best result---linq2db scoring 91 milliseconds. That is more than a 20 times increase in speed! 
+The transformation is illustrated in \autoref{fig:db_to_orm}. The database record is processed through an ORM, represented here as a black box containing predefined mapping rules, ultimately converting the data into a strongly typed C\# object.
 
-Multiple ORMs should be able to coexist in one application. When we looked at Dapper in \autoref{sec:feat_dapper}, the authors even recommended using it alongside another ORM in performance-critical areas. But converting queries between different ORMs and query languages can be a difficult process. We will focus on automating the conversion process. In addition, we will design a tool using our conversion process to compare performance of a specific query across different frameworks.
+Despite their common goals, we observed significant performance differences during the evaluation in \autoref{sec:perf_eval}. For instance, query \hyperref[query:d3]{D3}, testing retrieval of one-to-many optional relationships, took over 2.5 seconds in EF Core. In contrast, the same query executed with linq2db completed in just 91 milliseconds--a performance improvement of more than twenty times. Clearly, performance differences among ORMs can be substantial.
+
+Typically, developers stick to using a single ORM per application, mainly to avoid complexity. However, combining multiple ORMs can be beneficial, particularly in performance-critical areas. For example, as we noted in \autoref{sec:feat_dapper}, Dapper's creators explicitly suggest using it alongside another macro ORM to boost read performance where necessary. Nonetheless, employing multiple ORMs on the same database tables may introduce issues like data inconsistencies, particularly during write operations. Read operations do not modify the state of the database, and we will only work with read operations in this work. Ensuring consistency remains a developer's responsibility when mixing ORMs.
+
+Currently, converting queries from one ORM to another is challenging and typically requires manual intervention. Our approach will focus on automating this conversion process. We propose creating an abstraction that unifies entities, mappings, and queries into an intermediate representation, enabling efficient conversion between different ORM frameworks.
 
 \section{Translation}
 
-A query in a .NET application is dependent not only on the actual query statement, but also on the entity and its mapping. We have already seen how different mappings can look. The entity is always a C\# class. The mapping can vary in format and style. We have seen mapping in the form of property attributes, fluent API syntax, and even XML files. Despite the differences, the core concept remains the same. We need to tell the ORM how to map each entity to respective tables, which data types and restrictions to use, and so on. We will take a closer look at what each mapping can express and find common patterns across ORMs. 
+In a .NET application, queries depend not only on the query statements themselves but also on entities and their respective mappings. While entities are always represented as C\# classes, mappings vary significantly. We have encountered mapping defined via attributes, fluent code syntax, and even XML files. Despite these syntactical differences, the conceptual goal remains the same. We have to explicitly instruct the ORM how entities map to database tables, including data types, constraints, and relationships. To effectively automate query translation, we must begin with identifying common patterns across these diverse mapping strategies.
 
-In the same way, we will look at querying. We have seen two types - directly using raw SQL or statically typed LINQ. Actually, there was one more, lambda functions in RepoDB. But these functions can be viewed as a very limited subset of LINQ, so we will not consider them. Regardless of the query language, all queries must be translated into SQL statements when sent to the database. Therefore, SQL is actually a good base for the abstraction we can build on.
+Querying approaches differ similarly, primarily between raw SQL and strongly-typed LINQ queries. RepoDB introduces a third variant---lambda functions---but these functions can be viewed as a very limited subset of LINQ and therefore we will not consider them separately. Regardless of initial query method, all queries eventually get translated into SQL statements executed by the database. This observation makes SQL a logical basis for a unified abstraction layer.
 
-An abstraction over entities, mapping, and queries will give us a unified intermediate representation we can convert into and out of. We will only need to implement two conversions for each ORM. One to parse it into the abstract representation, and the other to build ORM-specific statements from. Instead of $N^2 - N$ conversions (one from each framework to another, except itself), only $2N$ will need to be implemented, where $N$ is the number of supported ORMs. Of course, not all directions need to be implemented. For example, translating from a deprecated ORM might be useful for migrations, but translating into it might be unnecessary.
+By creating a common abstraction over entities, mappings, and queries, we achieve a unified intermediate representation suitable for translation between different ORMs. Implementing this intermediate representation significantly simplifies the translation task. Instead of requiring $N^2 - N$ direct conversions (each ORM to every other ORM, excluding self-conversions), we reduce the effort to just $2N$ conversions---one into the intermediate representation and one out for each ORM. Additionally, not every conversion direction needs full support. For instance, translating from a deprecated ORM might be useful for migrations, but translating into it may be unnecessary.
+
+Leveraging this approach, we will design and implement a tool that automates query conversion and facilitates easy performance comparisons across different ORM frameworks.
 
 \section{User interaction}
 Input into the conversion tool will be \textbf{entity}, \textbf{mapping} and a \textbf{query}. Not all ORMs require or even support mapping, and there are different formats. So each ORM will have defined which parts it accepts. Input framework can be either auto-detected or manually selected by the user. Upon selection, multiple inputs with a description will appear.
@@ -28,7 +34,7 @@ As an example in \autoref{fig:orm_to_abstract}, the user selects Entity Framewor
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{thesis/img/thesis/03_core_concepts.drawio.pdf}
+  \includegraphics[width=\textwidth]{thesis/img/thesis/03_user_interaction.drawio.pdf}
   \caption{An example of entity and query being converted into abstract representation. User inputs EF Core entity and LINQ query. Our tool converts it to abstract representation, which in turn can be translated into any user selected ORM.}
   \label{fig:orm_to_abstract}
 \end{figure}
