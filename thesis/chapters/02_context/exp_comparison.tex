@@ -1,7 +1,7 @@
 \section{Performance evaluation}\label{sec:perf_eval}
 
 This chapter presents an experimental comparison of the seven selected ORM frameworks. 
-The primary goals are to assert the correctness of our previous comparison, measure performance, and assess how effectively each framework integrates into the .NET through its supported query language.
+The primary goals are to validate the correctness of our previous analysis, measure performance, and assess how effectively each framework integrates into the .NET through its supported query language.
 
 For each framework, we will create a set of unit tests performing pre-selected queries. They should cover different areas of querying through ORMs, such as entity mapping, relationships, result modification, and aggregation.
 
@@ -13,33 +13,52 @@ To adequately test performance, we need a sufficiently large data set. Microsoft
 For this comparison, the Wide World Importers sample database \cite{microsoftWWI} has been selected.
 It contains a diverse set of fictional data about a company Wide World Importers described as ``wholesale novelty goods importer and distributor operating from the San Francisco bay area.``\cite{microsoftWWI}
 
-The database contains over thirty tables split into four schemas: Application, Purchasing, Sales, Warehouse. For each query, we will select a suitable table and columns that can best showcase the desired feature.
+The database contains over thirty tables split into four schemas: \texttt{Application}, \texttt{Purchasing}, \texttt{Sales}, \texttt{Warehouse}. For each query, we will select a suitable table and columns that can best showcase the desired feature.
 
 % database, docker, test project, .net
-The dataset is made for Microsoft SQL Server (MSSQL). It is the third most popular database management system as of March 2025 according to DB-Engines Ranking\cite{DBEngines2025Ranking}. With a score of 788.14, it is behind Oracle (1253.08) and MySQL (988.13). The score takes into account the number of mentions on websites, frequency of technical discussions, number of job offers mentioning the system, relevance in social networks, and other parameters.\cite{DBEnginesRankingMetrics} 
-Microsoft SQL Server is commonly used in .NET applications with EF Core ORM as the three products are all developed by Microsoft.  
-
+The dataset is made for Microsoft SQL Server (MSSQL). \footnote{Microsoft SQL Server is the third most popular database management system as of March 2025 according to DB-Engines Ranking\cite{DBEngines2025Ranking}. With a score of 788.14, it is behind Oracle (1253.08) and MySQL (988.13). The score takes into account the number of mentions on websites, frequency of technical discussions, number of job offers mentioning the system, relevance in social networks, and other parameters. \cite{DBEnginesRankingMetrics} } Microsoft SQL Server is commonly used in .NET applications with EF Core ORM as the three products are all developed by Microsoft.  
 Unit tests should be easy to set up and run. Configuring a database can turn into a complicated task. We will create a Docker container running MSSQL. The dataset will be loaded on startup. Execution of unit tests will be just a matter of starting the Docker container and running the \texttt{dotnet test} command (or alternatively using Visual Studio Test Explorer). 
 
-\subsection{Testing approach}\label{sec:testing_approach}
-We will prefer to use LINQ where possible as it is tightly integrated into the .NET environment. 
-If LINQ integration is not available, we will use any suitable alternative. And if there are no other possibilities, we will default to raw SQL queries. 
-
-There are multiple different methods for mapping database tables to entities. We will be using different methods to show the variety and their impact or trade-offs. 
-
-If ORM supports caching entities, we will disable it so that our benchmarks are not affected. 
-A feature related to caching is change tracking. For example, EF Core tracks changes made to an entity, so that it can later perform an update. All our tests will only execute read operations. Change tracking would unnecessarily increase measured time or allocated memory, so we will disable it.
-
-Logging will be turned off for performance tests. In feature tests, we might want to compare generated SQL. So, we will enable SQL logging into the test output window where possible.
-
-
 \subsection{Selected queries}\label{sec:selected_queries}
-Our goal is to test the query capabilities as broadly as possible. We want to create queries that use different conditions, result modifications, aggregations, relationships between tables, etc. The queries are grouped into categories A-H by the type of features they test.
+Our goal is to test the query capabilities as broadly as possible. We want to create queries that use different conditions, result modifications, aggregations, relationships between tables, etc. The queries are grouped into categories A-H by the type of features they test. \autoref{tab:queries-sum} provides an overview of each query purpose. 
+We will go over each query and provide an example of what the query should look like in raw SQL. The example can be used to directly query the test database to preview results. The example might be simplified for this text. Unit tests might use a different query language where available.
 
-Each query type will contain an example of what the query should look like in raw SQL. The example can be used to directly query the test database to preview results. The example might be simplified for this text. Unit tests might use a different query language where available.
+\begin{table}[H]
+\centering
+\caption{Benchmark queries}\label{tab:queries-sum}
+\begin{tabular}{ll}
+\toprule
+\textbf{ID} & \textbf{Query purpose} \\ 
+\midrule
+A1 & Projection – entity identical to table \\ 
+A2 & Limited projection – subset of columns \\ 
+A3 & Split projection – one row to multiple entities \\ 
+A4 & Stored-procedure projection \\ 
+B1 & Selection over indexed column \\ 
+B2 & Selection over non-indexed column \\ 
+B3 & Range filter \\ 
+B4 & \texttt{IN} list filter \\ 
+B5 & Text search \\ 
+B6 & Paging \\ 
+C1 & Aggregation - count \\ 
+C2 & Aggregation - max \\ 
+C3 & Aggregation - sum with expression \\ 
+D1 & One-to-many relationship\\ 
+D2 & Many-to-many relationship \\ 
+D3 & Optional one-to-many relationship \\ 
+E1 & Sorting with limit \\ 
+E2 & Distinct projection \\ 
+F1 & JSON object query \\ 
+F2 & JSON array query \\ 
+G1 & Set union\\ 
+G2 & Set intersection \\ 
+H1 & Metadata lookup – column data type \\ 
+\bottomrule
+\end{tabular}
+\end{table}
 
-\subsubsection{}{A - Entity projection}
-This group will test how well ORM can handle projecting table columns onto a user-defined entity or entities.
+\subsubsection{A - Entity projection}
+This group will test how well ORM can handle projecting table columns onto a user-defined entity or entities. Queries \textbf{A1}, \textbf{A2}, and \textbf{A3} will fetch one row based on its ID. The measured time and memory allocation will then show the overhead of the ORM framework when mapping data to the resulting entities. Query \textbf{A4} returns a large number of results, so it is the first query that shows us the performance with high-volume data.
 
 \subsubsection*{A1 Entity identical to a table} \label{query:a1}
 The test will retrieve a table row and map it to an entity with properties identical to table columns. 
@@ -50,9 +69,9 @@ SELECT * FROM Purchasing.PurchaseOrders
 WHERE PurchaseOrderId = 25
 \end{lstlisting}
 
-\subsubsection*{A2 Limited entity} \label{query:a2}
-The resulting entity will have less properties than table columns. Only the data we really need should be transferred. 
-Table \texttt{Purchasing.Suppliers} will be queried and only columns related to supplier's contact info will be retrieved.
+\subsubsection*{A2 Subset of columns} \label{query:a2}
+The resulting entity will have fewer properties than table columns. Only the data we really need should be transferred. 
+Table \texttt{Purchasing.Suppliers} will be queried, and only columns related to the supplier's contact info will be retrieved.
 
 \begin{lstlisting}[language=SQL]
 SELECT SupplierID, SupplierName, PhoneNumber, FaxNumber, WebsiteURL, ValidFrom, ValidTo 
@@ -60,7 +79,7 @@ FROM Purchasing.Suppliers
 WHERE SupplierID = 10
 \end{lstlisting}
 
-\subsubsection*{A3 Multiple entities from one table} \label{query:a3}
+\subsubsection*{A3 One row to multiple entities} \label{query:a3}
 One table will be queried and the result will be divided into two different entities. 
 Table \texttt{Purchasing.Suppliers} will be used again, from which we will retrieve contact information and bank account information into two separate entities. 
 
@@ -72,7 +91,7 @@ FROM Purchasing.Suppliers
 WHERE SupplierID = 10
 \end{lstlisting}
 
-\subsubsection*{A4 Stored procedure result into entity} \label{query:a4}
+\subsubsection*{A4 Stored procedure result projection} \label{query:a4}
 This query will execute a stored procedure, limited by parameters, and load the result into an entity.
 The executed stored procedure will be \texttt{Integration.GetOrderUpdates} with parameters LastCutoff and NewCutoff. 
 We will limit the cut-off to a one-year range from 2014 to 2015. 66741 order updates should be returned.
@@ -84,29 +103,25 @@ EXEC WideWorldImporters.Integration.GetOrderUpdates
 @LastCutoff = '2014-01-01', @NewCutoff = '2015-01-01'
 \end{lstlisting}
 
-% \paragraph{} % - jak tady vrátit tenhle text zpět 
-\subsubsection*{A Summary}
-Queries \textbf{A1}, \textbf{A2}, and \textbf{A3} will fetch one row based on its ID. The measured time and memory allocation will then show the overhead of the ORM framework when mapping data to the resulting entities. Query \textbf{A4} returns a large number of results, so it is a first query that shows us the performance with high-volume data.
-
 \subsubsection{B - Selection}
 Probably the most common query operation is limiting results based on a condition. This set of queries will query table \texttt{Sales.OrderLines} with varied conditions.
 
 \subsubsection*{B1 Selection over indexed column} \label{query:b1}
-The query will retrieve one order line based on the ID of its order. The ID is foreign key with an index built over it.
+The query will retrieve one order line based on the ID of its order. The ID is a foreign key with an index built over it.
 
 \begin{lstlisting}[language=SQL]
 SELECT * FROM Sales.OrderLines WHERE OrderID = 26866
 \end{lstlisting}
 
 \subsubsection*{B2 Selection over non-indexed column} \label{query:b2}
-Unlike the first query, this one will fetch order lines filtered by a column without an index. The column that we will filter over will be unit price of the order line.
+Unlike the first query, this one will fetch order lines filtered by a column without an index. The column that we will filter over will be the unit price of the order line.
 It is worth noting that it should not be relevant if a column is indexed or not for ORM comparison. Because all the queries will be performed over the same database system. We include both queries in case an interesting result appears.
 
 \begin{lstlisting}[language=SQL]
 SELECT * FROM Sales.OrderLines WHERE UnitPrice = 25
 \end{lstlisting}
 
-\subsubsection*{B3 Range query} \label{query:b3}
+\subsubsection*{B3 Range filter} \label{query:b3}
 The previous queries filtered based on a single value, but a range of values is often desirable as well.
 This query will select a subset of order lines with a column \texttt{PickingCompletedWhen} within a selected date range.
 
@@ -116,7 +131,7 @@ WHERE PickingCompletedWhen
 BETWEEN '2014-12-20' AND '2014-12-31'
 \end{lstlisting}
 
-\subsubsection*{B4 In query} \label{query:b4}
+\subsubsection*{B4 IN list filter} \label{query:b4}
 When a range is not sufficient and we want specific values not fitting into an interval, we can provide a collection of values.
 This query will return order lines belonging to orders with IDs 1, 10, 100, 1000, and 10000.
 
@@ -126,7 +141,7 @@ WHERE OrderID IN (1, 10, 100, 1000, 10000)
 \end{lstlisting}
 
 \subsubsection*{B5 Text search} \label{query:b5}
-This query will test a text search, looking for any order lines with description containing the word ``C++``.  The column does not have a full text search or any other index.
+This query will test a text search, looking for any order lines with descriptions containing the word ``C++``.  The column does not have a full-text search or any other index.
 
 \begin{lstlisting}[language=SQL]
 SELECT * FROM Sales.OrderLines 
@@ -134,8 +149,8 @@ WHERE Description LIKE '%C++%'
 \end{lstlisting}
 
 \subsubsection*{B6 Paging} \label{query:b6}
-When filtering with a broad condition, a large amount of data might be returned. So we may opt to receive the data in batches. Another use case might be a paged table displayed to a user. For these a paging query with skip and take might be useful.
-This query will fetch all order lines ordered by ID, but will skip first 1000 and take only next 50.
+When filtering with a broad condition, a large amount of data might be returned. So we may opt to receive the data in batches. Another use case might be a paged table displayed to a user. For these, a paging query with skip and take might be useful.
+This query will fetch all order lines ordered by ID, but will skip the first 1000 and take only the next 50.
 
 \begin{lstlisting}[language=SQL]
 SELECT * FROM Sales.OrderLines 
@@ -147,7 +162,7 @@ OFFSET 1000 ROWS FETCH NEXT 50 ROWS ONLY
 Aggregation functions are often used when performing calculations on data. We will test a select few.
 
 \subsubsection*{C1 Count} \label{query:c1}
-Count is very useful when we need to know the number of records that correspond to a specific condition. We will combine it with \texttt{GROUP BY} clause to retrieve distinct tax rates and the number of their occurrence.
+Count is very useful when we need to know the number of records that correspond to a specific condition. We will combine it with \texttt{GROUP BY} clause to retrieve distinct tax rates and the number of their occurrences.
 
 \begin{lstlisting}[language=SQL]
 SELECT TaxRate, COUNT(TaxRate) as Count 
@@ -173,14 +188,14 @@ SELECT SUM(Quantity * UnitPrice) FROM Sales.OrderLines
 An important feature of ORM should be mapping relations. Our domain entities are often connected, representing relations in real life.
 However, as we found out in our previous analysis, not all the selected frameworks support mapping relations. 
 
-Our test data contain no one to one relation. There should be a small difference between mapping one to one and one to many. We will cover the other types in sufficient detail.
+Our test data contain no one-to-one relation. There should be a small difference between mapping one-to-one and one-to-many. We will cover the other types in sufficient detail.
 
 Some ORMs support lazy loading. That means loading entities in a relation only after accessing the corresponding collection. That would result in more queries being sent and a potential slowdown.
 We will prevent this by setting the loading strategy to eager when possible.
 
-\subsubsection*{D1 One to many} \label{query:d1}
-In one to many relation we have one parent and multiple children. A parent entity should have a collection containing its children. Optionally, a child entity can have a reference to its parent.
-In this test, we will use the relation between order and its order lines. We will fetch one specific order along with all its lines.
+\subsubsection*{D1 One-to-many} \label{query:d1}
+In a one-to-many relation, we have one parent and multiple children. A parent entity should have a collection containing its children. Optionally, a child entity can have a reference to its parent.
+In this test, we will use the relation between an order and its order lines. We will fetch one specific order along with all its lines.
 
 We need to verify all child entities were returned and the parent collection filled. 
 
@@ -192,8 +207,8 @@ LEFT JOIN Sales.OrderLines ol ON ol.OrderID = o.OrderID
 WHERE o.OrderID = 530
 \end{lstlisting}
 
-\subsubsection*{D2 Many to many} \label{query:d2}
-In many to many relation, both sides can be connected with multiple entities of the same type. Therefore, it will be represented by a collection on both sides. The collection can contain the entity directly, which makes it easier for developers to work with. If necessary, it can contain entities that represent the join table for this relationship.
+\subsubsection*{D2 Many-to-many} \label{query:d2}
+In a many-to-many relation, both sides can be connected with multiple entities of the same type. Therefore, it will be represented by a collection on both sides. The collection can contain the entity directly, which makes it easier for developers to work with. If necessary, it can contain entities that represent the join table for this relationship.
 
 This test will consist of two queries. We want to test accessing the relationship from both sides. The first query will fetch stock items with their stock groups. And the other one stock groups with their stock items.
 The relationship is represented by a join table \texttt{Warehouse.StockItemStockGroups}. If possible, we will try to map this relation without a join entity in our tests.
@@ -216,9 +231,9 @@ ORDER BY si.StockItemID
 \end{lstlisting}
 The queries utilise left join, so we will get all stock items, even if they belong to no stock groups. And vice versa for the other query.
 
-\subsubsection*{D3 One to many with optional relation} \label{query:d3}
-In the D1 test case, the one to many relation was not optional. Each order has at least one order line. In the D2 test case, each item belonged to at least one category as well.
-This test case will utilize an optional one to many relation between a customer and a transaction. 
+\subsubsection*{D3 Optional one-to-many relationship} \label{query:d3}
+In the D1 test case, the one-to-many relation was not optional. Each order has at least one order line. In the D2 test case, each item belonged to at least one category as well.
+This test case will utilize an optional one-to-many relation between a customer and a transaction. 
 
 \begin{lstlisting}[language=SQL]
 SELECT c.*, ct.* FROM Sales.Customers c
@@ -230,7 +245,7 @@ ORDER BY c.CustomerID
 \subsubsection{E - Result modification}
 This category will test modifying the result set. We will test sorting by a column and filtering distinct result values.
 
-\subsubsection*{E1 Column sorting} \label{query:e1}
+\subsubsection*{E1 Sorting with limit} \label{query:e1}
 Although we have used sorting to order the results of some previous tests to get deterministic results, this test will focus solely on sorting.
 We will sort all purchase orders by their expected delivery date and retrieve only the first one thousand.
 
@@ -239,7 +254,7 @@ SELECT TOP (1000) * FROM Purchasing.PurchaseOrders
 ORDER BY ExpectedDeliveryDate ASC
 \end{lstlisting}
 
-\subsubsection*{E2 Distinct results} \label{query:e2}
+\subsubsection*{E2 Distinct projection} \label{query:e2}
 To test fetching only unique values, we will request all supplier references from purchase orders.
 
 \begin{lstlisting}[language=SQL]
@@ -247,7 +262,7 @@ SELECT DISTINCT SupplierReference
 FROM Purchasing.PurchaseOrders
 \end{lstlisting}
 
-\subsubsection{F - Querying JSON}
+\subsubsection{F - JSON queries}
 Microsoft SQL Server supports storing and querying JSON data\cite{mssqljson}. It is worth testing if our selected ORMs support constructing queries into the stored JSON.
 Table \texttt{Application.People} contains text columns storing JSON values.
 
@@ -307,7 +322,7 @@ SELECT SupplierID FROM Purchasing.Suppliers
 ORDER BY SupplierID
 \end{lstlisting}
 
-\subsubsection{H - Querying metadata}
+\subsubsection{H - Metadata lookup}
 In the last section, we will briefly test the ORM framework's ability to query information about the database itself. While not commonly used in applications, such data can be required in specific cases.
 
 \subsubsection*{H1 Column data type} \label{query:h1}
@@ -322,7 +337,7 @@ WHERE TABLE_SCHEMA = 'Purchasing'
 
 \subsubsection{Summary of the selected queries}
 We tried to pick as broad a selection of features as possible. 
-We certainly did not cover all of them, but our set should be representative enough to give us a fair idea of how different ORMs perform. 
+The set is not exhaustive but representative enough to give us a fair idea of how different ORMs perform. 
 
 The tests perform queries across different tables and fetch different amounts of data. 
 Measured time and memory allocation will not allow us to make any assumptions when comparing different test cases for the same ORM.
@@ -331,9 +346,21 @@ But we will be able to compare identical test cases across different ORMs.
 We can expect to see a difference in time performance between micro frameworks made to be efficient and feature-rich macro frameworks.
 The micro frameworks utilize raw SQL and have very little overhead. When using a macro framework, the LINQ query has to be compiled into SQL. Rich mapping capabilities may also cause significant slowdown. And extra features may even cause higher memory consumption.
 
+\subsection{Testing approach}\label{sec:testing_approach}
+We will prefer to use LINQ where possible as it is tightly integrated into the .NET environment. 
+If LINQ integration is not available, we will use any suitable alternative. And if there are no other possibilities, we will default to raw SQL queries. 
+
+There are multiple different methods for mapping database tables to entities. We will be using different methods to show the variety and their impact or trade-offs. 
+
+If ORM supports caching entities, we will disable it so that our benchmarks are not affected. 
+A feature related to caching is change tracking. For example, EF Core tracks changes made to an entity, so that it can later perform an update. All our tests will only execute read operations. Change tracking would unnecessarily increase measured time or allocated memory, so we will disable it.
+
+Logging will be turned off for performance tests. In feature tests, we might want to compare generated SQL. So, we will enable SQL logging into the test output window where possible.
+
+To showcase different approaches to mapping, we try to select a different method for each framework test. Mapping is usually compiled on application startup or the first query and then cached. So performance should not be affected by a choice of mapping. Dapper does not use any mapping. PetaPoco and RepoDB use attributes to declare table schema and name, and in some cases column names; the rest is inferred. LINQ to DB utilizes mapping by code through the builder pattern. NHibernate uses its proprietary mapping through files in XML format. Both versions of Entity Framework use attribute mapping combined with mapping through code. Their attribute mapping is much more powerful than those of PetaPoco and RepoDB, but in more complex cases, mapping by code has to be supplied.
+
 \subsection{Implementation}
 The comparison was implemented in the form of a Visual Studio solution, containing a project folder for each framework. Each project folder contains three projects - entities, feature tests, and performance benchmark. 
-
 
 \usetikzlibrary{positioning, arrows}
 \begin{center}
@@ -377,68 +404,13 @@ docker run -d --name orm-comparison -p 1444:1433 orm-comparison
 sqlcmd -S 127.0.0.1,1444 -U SA -P Testingorms123 -Q "SELECT * FROM [WideWorldImporters].[Purchasing].[PurchaseOrders]"
 \end{lstlisting}
 
-To run feature unit tests, build the project in Visual Studio and then use the Test Explorer window to select and run specific tests. Alternatively, navigate to the folder with solution file and run \lstinline{dotnet test}. This will build the project, find all tests, and run them. 
+To run feature unit tests, build the project in Visual Studio and then use the Test Explorer window to select and run specific tests. Alternatively, navigate to the folder with the solution file and run \lstinline{dotnet test}. This will build the project, find all tests, and run them. 
 
-To run performance benchmarks, set \texttt{BenchmarkMain} as a startup project. Right-click it in the Solution Explorer window and choose `Set as Startup project`. Make sure configuration is set to Release, not Debug. Then start the project without debugging (CTRL + F5 keys). A console window will appear. It contains instructions on how to target specific benchmarks. To run all, type in asterisk (*) and press enter. This will trigger full run, which takes approximately one hour to finish. You can switch to test configuration which does only a few number of iterations in \texttt{BenchmarkMain/Program.cs} file. What the configuration does is further explained in following sections. 
+To run performance benchmarks, set \texttt{BenchmarkMain} as a startup project. Right-click it in the Solution Explorer window and choose `Set as Startup project`. Make sure configuration is set to Release, not Debug. Then start the project without debugging (CTRL + F5 keys). A console window will appear. It contains instructions on how to target specific benchmarks. To run all, type in an asterisk (*) and press enter. This will trigger a full run, which takes approximately one hour to finish. You can switch to the test configuration which does only a few numbers of iterations in \texttt{BenchmarkMain/Program.cs} file. What the configuration does is further explained in the following sections. 
 
-Console command for running benchmarks is \lstinline{dotnet run --configuration Release --project BenchmarkMain\BenchmarkMain.csproj}. To run with shorter test configuration append \lstinline{-- --testb} at the end of the command.
-
-
-\subsubsection{Entities}
-Set of classes either mirroring a database table or containing a necessary subset of properties. The columns mapped always depend on the test they are being used in. The entities are POCOs (plain old CLR objects). The term is derived from POJO (plain old Java objects). \cite{Fowler2003POJO} It refers to classes that don't inherit from any base class or interface. And they are not tied to any specific framework.
-
-Below is an example of a POCO class for a purchase order. Visibility modifiers and some properties were omitted for readability. 
-
-% TODO Move explanation about what entities are to earlier section/introduction
-
-\begin{lstlisting}[language=CSharp]
-class PurchaseOrder
-{
-    int PurchaseOrderID { get; set; }
-    int SupplierID { get; set; }
-    DateTime OrderDate { get; set; }
-    DateTime? ExpectedDeliveryDate { get; set; }
-    string? Comments { get; set; }
-}
-\end{lstlisting}
-
-Some frameworks like Dapper do not need any entity mapping and simply require the properties to match selected query columns. The purchase order entity could be used to load results of a query, but the query has to return columns with matching names, data types, and nullability.
-
-More complex frameworks that do not just perform read queries need to know how to map an entity to a database table. The corresponding table might not even exist and is generated based on the entity. Such use case is central to domain-driven development\cite{FowlerDDD}.
-
-Entity mapping might be done in multiple ways. The simplest form is no mapping. The framework would then guess table and column names, data types, nullability, etc. from the way an entity is named and declared. Clearly, that lacks details like numeric precision, constraints, and indices.
-Those details could be specified by property and class attributes. That makes them tied to an entity, which could be a problem if we want to isolate the domain model from database access. 
-Mapping through code or a configuration file allows separation and can be more expressive and powerful.
-
-To showcase different approaches to mapping, we have tried to select a different method for each framework test. Mapping is usually compiled on application startup or first query and then cached. So performance should not be affected by a choice of mapping. Dapper does not use any mapping (as it does not support any). PetaPoco and RepoDB use attributes to declare table schema and name, and in some cases column names, the rest is inferred. For those two, mapping abilities are quite limited. LINQ to DB utilizes mapping by code through builder pattern. NHibernate has its proprietary mapping through files in XML format. Both versions of Entity Framework use attribute mapping combined with mapping through code. Their attribute mapping is much more powerful than those of PetaPoco and RepoDB, but in more complex cases, mapping by code has to be supplied.
-
-First listing below shows attribute mapping in EF Core, where attributes are placed directly above classes and properties. In the second one, part of an XML mapping file for the same entity is shown. The verbosity of the mapping is noticeable.
-
-\begin{lstlisting}[language=CSharp,basicstyle=\ttfamily\footnotesize]
-[Table("PurchaseOrders", Schema = "Purchasing")]
-class PurchaseOrder
-{
-    [Key]
-    int PurchaseOrderID { get; set; }
-}
-\end{lstlisting}
-
-\begin{lstlisting}[language=xml,basicstyle=\ttfamily\footnotesize]
-<?xml version="1.0" encoding="utf-8" ?>
-<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernateEntities">
-    <class name="NHibernateEntities.PurchaseOrder, NHibernateEntities" table="PurchaseOrders" schema="Purchasing">
-        <id name="PurchaseOrderID" column="PurchaseOrderID" type="int">
-            <generator class="identity" />
-        </id>
-        <property name="SupplierID" not-null="true" />
-        <property name="OrderDate" not-null="true" />
-        ...
-    </class>
-</hibernate-mapping>
-\end{lstlisting}
+Console command for running benchmarks is \lstinline{dotnet run --configuration Release --project BenchmarkMain\BenchmarkMain.csproj}. To run with a shorter test configuration, append \lstinline{-- --testb} at the end of the command.
 
 \subsubsection{Feature tests}
-
 For each query defined in \autoref{sec:selected_queries}, a unit test in the form of an isolated method was implemented. Connection and other configuration are created outside of the test in a setup part. The method executes the query and correct results are asserted. Assertion checks the amount of results and their order. Each property is tested to contain correct data to ensure mapping was done correctly.
 
 The example below shows Query A1 (\autoref{query:a1}) implemented for Dapper. A single purchase order is retrieved based on its ID, and its properties are checked for correct values. 

@@ -1,5 +1,5 @@
-\section{ORM selection process}
-Now that we know the basic concepts of ORMs have been introduced, we can move on to the criteria for selecting specific frameworks for our evaluation.
+\section{Selection process}
+Now that we know the basic concepts of ORMs, we can move on to the criteria for selecting specific frameworks for our evaluation.
 
 Important factors will be popularity and community support. Those can be estimated from the number of downloads on the .NET package manager NuGet\footnote{\url{https://www.nuget.org/}} or activity on GitHub\footnote{\url{https://github.com/}}. Since not all software is open source, we will limit ourselves to frameworks that are. We also  exclude outdated ORMs. Selected ones must have received at least some form of update or security fix in recent years.
 
@@ -7,7 +7,7 @@ Support for recent .NET versions is another essential factor. The versioning his
 
 Another version to be aware of is .NET Standard. It is a formal API specification designed to unify .NET implementations. It allows libraries to be compatible with both .NET Framework and Core by targeting a common subset of APIs. However, this can restrict access to newer features and optimizations. \cite{NETStandard}
 
-This work will be limited to ORMs supporting Microsoft SQL Server. As we will see, this is not a restrictive requirement. All major .NET ORMs offer SQL support.
+This work will be limited to ORMs supporting Microsoft SQL Server. As we will see, this is not a restrictive requirement. All major .NET ORMs offer SQL Server support.
 
 Our goal is to select a representative and diverse sample for comparison and testing. We aim to include at least two of micro and macro ORM frameworks. We will also add frameworks with notably interesting capabilities.
 

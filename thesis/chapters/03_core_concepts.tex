@@ -6,7 +6,7 @@
 %- overview co je potřeba přeložit
 %- výběr 3 frameowrků pro překlad
 
-We will now move on to the main part of this work. We discussed important concepts and differences of ORMs. We know some can be significantly more efficient in certain use cases than others. 
+After analyzing several ORMs we have discovered differences between them, yet at their core their purpose remains identical. The primary objective is to retrieve data via querying using a defined set of rules for transforming database records into application objects.
 
 Let us consider an example. In \autoref{sec:perf_eval}, specifically query \hyperref[query:d3]{D3}, we tested retrieving one-to-many optional relationship.
 EF Core took more than 2.5 seconds. Compare it to the best result---linq2db scoring 91 milliseconds. That is more than a 20 times increase in speed! 
@@ -22,9 +22,9 @@ In the same way, we will look at querying. We have seen two types - directly usi
 An abstraction over entities, mapping, and queries will give us a unified intermediate representation we can convert into and out of. We will only need to implement two conversions for each ORM. One to parse it into the abstract representation, and the other to build ORM-specific statements from. Instead of $N^2 - N$ conversions (one from each framework to another, except itself), only $2N$ will need to be implemented, where $N$ is the number of supported ORMs. Of course, not all directions need to be implemented. For example, translating from a deprecated ORM might be useful for migrations, but translating into it might be unnecessary.
 
 \section{User interaction}
-Input into the conversion tool will be \textbf{entity}, \textbf{mapping} and a \textbf{query}. Not all ORMs require or even support mapping, and there are different formats. So each ORM will have defined which parts it accepts. Input framework can be either auto detected or manually selected by the user. Upon selection a multiple inputs with a description will appear.
+Input into the conversion tool will be \textbf{entity}, \textbf{mapping} and a \textbf{query}. Not all ORMs require or even support mapping, and there are different formats. So each ORM will have defined which parts it accepts. Input framework can be either auto-detected or manually selected by the user. Upon selection, multiple inputs with a description will appear.
 
-As an example in \autoref{fig:orm_to_abstract}, user selects Entity Framework Core as source ORM. Given we support only attribute mapping, two inputs will be shown. One for an attributed entity and second for a LINQ query. After user confirms 
+As an example in \autoref{fig:orm_to_abstract}, the user selects Entity Framework Core as the source ORM. Given we support only attribute mapping, two inputs will be shown. One for an attributed entity and a second for a LINQ query. After user confirms 
 
 \begin{figure}[H]
   \centering
