@@ -1,18 +1,19 @@
 \section{Important concepts}
-To better understand ORMs and the .NET ecosystem, we will examine important concepts. And we will start by looking at how relational data are managed in .NET applications. 
+To better understand \acrshort{orm}s and the .NET\footnote{\url{TODO}} ecosystem, we will examine important concepts. And we will start by looking at how relational data are managed in .NET applications. 
 
-At the most basic level, we can manually compose an SQL query, create a database connection, execute the query, and parse the results. We can achieve this with the help of standard .NET libraries, particularly ADO.NET. However, by directly using SQL, we introduce dependencies on a query language that lacks static typing in the context of C\#, forcing us to deal with raw strings. This can potentially lead to vulnerabilities, unnecessary dependencies, and additional complexity. Nevertheless, ADO.NET remains crucial, and most .NET applications have it as a hidden dependency. All of the ORM frameworks we will talk about rely on it for database communication. 
+At the most basic level, we can manually compose an \acrshort{sql} query, create a database connection, execute the query, and parse the results. We can achieve this with the help of standard .NET libraries, particularly ADO.NET\footnote{\url{TODO}}. However, by directly using \acrshort{sql}, we introduce dependencies on a query language that lacks static typing in the context of C\#, forcing us to deal with raw strings. This can potentially lead to vulnerabilities, unnecessary dependencies, and additional complexity~\cite{TODO}. Nevertheless, ADO.NET remains crucial, and most .NET applications have it as a hidden dependency. All of the \acrshort{orm} frameworks we will talk about rely on it for database communication. 
 
-To lower complexity related to database communication and data persistence, we use abstraction provided by ORMs.
-The level of abstraction varies depending on the specific framework. There are generally two categories, micro and macro ORMs. On one end of the spectrum, we have lightweight, usually performance-oriented frameworks. They offer a narrow set of features, some simple abstraction over ADO.NET. Some of those might not even be full ORMs, omitting the "relational" part entirely. On the opposite end, we have full-fledged frameworks that completely abstract away database communication, providing abstraction over SQL in the form of different query languages and an extensive set of features to simplify the work of developers. \cite{Dapper}
+To lower complexity related to database communication and data persistence, we use abstraction provided by \acrshort{orm}(s).
+The level of abstraction varies depending on the specific framework. There are generally two categories, micro and macro \acrshort{orm}s~\cite{TODO}. On one end of the spectrum, we have lightweight, usually performance-oriented frameworks. They offer a narrow set of features, some simple abstraction over ADO.NET. Some of those might not even be full \acrshort{orm}s, omitting the ``relational'' part entirely. On the opposite end, we have full-fledged frameworks that completely abstract away database communication, providing abstraction over \acrshort{sql} in the form of different query languages and an extensive set of features to simplify the work of developers~\cite{Dapper}.
 
 \subsection{ADO.NET}
-ADO.NET provides access to different data sources, not limited to only databases. It provides components and models for connecting to the sources, executing commands, and retrieving results. All this functionality is built into \texttt{System.Data} library. \cite{ADONET}
+ADO.NET provides access to different data sources, not limited to only databases. It provides components and models for connecting to the sources, executing commands, and retrieving results. All this functionality is built into \texttt{System.Data} library~\cite{ADONET}.
 
 \begin{example}
-%\small
-Let us look at a code example from Microsoft documentation\cite{ADONET}, adapted and shortened for the purposes of this text.
-We can see the usage of key ADO.NET objects here, namely \texttt{SqlConnection}, \texttt{SqlCommand} and \texttt{SqlDataReader}. Managing the connection, building the query command and reading results introduces a fair amount of overhead and manual control. The indexed access to \texttt{SqlDataReader} inside the \texttt{while} loop can end up being error-prone and increase the risk of runtime exceptions. Although this approach is functional, it highlights why an abstraction would be more desirable.
+\small
+Let us look at a code example from Microsoft documentation~\cite{ADONET}, adapted and shortened for the purposes of this text.
+We can see the usage of key ADO.NET objects, namely \texttt{SqlConnection}, \texttt{SqlCommand} and \texttt{SqlDataReader}. Managing the connection, building the query command and reading results introduces a fair amount of overhead and manual control. The indexed access to \texttt{SqlDataReader} inside the \texttt{while} loop can end up being error-prone and increase the risk of runtime exceptions. Although this approach is functional, it highlights why an abstraction would be more desirable.
+\qed
 
 \begin{lstlisting}[language=CSharp]
 const string connectionString = "...";
@@ -38,15 +39,14 @@ using (SqlConnection connection = new(connectionString))
     reader.Close();
 }
 \end{lstlisting}
-\qed
 \end{example}
 
 \subsection{Entities and mapping}
-Entities are a set of classes either mirroring database tables or corresponding to a domain model. Entities should be POCOs (plain old CLR objects). The term is derived from POJOs (plain old Java objects). It refers to classes that don't inherit from any base class or interface. And they are not dependent on any library. \cite{Fowler2003POJO}
+Entities are a set of classes either mirroring database tables or corresponding to a domain model. Entities should be plain old \acrshort{clr} objects (\acrshort{poco}(s)). The term is derived from plain old Java objects (\acrshort{pojo}(s)). It refers to classes that don't inherit from any base class or interface. And they are not dependent on any library~\cite{Fowler2003POJO}.
 
 \begin{example}
-%\small
-Here is an example of a POCO class for a purchase order. It contains a set of properties with basic .NET data types. There is no dependency and the entity could be used with any framework.
+\small
+Here is an example of a \acrshort{poco} class for a purchase order. It contains a set of properties with basic .NET data types. There is no dependency and the entity could be used with any framework.
 \begin{lstlisting}[language=CSharp]
 class PurchaseOrder
 {
@@ -61,13 +61,13 @@ This entity contains no rules for mapping. It would work only with a query whose
 \qed
 \end{example}
 
-Micro ORMs do not usually use any entity mapping. They simply load query results into entities that match the result. More complex frameworks that do not just perform read queries need to know how to map an entity to a database table. The corresponding table might not even exist and is generated based on the entity. Such use case is central to domain-driven development\cite{FowlerDDD}.
+Micro \acrshort{orm}(s) do not usually use any entity mapping. They simply load query results into entities that match the result. More complex frameworks that do not just perform read queries need to know how to map an entity to a database table. The corresponding table might not even exist and is generated based on the entity. Such use case is central to domain-driven development~\cite{FowlerDDD}.
 
-Entity mapping might be done in multiple ways. The simplest form is inferred mapping or global conventions. The framework guesses table and column names, data types, nullability, etc. from the way an entity is named and declared or by some global rules. Clearly, that lacks details like numeric precision, constraints, and indices. Those details can be specified by property and class attributes. That makes mapping tied to an entity, making it framework dependent. That could be a problem if the domain model should be isolated from database access to not leak abstraction. Mapping through code or a configuration file allows separation and can be more expressive and powerful.
+Entity mapping might be done in multiple ways. The simplest form is inferred mapping or global conventions. The framework guesses, e.g., table and column names, data types, and nullability from the way an entity is named and declared or by some global rules. Clearly, that lacks details like numeric precision, constraints, and indices. Those details can be specified by property and class attributes. That makes mapping tied to an entity, making it framework dependent. That could be a problem if the domain model should be isolated from database access to not leak abstraction. Mapping through code or a configuration file allows separation and can be more expressive and powerful.
 
 \begin{example}
-%\small
-We can look at two different mapping approaches to compare them. In the first instance, \texttt{PurchaseOrder} entity is mapped in Entity Framework Core using attributes and the rest of the mapping is inferred. For example, \texttt{OrderDate} will likely be mapped to a \texttt{DATETIME2} column type, with default precision. Of course, the inferring is optional and we can add more configuration attributes or mapping by code to avoid any uncertainties. 
+\small
+We can look at two different mapping approaches to compare them. In the first instance, \texttt{PurchaseOrder} entity is mapped in Entity Framework Core\footnote{\url{TODO}} using attributes and the rest of the mapping is inferred. For example, \texttt{OrderDate} will likely be mapped to a \texttt{DATETIME2} column type, with default precision. Of course, the inferring is optional and we can add more configuration attributes or mapping by code to avoid any uncertainties. 
 \begin{lstlisting}[language=CSharp]
 [Table("PurchaseOrders", Schema = "Purchasing")]
 class PurchaseOrder
@@ -80,7 +80,8 @@ class PurchaseOrder
     DateTime OrderDate { get; set; }
 }
 \end{lstlisting}
-The second mapping is in the form of XML mapping file using NHibernate ORM. This assumes a bare POCO is somewhere else in a project.  More configuration is required to begin with. The mapping is isolated from the entity. This may be good for architecture, but bad for refactoring.
+The second mapping is in the form of XML mapping file using NHibernate ORM.\footnote{\url{TODO}} This assumes a bare \acrshort{poco} is somewhere else in a project.  More configuration is required to begin with. The mapping is isolated from the entity. This may be good for architecture, but bad for refactoring.
+\qed
 \begin{lstlisting}[language=CSharp]
 <?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernateEntities">
@@ -93,18 +94,19 @@ The second mapping is in the form of XML mapping file using NHibernate ORM. This
     </class>
 </hibernate-mapping>
 \end{lstlisting}
-\qed
 \end{example}
 
 Relationships are usually mapped through navigation properties. If the relationship has a single target, the navigation property is of the related entity's type. In contrast, if the relationship can target multiple entries, a collection of the related type (e.g. \texttt{List<T>}) is used instead.
 
 \subsection{Querying}
-Relational databases mostly support only SQL query language. Some ORMs use SQL directly. But relational databases and querying do not translate as well into a statically typed object-oriented language. That is why Language-Integrated Query (LINQ) was eventually introduced into C\#. It abstracts the data source and can operate not only over relational databases but other sources such as XML documents, object databases, or web services. \cite{linq}
+Relational databases mostly support only \acrshort{sql} query language. Some \acrshort{orm}(s) use \acrshort{sql} directly. But relational databases and querying do not translate as well into a statically typed object-oriented language. That is why Language-Integrated Query (\acrshort{linq})\footnote{\url{TODO}} was eventually introduced into C\#.\footnote{\url{TODO-LINK-CSHARP}} It abstracts the data source and can operate not only over relational databases but other sources such as XML documents, object databases, or web services.% \cite{linq}
 
-There are two ways to write LINQ queries. The first is called declarative query syntax and the second a method syntax. The query syntax is more SQL-like and should be easier to read. However, it doesn't exactly fit within the C\# language, and the compiler translates it into the method syntax anyway.
+There are two ways to write \acrshort{linq} queries. The first is called \textit{declarative query syntax} and the second a \textit{method syntax}. The query syntax is more \acrshort{sql}-like and should be easier to read. However, it doesn't exactly fit within the C\# language, and the compiler translates it into the method syntax anyway.
+
 \begin{example}
-
-To get an idea of how the two approaches differ, we can look at an example\cite{linqQueries}. The two queries execute the same way and return identical results. In fact, they get translated into the identical lower-level code by the compiler.
+\small
+To get an idea of how the two approaches differ, we can look at an example~\cite{linqQueries}. The two queries execute the same way and return identical results. In fact, they get translated into the identical lower-level code by the compiler.
+\qed
 
 \begin{lstlisting}[language=CSharp]
 int[] numbers = [ 5, 10, 8, 3, 6, 12 ];
@@ -121,9 +123,8 @@ IEnumerable<int> numQuery2 = numbers
     .Where(num => num % 2 == 0)
     .OrderBy(n => n);
 \end{lstlisting}
-\qed
 \end{example}
 
-By applying different methods, operations like filtering, sorting, or grouping are applied on the data source. However, no part of the query is executed until iteration over the result occurs. Or until a terminal method such as \texttt{ToList()}, \texttt{First()}, \texttt{Single()}, \texttt{Count()}, etc. is invoked. 
+By applying different methods, operations like filtering, sorting, or grouping are applied on the data source. However, no part of the query is executed until iteration over the result occurs. Or until a terminal method such as \texttt{ToList()}, \texttt{First()}, \texttt{Single()}, \texttt{Count()} is invoked. 
 
-If the source operates on in-memory data, it should implement \texttt{IEnumerable} interface. For remote data, such as those stored in a database, \texttt{IQueryable} interface must be implemented. The source can translate the method calls into any query language. In the case of ORMs, it will likely translate LINQ method calls into SQL statements. \cite{linq}
+If the source operates on in-memory data, it should implement \texttt{IEnumerable} interface. For remote data, such as those stored in a database, \texttt{IQueryable} interface must be implemented. The source can translate the method calls into any query language. In the case of \acrshort{orm}(s), it will likely translate \acrshort{linq} method calls into \acrshort{sql} statements~\cite{linq}.
