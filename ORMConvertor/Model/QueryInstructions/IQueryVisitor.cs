@@ -11,4 +11,5 @@ public interface IQueryVisitor
     public string Visit(GroupByInstruction instr);
     public string Visit(OrderByInstruction instr);
     public string Visit(HavingInstruction instr);
+    public string Visit(SetOperationInstruction instr);
 }

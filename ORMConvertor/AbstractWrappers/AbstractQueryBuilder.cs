@@ -8,6 +8,7 @@ public abstract class AbstractQueryBuilder()
 {
     protected readonly List<QueryInstruction> instructions = [];
     protected readonly Stack<int> marks = [];
+    private SetOperationInstruction? initiatedSetOperation = null;
 
     public void Push()
     {
@@ -19,7 +20,22 @@ public abstract class AbstractQueryBuilder()
         var start = marks.Pop();
         var body = instructions.GetRange(start, instructions.Count - start);
         instructions.RemoveRange(start, instructions.Count - start);
-        instructions.Add(new SubQueryInstruction(body));
+
+        // Store instruction into a subquery, unless there is an ongoing set operation.
+        if (initiatedSetOperation != null)
+        {
+            var newSetOp = new SetOperationInstruction(
+                initiatedSetOperation.OperationType,
+                initiatedSetOperation.Left,
+                new SubQueryInstruction(body)
+            );
+            instructions.Add(newSetOp);
+            initiatedSetOperation = null;
+        }
+        else
+        {
+            instructions.Add(new SubQueryInstruction(body));
+        }
     }
 
     public void From(string table, string? alias = null)
@@ -33,8 +49,8 @@ public abstract class AbstractQueryBuilder()
     }
 
     public void Select(
-        string? leftTable, string? leftProperty, string? leftConstant, 
-        BooleanOperator op, 
+        string? leftTable, string? leftProperty, string? leftConstant,
+        BooleanOperator op,
         string? rightTable, string? rightProperty, string? rightConstant)
     {
         instructions.Add(new SelectInstruction(leftTable, leftProperty, leftConstant, op, rightTable, rightProperty, rightConstant));
@@ -62,6 +78,17 @@ public abstract class AbstractQueryBuilder()
     )
     {
         instructions.Add(new HavingInstruction(leftTable, leftProperty, leftConstant, leftFunction, op, rightTable, rightProperty, rightConstant, rightFunction));
+    }
+
+    public void SetOperation(SetOperationType operation)
+    {
+        if (instructions.Count == 0 || instructions[0] is not SubQueryInstruction subQuery)
+        {
+            throw new InvalidOperationException("Set operation can only be initiated after a subquery has been defined. Use Push() to start a subquery and Pop() to end it.");
+        }
+        instructions.RemoveAt(0);
+
+        initiatedSetOperation = new SetOperationInstruction(operation, subQuery, new SubQueryInstruction([]));
     }
 
     public abstract List<ConversionSource> Build();

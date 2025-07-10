@@ -11,6 +11,7 @@ public class DapperSQLQueryBuilderTest
     {
         AbstractQueryBuilder builder = new DapperSqlQueryBuilder();
 
+        builder.Push();
         builder.Project("c", "CustomerName", "Name");
         builder.Project("ord", "Id", function: "COUNT", alias: "OrderCount");
         builder.Project("ord", "TotalPrice", function: "SUM", alias: "TotalSpent");
@@ -22,6 +23,8 @@ public class DapperSQLQueryBuilderTest
         builder.OrderBy(null, "TotalSpent", asc: true);
         builder.GroupBy("c", "CustomerName");
         builder.Having("ord", "TotalPrice", null, "SUM", BooleanOperator.GreaterThan, null, null, "1000", null);
+        builder.Pop();
+        
         var sql = builder.Build().First().Content;
 
         string expected = """"
@@ -37,6 +40,43 @@ public class DapperSQLQueryBuilderTest
                 GROUP BY c.CustomerName
                 HAVING SUM(ord.TotalPrice) > 1000
                 ORDER BY Name DESC, TotalSpent ASC
+                """,    
+            ).ToList();
+        }
+        """";
+
+        Assert.Equal(expected, sql, ignoreAllWhiteSpace: true, ignoreLineEndingDifferences: true);
+    }
+
+    [Fact]
+    public void SetOperationOnTwoSelects()
+    {
+        AbstractQueryBuilder builder = new DapperSqlQueryBuilder();
+
+        builder.Push();
+        builder.Project("c", "CustomerName", "Name");
+        builder.From("Sales.Customer", alias: "c");
+        builder.Pop();
+        builder.SetOperation(SetOperationType.Union);
+        builder.Push();
+        builder.Project("c", "CustomerName", "Name");
+        builder.From("Sales.Customer", alias: "c");
+        builder.Pop();
+
+        var sql = builder.Build().First().Content;
+
+        string expected = """"
+        public List<Customer> Query() 
+        {
+            return connection.Query<Customer>(
+                """
+                SELECT c.CustomerName AS Name
+                FROM Sales.Customer AS c
+                
+                UNION
+
+                SELECT c.CustomerName AS Name
+                FROM Sales.Customer AS c
                 """,    
             ).ToList();
         }

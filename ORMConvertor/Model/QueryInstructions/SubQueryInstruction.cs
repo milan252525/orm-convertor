@@ -1,10 +1,10 @@
 ﻿namespace Model.QueryInstructions;
 
-public sealed record SubQueryInstruction(IReadOnlyList<QueryInstruction> Body) : QueryInstruction
+public sealed record SubQueryInstruction(List<QueryInstruction> Instructions) : QueryInstruction
 {
     public override string Accept(IQueryVisitor v)
     {
-        foreach (var instr in Body)
+        foreach (var instr in Instructions)
         {
             instr.Accept(v);
         }

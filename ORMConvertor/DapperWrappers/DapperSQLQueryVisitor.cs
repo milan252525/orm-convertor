@@ -159,4 +159,15 @@ public class DapperSQLQueryVisitor : IQueryVisitor
         }
     }
 
+    public string Visit(SetOperationInstruction instr)
+    {
+        return instr.OperationType switch
+        {
+            SetOperationType.Union => "UNION",
+            SetOperationType.UnionAll => "UNION ALL",
+            SetOperationType.Intersect => "INTERSECT",
+            SetOperationType.Except => "EXCEPT",
+            _ => throw new QueryBuilderException($"Unsupported SetOperationType: {instr.OperationType}")
+        };
+    }
 }

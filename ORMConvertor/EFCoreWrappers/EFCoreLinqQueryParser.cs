@@ -39,6 +39,8 @@ public class EFCoreLinqQueryParser(AbstractQueryBuilder queryBuilder) : CSharpSy
             }}
         """;
 
+        queryBuilder.Push(); // We do not support nested queries for now
+
         var tree = CSharpSyntaxTree.ParseText(wrappedSource);
         var root = tree.GetCompilationUnitRoot();
 
@@ -52,6 +54,7 @@ public class EFCoreLinqQueryParser(AbstractQueryBuilder queryBuilder) : CSharpSy
         semanticModel = compilation.GetSemanticModel(tree, ignoreAccessibility: true);
 
         Visit(root);
+        queryBuilder.Pop();
     }
 
     public override void VisitInvocationExpression(InvocationExpressionSyntax node)

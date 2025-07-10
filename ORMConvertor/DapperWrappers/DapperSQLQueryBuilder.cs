@@ -15,7 +15,26 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
 
     public override List<ConversionSource> Build()
     {
-        var query = BuildSelectQuery().Trim();
+        var firstInstruction = instructions[0];
+
+        string query;
+
+        if (firstInstruction is SetOperationInstruction setOp)
+        {
+            var left = BuildSelectQuery(setOp.Left);
+            var right = BuildSelectQuery(setOp.Right);
+            query = $"{left.TrimEnd()}\n\n{visitor.Visit(setOp)}\n\n{right}";
+        }
+        else if (firstInstruction is SubQueryInstruction subQuery)
+        {
+            query = BuildSelectQuery(subQuery);
+        }
+        else
+        {
+            throw new NotSupportedException();
+        }
+
+        query = query.Trim();
         var indent = new string(' ', 8);
         var indentedQuery = string.Join("\n", query.Split('\n').Select(line => indent + line));
 
@@ -40,28 +59,31 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
         ];
     }
 
-    private string BuildSelectQuery()
+    private string BuildSelectQuery(SubQueryInstruction subQuery)
     {
         // Own builder for nesting
         StringBuilder sqlBuilder = new();
 
-        BuildProjectionPart(sqlBuilder);
+        var inst = subQuery.Instructions;
 
-        BuildFromPart(sqlBuilder);
+        BuildProjectionPart(inst, sqlBuilder);
 
-        BuildJoinPart(sqlBuilder);
+        BuildFromPart(inst, sqlBuilder);
 
-        BuildWherePart(sqlBuilder);
+        BuildJoinPart(inst, sqlBuilder);
 
-        BuildGroupByPart(sqlBuilder);
+        BuildWherePart(inst, sqlBuilder);
 
-        BuildHavingPart(sqlBuilder);
+        BuildGroupByPart(inst, sqlBuilder);
 
-        BuildOrderByPart(sqlBuilder);
+        BuildHavingPart(inst, sqlBuilder);
+
+        BuildOrderByPart(inst, sqlBuilder);
 
         return sqlBuilder.ToString();
     }
-    private void BuildProjectionPart(StringBuilder sqlBuilder)
+
+    private void BuildProjectionPart(List<QueryInstruction> instructions, StringBuilder sqlBuilder)
     {
         sqlBuilder.Append("SELECT ");
 
@@ -83,7 +105,7 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
         sqlBuilder.AppendLine();
     }
 
-    private void BuildFromPart(StringBuilder sqlBuilder)
+    private void BuildFromPart(List<QueryInstruction> instructions, StringBuilder sqlBuilder)
     {
         var fromInstructions = instructions.OfType<FromInstruction>().ToList();
 
@@ -103,7 +125,7 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
         sqlBuilder.AppendLine();
     }
 
-    private void BuildJoinPart(StringBuilder sqlBuilder)
+    private void BuildJoinPart(List<QueryInstruction> instructions, StringBuilder sqlBuilder)
     {
         var joinInstructions = instructions.OfType<JoinInstruction>().ToList();
 
@@ -113,7 +135,7 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
         }
     }
 
-    private void BuildWherePart(StringBuilder sqlBuilder)
+    private void BuildWherePart(List<QueryInstruction> instructions, StringBuilder sqlBuilder)
     {
         var selectInstructions = instructions.OfType<SelectInstruction>().ToList();
 
@@ -136,7 +158,7 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
         sqlBuilder.AppendLine();
     }
 
-    private void BuildOrderByPart(StringBuilder sqlBuilder)
+    private void BuildOrderByPart(List<QueryInstruction> instructions, StringBuilder sqlBuilder)
     {
         var orderByInstructions = instructions.OfType<OrderByInstruction>().ToList();
 
@@ -154,7 +176,7 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
         sqlBuilder.AppendLine();
     }
 
-    private void BuildGroupByPart(StringBuilder sqlBuilder)
+    private void BuildGroupByPart(List<QueryInstruction> instructions, StringBuilder sqlBuilder)
     {
         var groupByInstructions = instructions.OfType<GroupByInstruction>().ToList();
 
@@ -172,7 +194,7 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
         sqlBuilder.AppendLine();
     }
 
-    private void BuildHavingPart(StringBuilder sqlBuilder)
+    private void BuildHavingPart(List<QueryInstruction> instructions, StringBuilder sqlBuilder)
     {
         var havingInstructions = instructions.OfType<HavingInstruction>().ToList();
         if (havingInstructions.Count == 0)
