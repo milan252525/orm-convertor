@@ -18,7 +18,7 @@ Based on our observation, developers stick to using a single \acrshort{orm} per 
 
 Currently, converting queries from one \acrshort{orm} to another is challenging and typically requires manual work. Our approach will focus on automating this conversion process. We propose creating an abstraction that unifies entities, mappings, and queries into an intermediate representation, enabling efficient conversion between different \acrshort{orm} frameworks.
 
-\section{Translation}
+\section{Translation}\label{sec:core_translation}
 
 In a .NET application, queries depend not only on the query statements themselves but also on entities and their respective mappings. While entities are always represented as C\# classes, mappings vary significantly. We have encountered mapping defined via attributes, fluent code syntax, and even \acrshort{xml} files. Despite these syntactical differences, the conceptual goal remains the same. We have to explicitly instruct the \acrshort{orm} how entities map to database tables, including data types, constraints, and relationships. To effectively automate query translation, we must begin with identifying common patterns across these diverse mapping strategies.
 

@@ -119,6 +119,12 @@
 \floatname{listing}{Program}
 \fi
 
+\let\oldnl\nl
+\newcommand{\nonl}{\renewcommand{\nl}{\let\nl\oldnl}}
+\newlength\mylen
+\newcommand\myinput[1]{\nonl 
+  \settowidth\mylen{\KwIn{}}\setlength\hangindent{\mylen}\hspace*{\mylen}#1}
+
 %%% The field of all real and natural numbers
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\N}{\mathbb{N}}
@@ -209,7 +215,7 @@
 }
 
 \lstdefinelanguage{pseudo}{
-    morekeywords     = {abstract,class,public,private},
+    morekeywords     = {abstract,class,public,private,interface},
     basicstyle=\ttfamily\small,
     keywordstyle=\color{blue}\bfseries,
     commentstyle=\color{gray},

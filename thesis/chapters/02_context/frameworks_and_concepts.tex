@@ -98,7 +98,7 @@ The second mapping is in the form of XML mapping file using NHibernate ORM.\foot
 
 Relationships are usually mapped through navigation properties. If the relationship has a single target, the navigation property is of the related entity's type. In contrast, if the relationship can target multiple entries, a collection of the related type (e.g. \texttt{List<T>}) is used instead.
 
-\subsection{Querying}
+\subsection{Querying}\label{sec:queries}
 Relational databases mostly support only \acrshort{sql} query language. Some \acrshort{orm}(s) use \acrshort{sql} directly. But relational databases and querying do not translate as well into a statically typed object-oriented language. That is why Language-Integrated Query (\acrshort{linq})\footnote{\url{TODO}} was eventually introduced into C\#.\footnote{\url{TODO-LINK-CSHARP}} It abstracts the data source and can operate not only over relational databases but other sources such as XML documents, object databases, or web services.% \cite{linq}
 
 There are two ways to write \acrshort{linq} queries. The first is called \textit{declarative query syntax} and the second a \textit{method syntax}. The query syntax is more \acrshort{sql}-like and should be easier to read. However, it doesn't exactly fit within the C\# language, and the compiler translates it into the method syntax anyway.
