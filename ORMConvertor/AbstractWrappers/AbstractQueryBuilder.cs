@@ -22,7 +22,7 @@ public abstract class AbstractQueryBuilder()
         instructions.RemoveRange(start, instructions.Count - start);
 
         // Store instruction into a subquery, unless there is an ongoing set operation.
-        if (initiatedSetOperation != null)
+        if (initiatedSetOperation != null) // TODO does not keep track of level of nesting
         {
             var newSetOp = new SetOperationInstruction(
                 initiatedSetOperation.OperationType,
@@ -82,11 +82,11 @@ public abstract class AbstractQueryBuilder()
 
     public void SetOperation(SetOperationType operation)
     {
-        if (instructions.Count == 0 || instructions[0] is not SubQueryInstruction subQuery)
+        if (instructions.Last() is not SubQueryInstruction subQuery)
         {
             throw new InvalidOperationException("Set operation can only be initiated after a subquery has been defined. Use Push() to start a subquery and Pop() to end it.");
         }
-        instructions.RemoveAt(0);
+        instructions.RemoveAt(instructions.Count - 1);
 
         initiatedSetOperation = new SetOperationInstruction(operation, subQuery, new SubQueryInstruction([]));
     }
