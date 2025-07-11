@@ -1,4 +1,4 @@
-\chapter{Entity and mapping translation}
+\chapter{Entity and mapping translation}\label{chapter:entity_translation}
 % what is all needed (+table comparison)
 % abstraction and wrappers (generally)
 % algorithm pseudocodes - builder+ parser for mappings, visitor for queries
@@ -85,7 +85,7 @@ Building on the mapping aspects identified above, a unified intermediate represe
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[scale=1]{thesis/img/thesis/04_abstract_ir.drawio.pdf}
+  \includegraphics[scale=1]{thesis/img/thesis/03_abstract_ir.drawio.pdf}
   \caption{Class diagram of intermediate representation of entity mapping.}
   \label{fig:abstract_ir}
 \end{figure}
@@ -109,19 +109,19 @@ To enforce separation of concerns, the intermediate representation resides withi
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[scale=1]{thesis/img/thesis/04_translate_process.drawio.pdf}
+  \includegraphics[scale=1]{thesis/img/thesis/03_translate_process.drawio.pdf}
   \caption{Translation process of entity with (1) parsing and (2) building phase.}
   \label{fig:translation_process}
 \end{figure}
 
-\subsection{Entity builder}
+\subsection{Entity and mapping builder}
 
 The builder accepts entity and mapping information through a common interface and constructs the intermediate representation, which it stores internally. Once the parsing phase is complete and the representation is fully populated, the builder proceeds to generate the target source code.
 
 Since the target frameworks differ significantly in mapping styles, supported features, and default behaviours, each framework requires its own dedicated builder. Despite these differences, the process of constructing the intermediate representation is consistent across frameworks. To support this, all builders inherit from a shared abstract base class, \texttt{\textbf{AbstractEntityBuilder}}. It defines the common interface and core methods. And each concrete builder then implements the logic specific to generating syntax for its target framework.
 
 The abstraction builds on the common concepts identified in Section~\ref{sec:def_abstract} and defines the following core methods. To support seamless replacement of an existing entity, the builder stores the class namespace via the \texttt{\textbf{AddNamespace}} method, enabling the generated code to be placed back into its original file (assuming new \acrshort{orm} is installed). The \texttt{\textbf{AddClassHeader}} captures the class name along with its access modifier. 
-Schema and table names are handled separately from class-level metadata through \texttt{\textbf{AddSchema}} and \texttt{\textbf{AddTable}} methods, as their placement may differ across source frameworks. Together, these methods provide coverage for class and table related metadata. 
+Schema and table names are handled separately from class-level metadata through \texttt{\textbf{AddSchema}} and \texttt{\textbf{AddTable}} methods, as their placement may differ across source frameworks. Together, these methods provide coverage for class and table-related metadata. 
 
 The central method for defining class properties is \texttt{\textbf{AddProperty}}, which supports a wide range of (mostly optional) parameters. At minimum, it requires the property type and name. Additional parameters include modifiers, flags like \texttt{required} or \texttt{virtual}, nullability, default value, and getter/setter information. 
 
@@ -171,7 +171,7 @@ private:
 
  The specific approach each builder uses to generate output entities and mappings depends on the complexity of the target format. For simple C\# classes, a sequential construction using \texttt{StringBuilder}\footnote{\url{https://learn.microsoft.com/en-gb/dotnet/api/system.text.stringbuilder?view=net-9.0}} is sufficient. In more advanced scenarios, a templating engine or even compiler-level code generation using the .NET Roslyn compiler\footnote{\url{https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/}} can be employed.
 
-\subsection{Entity parser}
+\subsection{Entity and mapping parser}
 The parser has two main purposes: first, to determine which content type it can handle, and second, to perform the actual parsing. Content type detection is crucial when one framework allows mapping to be spread across multiple formats. For example, in NHibernate, the entity is defined in C\# code, while the mapping may reside in an \acrshort{xml} file. This requires two different parsers. To avoid hardcoding which formats each parser supports, they expose a method that accepts a content type and checks whether they can parse it.
 
 Due to the varied nature of source content and parsing strategies, the parser interface defines only two methods demonstrated in Listing~\ref{lst:parser}. The first, \texttt{\textbf{CanParse}}, accepts content type and returns a boolean indicating whether the parser can handle the given format. The second, \texttt{\textbf{Parse}}, performs the actual parsing over the source. This method has no return value; instead, it populates the intermediate representation by calling methods on an \texttt{AbstractEntityBuilder} instance, which is provided either as a parameter to the method or via the constructor.
@@ -232,7 +232,7 @@ The implementation of a parser for entities with mapping attributes is demonstra
             \ForEach{\textup{$arg$ in $attr$.GetArguments()}}{
                 $argName$ = $arg$.GetName()\;
     
-                \If{\textup{$argName$ == null || $argName$ == 'Name'}}{
+                \If{\textup{$argName$ == null or $argName$ == 'Name'}}{
                     $table$ = $arg$.Value\;
                 }
                 \ElseIf{\textup{$argName$ == 'Schema'}}{
@@ -314,7 +314,7 @@ The implementation of a parser for entities with mapping attributes is demonstra
         }
     }
     \BlankLine
-    $isNullable$ = $\neg hasRequiredAttr$ \&\& $type$.IsNullable\;
+    $isNullable$ = $\neg hasRequiredAttr$ and $type$.IsNullable\;
     $dbProps$['Nullable'] = $isNullable$\;
     \BlankLine
     $builder$.AddProperty($name$, $type$, $accessModifiers$, $otherModifiers$, $defaultValue$)\;
@@ -355,11 +355,9 @@ Note that the example highlights an absence of a defined database type on the \t
 \qed
 \end{example}
 
-%The translation process consists of two phases: a decoupled parsing phase followed by a framework-aware building phase. This approach ensures that the final output fully preserves the semantics of the original entity and its mapping. The result conforms to NHibernate’s requirements while remaining adherent to the structure and intent of the original \acrshort{efcore} entity.
-
 \begin{figure}[!htp]
   \centering
-  \includegraphics[width=\textwidth]{thesis/img/thesis/04_parsing_building.drawio.pdf}
+  \includegraphics[width=\textwidth]{thesis/img/thesis/03_parsing_building.drawio.pdf}
   \caption{Translation of \acrshort{efcore} entity mapping to NHibernate.}
   \label{fig:translation_complete}
 \end{figure}

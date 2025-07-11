@@ -412,7 +412,7 @@ The comparison was implemented in the form of a Visual Studio solution, containi
 Common project is also included. It contains a single class handling loading the database connection string from a configuration file. There is no dependency between feature tests and performance tests. It could be argued that the code for queries could be extracted to a separate class to avoid duplication. But we have kept it duplicated to isolate unit tests from performance benchmarks. This structure is repeated for each of the seven frameworks we are examining. There is again no dependency between the different frameworks for isolation purposes.
 
 \subsubsection{Technology overview}
-As we have decided before implementation in Section~\autoref{sec:dataset_database}, we are using \acrshort{mssql} with World Wide Importers data set. The database system is running in a Docker container. Base image used is \texttt{mssql/server:2022-latest}~\cite{mssqlDocker} provided by Microsoft. The image imports our dataset and waits until it is ready.
+As we have decided before implementation in Section~\ref{sec:dataset_database}, we are using \acrshort{mssql} with World Wide Importers data set. The database system is running in a Docker container. Base image used is \texttt{mssql/server:2022-latest}~\cite{mssqlDocker} provided by Microsoft. The image imports our dataset and waits until it is ready.
 
 The .NET tests are structured in .NET projects grouped in one solution. .NET version 8 was chosen as it is the latest long term support (\acrshort{lts}) version at the time of writing~\cite{NETversions}. Tests are developed and run using Microsoft Visual Studio 2022, but \texttt{dotnet} \acrshort{cli} commands are provided as well.
 
