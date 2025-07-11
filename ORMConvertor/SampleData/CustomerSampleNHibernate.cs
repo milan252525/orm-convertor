@@ -52,7 +52,6 @@ public class CustomerSampleNHibernate
                     Name = "Customer",
                     Namespace = "NHibernateEntities",
                     AccessModifier = AccessModifier.Public,
-                    Attributes = [],
                 },
                 Table = "Customers",
                 Schema = "Sales",

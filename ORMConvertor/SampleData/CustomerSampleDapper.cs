@@ -35,7 +35,6 @@ public class CustomerSampleDapper
                     Name = "Customer",
                     Namespace = "DapperEntities",
                     AccessModifier = AccessModifier.Public,
-                    Attributes = [],
                 },
                 Table = default,
                 Schema = default,
@@ -92,13 +91,6 @@ public class CustomerSampleDapper
                            HasSetter = true,
                            DefaultValue = "[]",
                        },
-                       //Relations = [
-                       //    new() {
-                       //        Cardinality = Cardinality.OneToMany,
-                       //        Source = "Customer",
-                       //        Target = "CustomerTransaction",
-                       //    },
-                       //]
                    },
                ],
             };

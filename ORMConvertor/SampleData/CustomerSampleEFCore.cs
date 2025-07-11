@@ -57,7 +57,6 @@ public static class CustomerSampleEFCore
                     Name = "Customer",
                     Namespace = "EFCoreEntities",
                     AccessModifier = AccessModifier.Public,
-                    Attributes = []
                 },
                 Table = "Customers",
                 Schema = "Sales",

@@ -19,6 +19,4 @@ public class Property
     public bool HasSetter { get; set; } = false;
 
     public string? DefaultValue { get; set; }
-
-    public List<AttributeModel> Attributes { get; set; } = [];
 }
