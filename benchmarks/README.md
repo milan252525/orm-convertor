@@ -1,5 +1,7 @@
+Visual studio projects containing unit and benchmark tests for 7 different .NET ORMs.
+
 # Database setup
-Dockerfile is provided to initialize Microsoft SQL Server database and fill it with data. Tested using podman.
+Dockerfile is provided to initialize Microsoft SQL Server database and fill it with data. Tested using Podman and Docker.
 
 Build image:
 `podman build -t orm-comparison .`
