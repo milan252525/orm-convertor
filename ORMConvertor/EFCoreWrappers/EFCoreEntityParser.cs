@@ -13,9 +13,9 @@ namespace EFCoreWrappers;
 /// </summary>
 public class EFCoreEntityParser(AbstractEntityBuilder entityBuilder) : IParser
 {
-    public bool CanParse(ContentType contentType)
+    public bool CanParse(ConversionContentType contentType)
     {
-        return contentType == ContentType.CSharpEntity;
+        return contentType == ConversionContentType.CSharpEntity;
     }
 
     /// <summary>

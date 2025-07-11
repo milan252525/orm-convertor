@@ -1,5 +1,4 @@
 ﻿using AbstractWrappers;
-using AbstractWrappers.Convertors;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,9 +12,9 @@ namespace DapperWrappers;
 /// </summary>
 public class DapperEntityParser(AbstractEntityBuilder entityBuilder) : IParser
 {
-    public bool CanParse(ContentType contentType)
+    public bool CanParse(ConversionContentType contentType)
     {
-        return contentType == ContentType.CSharpEntity;
+        return contentType == ConversionContentType.CSharpEntity;
     }
 
     /// <summary>

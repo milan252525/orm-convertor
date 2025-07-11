@@ -1,5 +1,5 @@
 ﻿using AbstractWrappers;
-using AbstractWrappers.Convertors;
+using Common.Convertors;
 using Model;
 using Model.AbstractRepresentation;
 using Model.AbstractRepresentation.Enums;
@@ -32,8 +32,8 @@ public class NHibernateEntityBuilder : AbstractEntityBuilder
 
         return
         [
-            new() { ContentType = ContentType.CSharpEntity, Content = codeResult.ToString() },
-            new() { ContentType = ContentType.XML, Content = mappingResult.ToString() }
+            new() { ContentType = ConversionContentType.CSharpEntity, Content = codeResult.ToString() },
+            new() { ContentType = ConversionContentType.XML, Content = mappingResult.ToString() }
         ];
     }
 

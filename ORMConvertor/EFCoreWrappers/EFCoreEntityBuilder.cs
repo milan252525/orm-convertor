@@ -1,5 +1,5 @@
 ﻿using AbstractWrappers;
-using AbstractWrappers.Convertors;
+using Common.Convertors;
 using EFCoreWrappers.Convertors;
 using Model;
 using Model.AbstractRepresentation;
@@ -27,7 +27,7 @@ public class EFCoreEntityBuilder : AbstractEntityBuilder
         return [
             new ConversionSource
             {
-                ContentType = ContentType.CSharpEntity,
+                ContentType = ConversionContentType.CSharpEntity,
                 Content = codeResult.ToString()
             }
         ];

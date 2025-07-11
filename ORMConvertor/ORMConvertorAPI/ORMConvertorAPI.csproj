@@ -19,11 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AbstractWrappers\AbstractWrappers.csproj" />
-    <ProjectReference Include="..\DapperWrappers\DapperWrappers.csproj" />
-    <ProjectReference Include="..\EFCoreWrappers\EFCoreWrappers.csproj" />
-    <ProjectReference Include="..\Model\Model.csproj" />
-    <ProjectReference Include="..\NHibernateWrappers\NHibernateWrappers.csproj" />
+    <ProjectReference Include="..\OrmConvertor\OrmConvertor.csproj" />
     <ProjectReference Include="..\SampleData\SampleData.csproj" />
   </ItemGroup>
 

@@ -14,9 +14,9 @@ public class EFCoreLinqQueryParser(AbstractQueryBuilder queryBuilder) : CSharpSy
     private bool fromWasEmitted;
     private EntityMap? entityMap;
 
-    public bool CanParse(ContentType contentType)
+    public bool CanParse(ConversionContentType contentType)
     {
-        return contentType == ContentType.CSharpQuery;
+        return contentType == ConversionContentType.CSharpQuery;
     }
 
     public void Parse(string source)
@@ -82,7 +82,10 @@ public class EFCoreLinqQueryParser(AbstractQueryBuilder queryBuilder) : CSharpSy
     {
         base.VisitMemberAccessExpression(node);
 
-        if (fromWasEmitted) return;
+        if (fromWasEmitted)
+        {
+            return;
+        }
 
         if (node.Expression is IdentifierNameSyntax id && id.Identifier.Text == "ctx")
         {

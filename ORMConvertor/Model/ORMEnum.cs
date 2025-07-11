@@ -1,6 +1,6 @@
-﻿namespace ORMConvertorAPI;
+﻿namespace Model;
 
-public enum ORMType
+public enum ORMEnum
 {
     Dapper = 10,
     NHibernate = 20,

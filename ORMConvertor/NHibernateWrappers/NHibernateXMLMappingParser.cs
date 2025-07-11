@@ -12,9 +12,9 @@ namespace NHibernateWrappers;
 /// </summary>
 public class NHibernateXMLMappingParser(AbstractEntityBuilder entityBuilder) : IParser
 {
-    public bool CanParse(ContentType contentType)
+    public bool CanParse(ConversionContentType contentType)
     {
-        return contentType == ContentType.XML;
+        return contentType == ConversionContentType.XML;
     }
 
     /// <summary>

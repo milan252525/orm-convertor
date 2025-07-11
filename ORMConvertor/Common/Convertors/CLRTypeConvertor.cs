@@ -1,7 +1,7 @@
 ﻿using Model.AbstractRepresentation;
 using Model.AbstractRepresentation.Enums;
 
-namespace AbstractWrappers.Convertors;
+namespace Common.Convertors;
 
 public static class CLRTypeConvertor
 {

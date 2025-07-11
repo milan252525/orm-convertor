@@ -54,7 +54,7 @@ public class DapperSqlQueryBuilder : AbstractQueryBuilder
         return [
             new() {
                 Content = finalMethod,
-                ContentType = ContentType.CSharpQuery
+                ContentType = ConversionContentType.CSharpQuery
             }
         ];
     }

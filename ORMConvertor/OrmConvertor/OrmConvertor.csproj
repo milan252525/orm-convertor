@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AbstractWrappers\AbstractWrappers.csproj" />
+    <ProjectReference Include="..\DapperWrappers\DapperWrappers.csproj" />
+    <ProjectReference Include="..\EFCoreWrappers\EFCoreWrappers.csproj" />
+    <ProjectReference Include="..\Model\Model.csproj" />
+    <ProjectReference Include="..\NHibernateWrappers\NHibernateWrappers.csproj" />
+  </ItemGroup>
+
+</Project>

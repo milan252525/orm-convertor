@@ -13,9 +13,9 @@ namespace NHibernateWrappers;
 /// </summary>
 public class NHibernateEntityParser(AbstractEntityBuilder entityBuilder) : IParser
 {
-    public bool CanParse(ContentType contentType)
+    public bool CanParse(ConversionContentType contentType)
     {
-        return contentType == ContentType.CSharpEntity;
+        return contentType == ConversionContentType.CSharpEntity;
     }
 
     /// <summary>

@@ -1,5 +1,5 @@
 ﻿using AbstractWrappers;
-using AbstractWrappers.Convertors;
+using Common.Convertors;
 using Model;
 using Model.AbstractRepresentation;
 using System.Text;
@@ -23,7 +23,7 @@ public class DapperEntityBuilder : AbstractEntityBuilder
         return [
             new ConversionSource
             {
-                ContentType = ContentType.CSharpEntity,
+                ContentType = ConversionContentType.CSharpEntity,
                 Content = codeResult.ToString()
             }
         ];
