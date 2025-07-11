@@ -9,8 +9,6 @@
   <ItemGroup>
     <Compile Remove="frontend\**" />
     <Content Remove="frontend\**" />
-    <EmbeddedResource Remove="frontend\**" />
-    <None Remove="frontend\**" />
   </ItemGroup>
 
   <ItemGroup>
