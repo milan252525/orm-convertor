@@ -1,6 +1,6 @@
 ﻿using SampleData;
 
-namespace ORMConvertorAPI.API;
+namespace ORMConvertorAPI.Data;
 
 public static class Samples
 {

@@ -1,6 +1,4 @@
-﻿using Model.APIModels;
-using OrmConvertor;
-using ORMConvertorAPI.API;
+﻿using OrmConvertor;
 using ORMConvertorAPI.Data;
 using ORMConvertorAPI.Dtos;
 

@@ -1,4 +1,6 @@
-﻿namespace Model.APIModels;
+﻿using Model;
+
+namespace ORMConvertorAPI.Dtos;
 
 public record RequiredContentDefinition(
     ORMEnum OrmType, 

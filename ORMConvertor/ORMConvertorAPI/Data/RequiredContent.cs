@@ -1,5 +1,5 @@
 ﻿using Model;
-using Model.APIModels;
+using ORMConvertorAPI.Dtos;
 
 namespace ORMConvertorAPI.Data;
 public static class RequiredContent
