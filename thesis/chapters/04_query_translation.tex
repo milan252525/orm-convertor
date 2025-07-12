@@ -1,4 +1,4 @@
-\chapter{Query translation}
+\chapter{Query translation}\label{chapter:query_translation}
 Following the abstraction and conversion processes established for entities and mapping, query translation can be approached in a similar manner. By comparing query concepts across \acrshort{orm} frameworks, a unified abstraction can be derived. Once this abstraction is defined, the full translation process can be formulated, along with algorithms demonstrating its application. 
 
 
@@ -435,7 +435,7 @@ public:
 \begin{example}
 \small
 
-The established abstraction and algorithms enable the demonstration of the complete translation process. Figure~\ref{fig:translation_complete_query} visualizes the conversion of an \acrshort{efcore} \texttt{linq} query into Dapper using \acrshort{sql}. The example query consists of two filter conditions followed by result sorting. For clarity, only the method containing the query is displayed. 
+The established abstraction and algorithms enable the demonstration of the complete query translation workflow. Figure~\ref{fig:translation_complete_query} visualizes the conversion of an \acrshort{efcore} \texttt{linq} query into Dapper using \acrshort{sql}. The example query consists of two filter conditions followed by result sorting. For clarity, only the method containing the query is displayed. 
 
 The translation begins with the parser analyzing the query and converting each component into an intermediate representation. In this example, the query translates into three instructions. To construct the \texttt{FROM} instruction, the parser consults the entity mapping to associate the entity with a corresponding database table. The entity mapping is repeatedly accessed multiple times to map  properties within each method call.
 
@@ -451,3 +451,42 @@ In the subsequent phase, the builder translates these intermediate instructions 
   \caption{Translation of \acrshort{efcore} LINQ query to SQL in Dapper.}
   \label{fig:translation_complete_query}
 \end{figure}
+
+With all abstractions and algorithms for both parsing and building established, the final step is to unify them into a complete translation algorithm, as shown in Algorithm~\ref{alg:translation_alg}. The algorithm takes as input the source content and the input and output \acrshort{orm}s. Concrete implementations of builders and parsers are instantiated through factories, abstracting away framework-specific details. It is assumed that the factory returns parsers in the correct order—specifically, entity and mapping parsers precede query parsers, as the latter require access to entity mapping metadata. Each parser processes all compatible sources while building the intermediate representation in corresponding builders. Once parsing is complete, the builders generate final translation outputs.
+
+\begin{algorithm}[!htp]
+    \footnotesize
+    \DontPrintSemicolon
+
+    \SetKw{return}{return}
+    
+    \KwIn{$ORM_{in}$ -- input ORM\;}
+    \myinput{$ORM_{out}$ -- output ORM\;}
+    \myinput{$sources$ -- entity, mapping and queries to translate\;}
+
+    $entityBuilder$ = EntityBuilderFactory.Create($ORM_{out}$)\;
+    $queryBuilder$ = QueryBuilderFactory.Create($ORM_{out}$)\;
+    $parsers$ = ParserFactory.Create($ORM_{in}$, $entityBuilder$, $queryBuilder$)\;
+    $results$ = empty list\;
+    
+    \ForEach{\textup{$parser$ in $parsers$}}{
+        \ForEach{\textup{$source$ in $sources$}}{
+            \If{\textup{$parser$.CanParse($source$.ContentType)}}{
+                \If{\textup{$parser$ is IQueryParser}}{
+                    $parser$.Parse($source$.Content, $entityBuilder$.EntityMap)\;
+                } \Else {
+                    $parser$.Parse($source$.Content)\;
+                }
+            }
+        }
+    }
+
+    $results$.AddRange($entityBuilder$.Build())\;
+    \If{\textup{$queryBuilder$ != null}} {
+        $results$.AddRange($queryBuilder$.Build())\;
+    }
+    
+    \return{$results$}
+    \caption{Translation algorithm}
+    \label{alg:translation_alg}
+\end{algorithm}
