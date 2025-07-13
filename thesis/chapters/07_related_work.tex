@@ -1,1 +1,28 @@
 \chapter{Related work}
+% zatím náhodné nezpracované pořadí
+
+% two visual entity modelling tools exist, allowing export to multiple .NET ORMs
+% https://www.devart.com/entitydeveloper/features.html
+% https://www.llblgen.com/
+% oboje komerčně licencované - má cenu uvádět?
+
+
+Adding \acrshort{orm} into an application with database access can significantly reduce the amount of code written and, in some cases, even speed up access time~\cite{optimizatio_code_lines_time}. However, the speed-up depends on correct framework selection and in-depth knowledge. Performance limitations in \acrshort{orm} are a known and longstanding issue~\cite{survey_hule_ranawat_2023}. There are several ways to improve performance ...
+
+improvements: % todo convert to text
+- parallelization~\cite{orm_parallel}
+- predictions of future queries and prefetching~\cite{prefetching} % bez orm
+- adapting the query on ORM level by choosing necessary columns automatically and join elimination - optimization~\cite{quartarone2020adaptive}
+- optimizing \acrshort{orm} configuration itself by employing a multi-objective genetic algorithm~\cite{orm_configuration_optimization}
+
+
+With the recent progress in the area of large language models and their improving code-writing capabilities~\cite{evaluatingllms}, utilizing them for \acrshort{orm} translation could be attempted.
+This approach has been applied on different programming languages using unsupervised machine translation~\cite{translation_unsupervised} or \acrshort{llm}s~\cite{transagentllm}.
+
+Deep learning methods have been explored~\cite{text-to-sql-survey} in the area of translating natural language into \acrshort{sql} queries. Tools such as IRNet~\cite{text-to-sql-irnet} or RAT-SQL~\cite{text-to-sql-rat} are able to generate queries from user input.
+
+
+% Transformations on the DB side
+Combining various \acrshort{orm}s in a single application can improve performance over a singular database system. Better performance might also be achieved by modifying the database schema. Some data may not be suitable for relational databases, and a multi-model schema may provide a better solution for diverse data. 
+
+To address the challenges of managing multi-model databases and ensure consistency, a set of tools has been developed. MM-evocat~\cite{mm_evocat} supports schema evolution over multi-model databases using an abstract representation built on category theory. MM-quecat~\cite{mm_quecat} utilizes the representation to provide a unified query language over multi-model data, and MM-evoque~\cite{mm_evoque} ensures schema changes are propagated to all database queries. 

@@ -292,10 +292,6 @@ While the \acrshort{linq} support is extensive, querying into data types like \a
 Database can be manipulated through exposed \acrshort{ddl} methods like \texttt{CreateTable} and \texttt{DropTable}, but the documentation provides no explanation. Data modification is possible through \texttt{Insert}, \texttt{Update} and \texttt{Delete} methods. Bulk data operations are available for selected database systems.
 Advanced \acrshort{sql} constructs like transactions, common table expressions (\acrshort{cte}), \texttt{MERGE}, and window analytic functions are supported. Of course, any raw \acrshort{sql} can be executed too, but it is not the concern of this \acrshort{orm}. Asynchronous variants of all methods are exposed.
 
-Some additional tooling is provided. Scaffolding database schema to generate entities and mapping is possible with a \acrshort{cli} tool. The library offers extendibility through exposed interceptor interfaces, which allow modifying behavior in different stages of querying. Support for profiling using MiniProfiler\footnote{\url{https://github.com/MiniProfiler/dotnet}} is also explicitly provided and described.
-LINQ to DB can be used alongside Entity Framework Core to extend its \acrshort{linq} to \acrshort{sql} translation capabilities. This is enabled using an official extension built into this library.
-
-The LINQ to DB framework is open-source and provided under the MIT license.\footnote{\url{https://github.com/linq2db/linq2db/blob/master/MIT-LICENSE.txt}} It is distributed via GitHub\footnote{\url{https://github.com/linq2db/linq2db}} and NuGet.\footnote{\url{https://www.nuget.org/packages/linq2db}} The last released version is 5.4.1 in April 2024, although major version 6 is currently being released under previews. The package was downloaded 17 million times in total, with almost 5 million downloads in the last year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=linq2db}} Project issues receive attention from contributors and are resolved relatively quickly. Documentation is provided on a separate page; it is quite extensive and covers a lot of areas. Examples along with tests are available in the repository. The framework supports multiple .NET versions, including .NET Framework, .NET Standard, and .NET 6.
 
 \afterpage{
 \begin{landscape}
@@ -338,6 +334,12 @@ The LINQ to DB framework is open-source and provided under the MIT license.\foot
 \end{table}
 \end{landscape}
 }
+
+Some additional tooling is provided. Scaffolding database schema to generate entities and mapping is possible with a \acrshort{cli} tool. The library offers extendibility through exposed interceptor interfaces, which allow modifying behavior in different stages of querying. Support for profiling using MiniProfiler\footnote{\url{https://github.com/MiniProfiler/dotnet}} is also explicitly provided and described.
+LINQ to DB can be used alongside Entity Framework Core to extend its \acrshort{linq} to \acrshort{sql} translation capabilities. This is enabled using an official extension built into this library.
+
+The LINQ to DB framework is open-source and provided under the MIT license.\footnote{\url{https://github.com/linq2db/linq2db/blob/master/MIT-LICENSE.txt}} It is distributed via GitHub\footnote{\url{https://github.com/linq2db/linq2db}} and NuGet.\footnote{\url{https://www.nuget.org/packages/linq2db}} The last released version is 5.4.1 in April 2024, although major version 6 is currently being released under previews. The package was downloaded 17 million times in total, with almost 5 million downloads in the last year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=linq2db}} Project issues receive attention from contributors and are resolved relatively quickly. Documentation is provided on a separate page; it is quite extensive and covers a lot of areas. Examples along with tests are available in the repository. The framework supports multiple .NET versions, including .NET Framework, .NET Standard, and .NET 6.
+
 
 
 \subsection{NHibernate}
