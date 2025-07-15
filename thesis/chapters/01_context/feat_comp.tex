@@ -1,9 +1,9 @@
 \section{Feature comparison}
-We will start with gathering sources for each \acrshort{orm} -- links to documentation, repository, and package managers. We will give each framework a short introduction, mainly based on what each framework's documentation promises. We will follow with distribution, licensing, and version info. To get an idea of relevancy, we will check development cycles, community forums, and tool support. Then we will move onto more technical areas. We are interested in database system support and configuration, as well as how each \acrshort{orm} handles entity and relationship mapping and various aspects of database operations.
+The process begins by gathering sources for each \acrshort{orm}, including links to documentation, repositories, and package managers. Each framework is briefly introduced, primarily based on claims made in its official documentation. This is followed by an overview of distribution channels, licensing, and versioning information. To assess relevancy, development activity, community engagement, and available tool support are reviewed. The focus then shifts to more technical aspects, such as supported database systems and configuration options, as well as how each \acrshort{orm} handles entity and relationship mapping and various aspects of database operations.
 
-In the context of the .NET ecosystem, we are interested in supported versions, hence we only list versions specifically targeted by the package. But as we have already discussed, .NET packages are usually backward and forward compatible. And the .NET Standard allows targeting both .NET Framework and Core.
+In the context of the .NET ecosystem, the focus is placed on supported versions. Therefore, only versions explicitly targeted by the package are listed. However, as previously discussed, .NET packages typically maintain both backward and forward compatibility, and the use of .NET Standard enables targeting both .NET Framework and .NET Core.
 
-Amount of downloads can help us assess usage. The amount of downloads will be obtained from the respective NuGet package page. Download counts are collected by NuGet Trends website.\footnote{\url{https://nugettrends.com/}} Yearly downloads will be from the period between 30th June 2024 and 29th June 2025.
+To help assess usage, download counts are considered. These figures are obtained from the respective NuGet package pages, with aggregate counts sourced from the NuGet Trends website.\footnote{\url{https://nugettrends.com/}} Yearly downloads reflect the period between 30th June 2024 and 29th June 2025.
 
 \subsection{Dapper}
 \label{sec:feat_dapper}
@@ -16,7 +16,7 @@ Entity mapping in Dapper is handled by matching the names of query result column
 
 \begin{example}
 \small
-This code example~\cite{DapperRepo} showcases an entity and a query returning one instance. Properties are matched and filled by names, the rest remain empty.
+This code example from the Dapper repository\footnote{\url{https://github.com/DapperLib/Dapper?tab=readme-ov-file\#execute-a-query-and-map-it-to-a-list-of-typed-objects}} showcases an entity and a query returning one instance. Properties are matched and filled by name, the rest remain empty.
 \qed
 
 \begin{lstlisting}[language=CSharp]
@@ -37,7 +37,7 @@ var dog = connection.Query<Dog>("select Age = @Age, Id = @Id", new { Age = (int?
 
 \begin{example}
 \small
-In this example, each post is connected to its owner. The lambda function in \texttt{Query} methods specifies how to connect the entities. Users are likely duplicated for each post. Overall, this is just a simplification of the manual handling of the data, and overhead is still present. Real use cases could be more complex and inefficient.
+In this example from the same repository\footnote{\url{https://github.com/DapperLib/Dapper?tab=readme-ov-file\#multi-mapping}}, each post is connected to its owner. The lambda function in \texttt{Query} methods specifies how to connect the entities. Users are likely duplicated for each post. Overall, this is just a simplification of the manual handling of the data, and overhead is still present. Real use cases could be more complex and inefficient.
 \qed
 
 \begin{lstlisting}[language=CSharp]
@@ -209,7 +209,7 @@ The main focus of RepoDB is abstracting \acrshort{sql}. However, \acrshort{linq}
 
 Transactions are supported through ADO.NET. Application-level cache is supported in-memory, with options for custom providers. Database schema and queries are also cached, speeding up subsequent queries. The library offers a wide variety of interfaces for extension. One example can be query tracing and logging, which is provided by default but can be easily added. While the library provides asynchronous methods, there is no mention of them in the documentation. More advanced features such as change tracking, data seeding, or migration support are not provided. The \acrshort{orm} also focuses on providing the user with the implementation of common repository and unit of work patterns.
 
-The project is open-source and distributed under Apache 2.0 license\footnote{\url{https://github.com/mikependon/RepoDB/blob/master/LICENSE.txt}} on GitHub\footnote{\url{https://github.com/mikependon/RepoDB}} and NuGet.\footnote{\url{https://www.nuget.org/packages/repodb}} With the latest version 1.13.1 released in March 2023, the updates are infrequent. The development is currently paused as per the author's comment~\cite{PendonRepoDBComment}. The project has over 1.9 million total downloads, approximately half a million of those gained in the past year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=RepoDb}} .NET versions 7 and Standard are targeted. The documentation is hosted on a separate website~\cite{RepoDB}. It provides several tutorials and widely describes available classes and \acrshort{api}(s). However, it mostly reads as developer documentation; contextual explanations and longer examples are missing. Missing examples can be substituted by extensive unit and integration tests available in the repository. No extensions are provided, except those for specific database systems we have already discussed.
+The project is open-source and distributed under Apache 2.0 license\footnote{\url{https://github.com/mikependon/RepoDB/blob/master/LICENSE.txt}} on GitHub\footnote{\url{https://github.com/mikependon/RepoDB}} and NuGet.\footnote{\url{https://www.nuget.org/packages/repodb}} With the latest version 1.13.1 released in March 2023, the updates are infrequent. The development is currently paused as per the author's comment~\cite{PendonRepoDBComment}. The project has over 1.9 million total downloads, approximately half a million of those gained in the past year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=RepoDb}} .NET versions 7 and Standard are targeted. The documentation is hosted on a separate website~\cite{RepoDB}. It provides several tutorials and widely describes available classes and \acrshort{api}(s). However, it mostly reads as developer documentation; contextual explanations and longer examples are missing. Missing examples can be substituted by extensive unit and integration tests available in the repository. No extensions are provided, except those for specific database systems already discussed.
 
 
 \afterpage{
@@ -260,7 +260,7 @@ The project is open-source and distributed under Apache 2.0 license\footnote{\ur
 
 LINQ to DB~\cite{linq2db, linq2dbRepo}, alternatively linq2db, is an \acrshort{orm} that focuses primarily on offering a type-safe layer above \acrshort{sql} through \acrshort{linq}. Statically typed, compiler-checked queries are a huge benefit for bigger projects and allow easier refactoring. It supports extensive entity and relationship mapping and should offer the best performance in terms of querying through \acrshort{linq}. Relative to that focus, it does not offer features expected from full-fledged macro \acrshort{orm}(s). There is no change tracking or caching with this framework.
 
-LINQ to DB is compatible with a big range of database systems, e.g., \acrshort{mssql}, MySQL, Oracle, PostgreSQL, MS Access, SQLite, and even less common ones like SAP HANA,\footnote{\url{https://www.sap.com/products/data-cloud/hana/what-is-sap-hana.html}} ClickHouse,\footnote{\url{https://clickhouse.com/}}. Database schema must be handled by the developer, but entity generation from the database is available. Configuration is fairly simple through the \texttt{DataConnection} object. This object can be inherited from, allowing us to configure a wide set of options, including entity mapping. Mapping can be done using fluent methods using the aforementioned object. Another option is attributes on the entity class and properties. Convention-based and automatic mapping is also an option. All multiplicities of relationships are configurable, although the documentation provides limited information on this topic. 
+LINQ to DB is compatible with a big range of database systems, e.g., \acrshort{mssql}, MySQL, Oracle, PostgreSQL, MS Access, SQLite, and even less common ones like SAP HANA,\footnote{\url{https://www.sap.com/products/data-cloud/hana/what-is-sap-hana.html}} ClickHouse,\footnote{\url{https://clickhouse.com/}}. Database schema must be handled by the developer, but entity generation from the database is available. Configuration is fairly simple through the \texttt{DataConnection} object. This object can be inherited from, allowing configuration of a wide set of options, including entity mapping. Mapping can be done using fluent methods using the aforementioned object. Another option is attributes on the entity class and properties. Convention-based and automatic mapping is also an option. All multiplicities of relationships are configurable, although the documentation provides limited information on this topic.\footnote{\url{https://linq2db.github.io/index.html\#configuration-using-mapping-attributes}}
 
 \begin{example}
 \small
@@ -399,7 +399,7 @@ As both NHibernate and .NET developed over the years, new forms of querying coul
 
 \begin{example}
 \small
-This example~\cite{nhibernate} shows a difference between Criteria and \acrshort{linq} queries. Criteria queries were introduced before .NET had support for \acrshort{linq}. We can see the evolution from building a query object using expression builders to extension functions that retain the entity type information and statically typed lambda expressions over them. 
+This example~\cite{nhibernate} shows a difference between Criteria and \acrshort{linq} queries. Criteria queries were introduced prior to native \acrshort{linq} support in .NET. The example demonstrates the evolution from constructing query objects with expression builders to using extension methods that preserve entity type information and enable statically typed lambda expressions.
 \qed
 
 \begin{lstlisting}[language=CSharp]
@@ -554,7 +554,7 @@ The \acrshort{orm} is distributed under the MIT license\footnote{\url{https://gi
 }
 
 \subsection{Entity Framework 6}
-Entity Framework 6~\cite{ef6,ef6Repo} is a stable \acrshort{orm} developed by Microsoft with a long history. While it continues to receive security updates, no new features are being added. Since \acrshort{ef} Core builds upon \acrshort{ef}6, we focus on highlighting notable differences only.
+Entity Framework 6~\cite{ef6,ef6Repo} is a stable \acrshort{orm} developed by Microsoft with a long history. While it continues to receive security updates, no new features are being added. Since \acrshort{ef} Core builds upon \acrshort{ef}6, only notable differences are highlighted.
 
 \acrshort{ef}6 is available under the MIT license\footnote{\url{https://github.com/dotnet/ef6/blob/main/LICENSE.txt}} and distributed via GitHub\footnote{\url{https://github.com/dotnet/ef6}} and NuGet.\footnote{\url{https://www.nuget.org/packages/EntityFramework/}} In earlier versions, it was directly integrated into the .NET standard library. Over its lifespan, it has accumulated over 336 million downloads, with 60 million in the past year alone.\footnote{\url{https://nugettrends.com/packages?months=72&ids=EntityFramework}} With the third highest download count, it indicates significant usage in legacy projects.
 

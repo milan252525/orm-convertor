@@ -34,7 +34,7 @@
 }
 
 @misc{Fowler2003POJO,
-  author = {Martin Fowler},
+  author = {Fowler, Martin},
   title = {{POJO}},
   year = {2003},
   howpublished = {\url{https://martinfowler.com/bliki/POJO.html}},
@@ -42,7 +42,7 @@
 }
 
 @misc{FowlerDDD,
-  author = {Martin Fowler},
+  author = {Fowler, Martin},
   title = {{Domen Driven Design}},
   year = {2020},
   howpublished = {\url{https://martinfowler.com/bliki/DomainDrivenDesign.html}},
@@ -50,7 +50,7 @@
 }
 
 @misc{FowlerUOW,
-  author = {Martin Fowler},
+  author = {Fowler, Martin},
   title = {{Unit of Work}},
   year = {2003},
   howpublished = {\url{https://martinfowler.com/eaaCatalog/unitOfWork.html}},
@@ -89,12 +89,14 @@
   note = {Accessed: 10-03-2025},
 }
 
-@misc{ADONET,
-    author = {{Microsoft Corporation}},
-    title = {ADO.NET Overview},
-    howpublished = {\url{https://learn.microsoft.com/en-us/dotnet/framework/data/adonet/ado-net-overview}},
-    note = {Accessed 11-06-2025},
-    year = {2025},
+@online{shapovalov2024micro,
+  author  = {Shapovalov, Alex},
+  title   = {Micro ORM vs ORM},
+  year    = {2024},
+  month   = sep,
+  url     = {https://yaplex.com/micro-orm-vs-orm/},
+  urldate = {2025-07-14},
+  note    = {Blog post on Yaplex, last updated September 30, 2024}
 }
 
 @misc{Dapper,
@@ -121,30 +123,6 @@
     year = {2025}
 }
 
-@misc{NETversions,
-    author = {{Microsoft Corporation}},
-    title = {{.NET} and {.NET} {C}ore Support Policy},
-    howpublished = {\url{https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core}},
-    note = {Accessed 10-03-2025}},
-    year = {2025}
-}
-
-@misc{NETFrameworkVersions,
-    author = {{Microsoft Corporation}},
-    title = {What is {.NET} Framework?},
-    howpublished = {\url{https://dotnet.microsoft.com/en-us/learn/dotnet/what-is-dotnet-framework}},
-    note = {Accessed: 11-06-2025},
-    year = {2025}
-}
-
-@misc{NETStandard,
-    author = {{Microsoft Corporation}},
-    title = {{.NET} Standard},
-    howpublished = {\url{https://dotnet.microsoft.com/en-us/platform/dotnet-standard}},
-    note = {Accessed: 11-06-2025},
-    year = {2025}
-}
-
 @misc{DapperRepo,
     author = {DapperLib},
     title = {DapperLib/Dapper: Dapper - a simple object mapper for .Net},
@@ -160,21 +138,21 @@
 }
 
 @misc{RepoDB,
-    author = {Michael Camara Pendon},
+    author = {Camara Pendon, Michael},
     title = {RepodDB},
     howpublished = {\url{https://repodb.net/}},
     year = {2025}
 }
 
 @misc{RepoDBRepo,
-    author = {Michael Camara Pendon},
+    author = {Camara Pendon, Michael},
     title = {mikependon/RepoDB: A hybrid ORM library for .NET.},
     howpublished = {\url{https://github.com/mikependon/RepoDB}},
     year = {2025}
 }
 
 @misc{PendonRepoDBComment,
-  author = {Michael Camara Pendon},
+  author = {Camara Pendon, Michael},
   title = {Comment on issue \#1200 in mikependon/RepoDB},
   howpublished = {\url{https://github.com/mikependon/RepoDB/issues/1200\#issuecomment-2703682584}},
   note = {Accessed: 24-06-2025},
@@ -266,7 +244,8 @@
 
 
 
-% related work
+% RELATED WORK
+
 @inproceedings{text-to-sql-irnet,
     title = "Towards Complex Text-to-{SQL} in Cross-Domain Database with Intermediate Representation",
     author = "Guo, Jiaqi  and
@@ -451,4 +430,41 @@ pages        = {831--834}
     keywords = {multi-objective genetic algorithm, object-relational mapping performance, performance configuration optimization},
     location = {Delft, The Netherlands},
     series = {ICPE '16}
+}
+
+@article{orm_comp_postgre,
+    title         = {Performance Analysis of Object-Relational Mapping (ORM) Tools in .Net 6 Environment},
+    journal       = {Bili\c{s}im Teknolojileri Dergisi},
+    volume        = {15},
+    pages         = {453–465},
+    year          = {2022},
+    doi           = {10.17671/gazibtd.1059516},
+    author        = {G\"{u}vercin, Abdullah Eren and Avenoglu, Bilgin},
+    keywords      = {ORM, .net 6, dapper, nhibernate, entity framework core},
+    number        = {4},
+    publisher     = {Gazi University}
+}
+
+@article{orm_comp_2020,
+    author = {Zmaranda, Doina and Pop-Fele, Lucian-Laurentiu and Győrödi, Cornelia and Gyorodi, Robert and Pecherle, George},
+    year = {2020},
+    month = {01},
+    pages = {},
+    title = {Performance Comparison of CRUD Methods using NET Object Relational Mappers: A Case Study},
+    volume = {11},
+    journal = {International Journal of Advanced Computer Science and Applications},
+    doi = {10.14569/IJACSA.2020.0110107}
+}
+
+@bachelorsthesis{myllyahoforsberg2022orm,
+  author       = {Myllyaho Forsberg, Maximilian},
+  title        = {An evaluation of .NET Object-Relational Mappers in relational databases: Entity Framework Core and Dapper},
+  school       = {Umeå University, Department of Computing Science},
+  type         = {Bachelor’s thesis},
+  year         = {2022},
+  address      = {Umeå, Sweden},
+  pages        = {21},
+  series       = {UMNAD},
+  number       = {1361},
+  url          = {https://urn.kb.se/resolve?urn=urn:nbn:se:umu:diva-198651}
 }

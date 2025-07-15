@@ -1,28 +1,30 @@
-\chapter{Related work}
-% zatím náhodné nezpracované pořadí
+\chapter{Related work}\label{chapter:related_work}
+Including an \acrshort{orm} into an application with database access can significantly reduce the amount of code written and, in certain cases, improve access time~\cite{optimizatio_code_lines_time}. However, such speedup depends on selecting an appropriate framework and deep domain knowledge. Multiple analyses have been conducted in the past to guide this selection.
 
-% two visual entity modelling tools exist, allowing export to multiple .NET ORMs
-% https://www.devart.com/entitydeveloper/features.html
-% https://www.llblgen.com/
-% oboje komerčně licencované - má cenu uvádět?
+A performance evaluation conducted in 2020 over a PostgreSQL database~\cite{orm_comp_postgre} identified Dapper as the most efficient framework in terms of resource usage, outperforming both \acrshort{efcore} and NHibernate. Nevertheless, the authors also noted Dapper's limited feature set, suggesting that \acrshort{efcore} would be more suitable when a full-featured \acrshort{orm} is necessary. The findings align with the conclusions reached in our comparison.
+
+Another study~\cite{myllyahoforsberg2022orm} from 2022 assessed Dapper and \acrfull{efcore} over Microsoft SQL database. This comparison not only analyzed resource allocation but also considered aspects of code complexity, such as cyclomatic complexity\footnote{\url{https://learn.microsoft.com/en-us/visualstudio/code-quality/code-metrics-cyclomatic-complexity}} and lines of code. The authors concluded by recommending Dapper for performance and \acrshort{efcore} for development efficiency, aligning with our findings.
+
+An older comparison~\cite{orm_comp_2020} examined the same three frameworks over Microsoft SQL Server but did not reach a definitive conclusion. Instead, the authors advised selecting different frameworks based on specific operation types. However, since their analysis was based on framework versions from approximately 2018, rapid advancements, especially within \acrshort{efcore}, limit its relevance today. Furthermore, the use of default configurations, including caching and lazy loading without consistent alignment across frameworks, could have influenced the outcome.
+
+% pokud by bylo potřeba více, případně 2013 ve slovenštině - https://is.muni.cz/th/jnyd5/Stach_Tomas_-_DP.pdf, ale je to zastaralé
+
+To the best of our knowledge, no other recent research has performed a comparison of .NET \acrshort{orm}s on the scale presented in this work. Specifically, PetaPoco, RepoDB, and LINQ To DB have not been previously evaluated. In particular, a systematic evaluation of more than twenty read queries across seven frameworks has not been previously conducted.
+
+Even after selecting an optimal \acrshort{orm}, performance limitations remain a known and longstanding issue~\cite{survey_hule_ranawat_2023}. Various methods for addressing these limitations have been explored, including parallelization~\cite{orm_parallel}, optimizing \acrshort{orm} configuration through multi-objective genetic algorithms~\cite{orm_configuration_optimization} or adapting queries by automatically selecting necessary columns and applying join elimination~\cite{quartarone2020adaptive}. Another performance enhancement strategy involves predicting future queries and prefetching results~\cite{prefetching}.
+% případně lze vyvinout vlastní ORM - https://www.sciencedirect.com/science/article/pii/S2405896319327107
+
+Combining multiple \acrshort{orm}s within a single application presents an alternative approach, one that our work explores by proposing an automated advisor to select the most suitable frameworks. 
+
+Improved performance might also be achieved through modifications to the database schema. Certain data may not be suitable for relational databases, making a multi-model schema potentially a better solution for diverse data. 
+
+To address the complexities associated with managing multi-model databases and ensuring consistency, a set of tools has been developed. MM-evocat~\cite{mm_evocat} supports schema evolution over multi-model databases using an abstract representation based on category theory. MM-quecat~\cite{mm_quecat} leverages this representation to provide a unified query language over multi-model data, while MM-evoque~\cite{mm_evoque} ensures that schema changes are propagated across all database queries. 
+
+When it comes to translation between different \acrshort{orm}s, an approach using artificial intelligence could be investigated. The area has seen recent progress in improved code-writing capabilities~\cite{evaluatingllms} of \acrlong{llm}s. \acrshort{llm}s\cite{transagentllm} and unsupervised machine translation~\cite{translation_unsupervised} have been used for translation across different programming languages in addition to .
+
+Deep learning methods have also been extensively studied~\cite{text-to-sql-survey} for translating natural language into \acrshort{sql} queries. Tools such as IRNet~\cite{text-to-sql-irnet} or RAT-SQL~\cite{text-to-sql-rat} demonstrate capability in generating queries directly from user input.
 
 
-Adding \acrshort{orm} into an application with database access can significantly reduce the amount of code written and, in some cases, even speed up access time~\cite{optimizatio_code_lines_time}. However, the speed-up depends on correct framework selection and in-depth knowledge. Performance limitations in \acrshort{orm} are a known and longstanding issue~\cite{survey_hule_ranawat_2023}. There are several ways to improve performance ...
-
-improvements: % todo convert to text
-- parallelization~\cite{orm_parallel}
-- predictions of future queries and prefetching~\cite{prefetching} % bez orm
-- adapting the query on ORM level by choosing necessary columns automatically and join elimination - optimization~\cite{quartarone2020adaptive}
-- optimizing \acrshort{orm} configuration itself by employing a multi-objective genetic algorithm~\cite{orm_configuration_optimization}
-
-
-With the recent progress in the area of large language models and their improving code-writing capabilities~\cite{evaluatingllms}, utilizing them for \acrshort{orm} translation could be attempted.
-This approach has been applied on different programming languages using unsupervised machine translation~\cite{translation_unsupervised} or \acrshort{llm}s~\cite{transagentllm}.
-
-Deep learning methods have been explored~\cite{text-to-sql-survey} in the area of translating natural language into \acrshort{sql} queries. Tools such as IRNet~\cite{text-to-sql-irnet} or RAT-SQL~\cite{text-to-sql-rat} are able to generate queries from user input.
-
-
-% Transformations on the DB side
-Combining various \acrshort{orm}s in a single application can improve performance over a singular database system. Better performance might also be achieved by modifying the database schema. Some data may not be suitable for relational databases, and a multi-model schema may provide a better solution for diverse data. 
-
-To address the challenges of managing multi-model databases and ensure consistency, a set of tools has been developed. MM-evocat~\cite{mm_evocat} supports schema evolution over multi-model databases using an abstract representation built on category theory. MM-quecat~\cite{mm_quecat} utilizes the representation to provide a unified query language over multi-model data, and MM-evoque~\cite{mm_evoque} ensures schema changes are propagated to all database queries. 
+% kdyby bylo potřeba prodloužit ještě jsem našel:
+% https://arxiv.org/abs/2403.09060 - Query Rewriting via Large Language Models
+% https://arxiv.org/abs/2401.02115 - Using LLM to select the right SQL Query from candidate
