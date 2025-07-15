@@ -26,3 +26,5 @@ For Linux:
 npm install
 ng build --configuration "production" --base-href "/orm/" --deploy-url "/orm/" && rm -rf "../wwwroot" && mkdir "../wwwroot" && cp -r dist/browser/* ../wwwroot/
 ```
+
+The frontend is served by the backend application, there is no need to initialize it separately.

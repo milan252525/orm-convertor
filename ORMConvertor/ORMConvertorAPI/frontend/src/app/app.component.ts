@@ -54,8 +54,8 @@ export class AppComponent implements OnInit {
   ormTypeEnum = ORMType;
   contentTypeEnum = ContentType;
 
-  sourceOrm: ORMType = ORMType.NHibernate;
-  targetOrm: ORMType = ORMType.NHibernate;
+  sourceOrm: ORMType = ORMType.EFCore;
+  targetOrm: ORMType = ORMType.Dapper;
   text = "";
   result = "";
   error = "";
