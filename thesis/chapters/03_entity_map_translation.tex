@@ -15,7 +15,7 @@ Beginning, with the entity, at its core, it is a plain C\# class composed of pro
 
 And of course, a table rarely exists in isolation. In a relational model, it is typically connected to others through defined relationships. The mapping must at least capture primary and foreign keys to allow proper navigation. More complex associations often require further configuration. An \acrshort{orm} may need to know which side owns the relationship, how cascading behaviour is handled, or how orphaned entities are treated.
 
-It is worth noting that features operating purely on the database side such as indexes, triggers, or computed columns are generally outside the scope of entity mapping. Some \acrshort{orm}(s) allow limited representation of those features, but they are not considered in the abstraction.
+It is worth noting that features operating purely on the database side such as indexes, triggers, or computed columns are generally outside the scope of entity mapping. Some \acrshort{orm}(s)\footnote{\url{https://learn.microsoft.com/en-us/ef/core/modeling/indexes}, \url{https://learn.microsoft.com/en-us/ef/core/modeling/generated-properties}} allow limited representation of those features, but they are not considered in the abstraction.
 
 The Table~\ref{tab:entity_mapping} is a result of framework examination in Chapter~\ref{chapter:ormcomparison}. First, important parts of entity mapping were identified, each represented by a table row. Each column depicts a different \acrshort{orm} and how the specific mapping is implemented. All possible mapping formats are not considered, and those selected in Section~\ref{sec:perf_eval} are used. 
 
@@ -40,7 +40,7 @@ From the table rows, it is evident that the most important mapping concepts incl
 >{\arraybackslash}p{35.00mm}
 }
 \toprule
-  &    \textbf{Dapper}\newline no mapping &  \textbf{PetaPoco} \newline attribute mapping &    \textbf{RepoDB} \newline attribute mapping &   \textbf{LINQ to DB} \newline fluent mapping & \textbf{NHibernate} \newline XML file mapping  &   \textbf{EF Core} \newline attribute mapping \\
+  &    \textbf{Dapper}\newline no mapping &  \textbf{PetaPoco} \newline attribute mapping &    \textbf{RepoDB} \newline attribute mapping &   \textbf{LINQ to DB} \newline fluent mapping & \textbf{NHibernate} \newline \acrshort{xml} file mapping  &   \textbf{EF Core} \newline attribute mapping \\
 \midrule
 \textbf{Primary key}  & - & \texttt{[PrimaryKey]} on class & \texttt{[Primary]} on property & HasPrimaryKey() & \texttt{<id name="OrderID" column="" type="">\ldots</id>} & \texttt{[Key]} on property \\
 
@@ -66,13 +66,13 @@ From the table rows, it is evident that the most important mapping concepts incl
 \textbf{Nullability} & derived from property & derived from property & \texttt{[IsNullable(true)]} & \texttt{.IsNullable()} & \texttt{not-null="false"} & derived from property \\
 
 %\midrule
-\textbf{One-to-one} & – \newline (join + \texttt{splitOn}) & – \newline (join + \texttt{Fetch<T1,T2>}) & – \newline (\texttt{QueryMultiple}) & \texttt{.Association()} and mapped keys & \texttt{<bag> <key column=""/> <one-to-one class="" column=""/> </bag>} & mapped keys and derived from property type \\
+\textbf{One-to-one} & – \newline (join + \texttt{splitOn}) & – \newline (join + \texttt{Fetch<T1,T2>}) & – \newline (\texttt{QueryMultiple}) & \texttt{.Association()} \newline and mapped keys & \texttt{<bag> <key column=""/> <one-to-one class="" column=""/> </bag>} & mapped keys and derived from property type \\
 
 %\midrule
-\textbf{One-to-many} & – \newline (join + \texttt{splitOn}) & – \newline (join + \texttt{Fetch<T1,T2>}) & – \newline (\texttt{QueryMultiple}) & \texttt{.Association()} and mapped keys & \texttt{<bag> <key column=""/> <one-to-many class="" column=""/> </bag>} & mapped keys and derived from property type \\
+\textbf{One-to-many} & – \newline (join + \texttt{splitOn}) & – \newline (join + \texttt{Fetch<T1,T2>}) & – \newline (\texttt{QueryMultiple}) & \texttt{.Association()} \newline and mapped keys & \texttt{<bag> <key column=""/> <one-to-many class="" column=""/> </bag>} & mapped keys and derived from property type \\
 
 %\midrule
-\textbf{Many-to-many} & – \newline (join + \texttt{splitOn}) & – \newline (join + \texttt{Fetch<T1,T2>}) & – \newline (raw SQL + in memory) & \texttt{.Association()} and mapped keys  & \texttt{<bag> <key column=""/> <many-to-many class="" column=""/> </bag>} & fluent join-table definition:\newline\texttt{UsingEntity("", l => l.$\cdots$, r => r.$\cdots$)} \\
+\textbf{Many-to-many} & – \newline (join + \texttt{splitOn}) & – \newline (join + \texttt{Fetch<T1,T2>}) & – \newline (raw SQL + in memory) & \texttt{.Association()} \newline and mapped keys  & \texttt{<bag> <key column=""/> <many-to-many class="" column=""/> </bag>} & fluent join-table definition:\newline\texttt{UsingEntity("", l => l.$\cdots$, r => r.$\cdots$)} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -96,7 +96,7 @@ Type information is extracted into the \texttt{CLRType} class (\acrshort{clr} re
 
 Additional classes must be introduced for database mapping purposes. At the core of data mapping representation is the \texttt{EntityMap} class, which acts as the primary container linking an entity class to a specific database table, namely schema and table names. Each entity property is mapped separately to its corresponding database column through the class \texttt{PropertyMap}, which stores details such as column name and its associated database data type.
 
-When an entity property represents a foreign key, additional details about the cardinality and the target entity of the relationship must also be stored. These details are explicitly handled by the \texttt{Relationship} class. Additionally, the more complex features of column mapping, such as type constraints and other specialized attributes, are represented using the flexible \texttt{DatabaseProperty} class. This class maintains information in key-value pairs. For example, a decimal property type like \texttt{DECIMAL(15,8)} would be represented by  keys `Precision' and `Scale', holding values 15 and 8, respectively. And the base type `decimal' would go under \texttt{database type}. 
+When an entity property represents a foreign key, additional details about the cardinality and the target entity of the relationship must also be stored. These details are explicitly handled by the \texttt{Relationship} class. Additionally, the more complex features of column mapping, such as type constraints and other specialized attributes, are represented using the flexible \texttt{DatabaseProperty} class. This class maintains information in key-value pairs. For example, a decimal property type like \texttt{DECIMAL(15,8)} would be represented by  keys ``Precision'' and ``Scale'', holding values 15 and 8, respectively. And the base type ``decimal'' would go under \texttt{database type}. 
 
 %The relationship between EntityMap and Entity has $1 \rightarrow 1$ multiplicity, but it could be modified to $1 \rightarrow *$ in the rare case of one entity mapping multiple tables.
 
@@ -132,13 +132,13 @@ To define relationships, two methods are available for handling primary and fore
 All these methods are implemented in the \texttt{AbstractEntityBuilder} and their only purpose is to build the intermediate representation. They are \acrshort{orm} framework-independent, have no other dependencies, and perform no unrelated logic. It can be assumed the builder can handle repeated method calls, merging new metadata with the existing representation, to support multiple (potentially parallel) parsers. 
 
 %TODO a separate section?
-
+\paragraph{Abstract Methods.}
 To translate the intermediate representation into target code or a different format, the builder exposes a set of abstract methods. The main one being \texttt{\textbf{Build}}, which is the only public method, and the translation tool can call it to begin the build phase. Its purpose is to orchestrate the build -- by calling other abstract methods in the appropriate order and collecting the generated sources. The order of the abstract methods might be important in some frameworks, while irrelevant to others. Some frameworks might even skip any of these methods.
 
 The exact implementation and purpose of the other abstract methods depend on the target framework and the developer. However, they follow a shared logical structure aligned with the general flow of the entity and mapping generation, and should serve similar roles. 
 
 The builder typically starts with \texttt{\textbf{BuildImports}}, generating required library imports and optionally the namespace declaration. Then, \texttt{\textbf{BuildTableSchema}} can begin the class definition, attaching it to the respective database schema and table. 
-Next, \texttt{\textbf{BuildProperties}} handles the declaration of all properties along with their associated column mappings. Some frameworks, e.g., \acrshort{efcore}, combine these into a single class, while others, such as, NHibernate, separate them across different files. The implementation must accommodate such differences accordingly.
+Next, \texttt{\textbf{BuildProperties}} handles the declaration of all properties along with their associated column mappings. Some frameworks, e.g., \acrshort{ef} Core, combine these into a single class, while others, such as, NHibernate, separate them across different files. The implementation must accommodate such differences accordingly.
 
 The \texttt{\textbf{BuildPrimaryKey}} and \texttt{\textbf{BuildForeignKey}} methods generate the necessary metadata and mapping declarations for primary and foreign keys, including any relationship details.
 Finally, \texttt{\textbf{FinalizeBuild}} is responsible for closing the class or mapping definition and performing any remaining clean-up or finalization.
@@ -343,7 +343,7 @@ This set of algorithms showcases a single parser responsible for both entity str
  % In case some information was not available---the source framework lacked mapping or perhaps did not even support it---the builder can make database calls for corresponding metadata. This is visualized in \autoref{fig:translation_complete}. In the center of the diagram, the entity builder is in the building phase. In the now completed intermediate representation, it lacks a data type of property that is mapped to string in the entity. With multiple possible database types, it performs SQL metadata query.
 \begin{example}
 \small
-To conclude the chapter, an illustration is provided showing how the previously defined abstractions, algorithms, and concepts combine into a complete translation process. Figure~\ref{fig:translation_complete} visualizes the conversion of an \acrshort{efcore} \texttt{Customer} entity to NHibernate. For simplicity, the example focuses on a minimal class with three properties.
+To conclude the chapter, an illustration is provided showing how the previously defined abstractions, algorithms, and concepts combine into a complete translation process. Figure~\ref{fig:translation_complete} visualizes the conversion of an \acrshort{ef} Core \texttt{Customer} entity to NHibernate. For simplicity, the example focuses on a minimal class with three properties.
 
 The process begins with the parser analyzing the input source code. It scans through the class definition, attributes, and properties, invoking the corresponding methods of \texttt{NHibernateEntityBuilder}. These method calls populate the internal intermediate representation. The parser operates without knowledge of the specific target format. It communicates only with the builder interface, ensuring full decoupling. As parsing completes, the builder holds a fully populated intermediate model, as illustrated in the center of the figure. 
 
@@ -358,7 +358,7 @@ Note that the example highlights an absence of a defined database type on the \t
 \begin{figure}[!htp]
   \centering
   \includegraphics[width=\textwidth]{thesis/img/thesis/03_parsing_building.drawio.pdf}
-  \caption{Translation of \acrshort{efcore} entity mapping to NHibernate.}
+  \caption{Translation of \acrshort{ef} Core entity mapping to NHibernate.}
   \label{fig:translation_complete}
 \end{figure}
 

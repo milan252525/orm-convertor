@@ -111,7 +111,7 @@ The parser must be provided an entire method or a repository class to obtain suf
 
 \begin{example}
 \small
-This example demonstrates a simple repository class using \acrshort{efcore} with one method. 
+This example demonstrates a simple repository class using \acrshort{ef} Core with one method. 
 It could serve as an input to the translation tool. A method argument is captured in the query and used as a parameter.
 \qed
 \begin{lstlisting}[language=CSharp]
@@ -239,11 +239,11 @@ One query builder is passed among the functions, sequentially constructing the f
     $projections$ = $instructions$.OfType(ProjectInstruction)\;
 
     \If{\textup{$projections$.IsEmpty()}}{
-        $sb$.AppendLine(`SELECT *')\;
+        $sb$.AppendLine(``SELECT *'')\;
         \return
     }
 
-    $sb$.Append(`SELECT')\;
+    $sb$.Append(``SELECT'')\;
     \ForEach{\textup{$proj$ in $projections$}}{
         $sb$.Append($proj$.Accept(visitor))\;
     }
@@ -269,7 +269,7 @@ One query builder is passed among the functions, sequentially constructing the f
         \return
     }
 
-    $sb$.Append(`WHERE')\;
+    $sb$.Append(``WHERE'')\;
     $andNode$ = new AndOperandNode\;
     \ForEach{\textup{$sel$ in $projections$}}{
         $andNode$.AddChild($sel$.ConditionTree)\;
@@ -352,7 +352,7 @@ Algorithm~\ref{alg:query_parser_where} illustrates a visitor for the selection m
     \tcp{Is this LINQ function for selection?}
     \Fn{\FCanVisit{$expressionSyntax$}}{
         $isMemberAccess$ = $expressionSyntax$.Expression is MemberAccessExpressionSyntax\;
-        $isWhere$ = $expressionSyntax$.Name.Identifier == `Where'\;
+        $isWhere$ = $expressionSyntax$.Name.Identifier == ``Where''\;
 
         \return $isMemberAccess$ and $isWhere$\;
     }
@@ -397,7 +397,7 @@ public:
     \tcp{Is this LINQ function for ordering?}
     \Fn{\FCanVisit{$expressionSyntax$}}{
         $isMemberAccess$ = $expressionSyntax$.Expression is MemberAccessExpressionSyntax\;
-        $isOrderBy$ = $expressionSyntax$.Name.Identifier in (`OrderBy', `OrderByDescending', `ThenBy', `ThenByDescending')\;
+        $isOrderBy$ = $expressionSyntax$.Name.Identifier in (``OrderBy'', ``OrderByDescending'', ``ThenBy'', ``ThenByDescending'')\;
 
         \return $isMemberAccess$ and $isOrderBy$\;
     }
@@ -418,7 +418,7 @@ public:
         $property$ = getPropertyFromExpression($lambdaBody$)\;
         $column$ = $parserContext$.EntityMap.GetColumnForProperty($entity$, $property$)\;
         \BlankLine
-        $isAsc$ = $expressionSyntax$.Identifier in (`OrderBy', `ThenBy')\;
+        $isAsc$ = $expressionSyntax$.Identifier in (``OrderBy'', ``ThenBy'')\;
         \BlankLine
         $parserContext$.QueryBuilder.OrderBy($table$, $column$, $isAsc$)\;
     }
@@ -433,7 +433,7 @@ public:
 %\FloatBarrier
 \begin{example}
 \small
-The established abstraction and algorithms enable the demonstration of the complete query translation workflow. Figure~\ref{fig:translation_complete_query} visualizes the conversion of an \acrshort{efcore} \texttt{linq} query into Dapper using \acrshort{sql}. The example query consists of two filter conditions followed by result sorting. For clarity, only the method containing the query is displayed. 
+The established abstraction and algorithms enable the demonstration of the complete query translation workflow. Figure~\ref{fig:translation_complete_query} visualizes the conversion of an \acrshort{ef} Core \texttt{linq} query into Dapper using \acrshort{sql}. The example query consists of two filter conditions followed by result sorting. For clarity, only the method containing the query is displayed. 
 
 The translation begins with the parser analyzing the query and converting each component into an intermediate representation. The example query is translated into three instructions.
 
@@ -446,7 +446,7 @@ In the following phase, the builder translates these intermediate instructions i
 \begin{figure}[!p]
   \centering
   \includegraphics[scale=1]{thesis/img/thesis/04_parsing_building_queries.drawio.pdf}
-  \caption{Translation of \acrshort{efcore} \acrshort{linq} query to \acrshort{sql} in Dapper.}
+  \caption{Translation of \acrshort{ef} Core \acrshort{linq} query to \acrshort{sql} in Dapper.}
   \label{fig:translation_complete_query}
 \end{figure}
 

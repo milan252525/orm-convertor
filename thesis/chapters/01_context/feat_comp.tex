@@ -8,7 +8,7 @@ To help assess usage, download counts are considered. These figures are obtained
 \subsection{Dapper}
 \label{sec:feat_dapper}
 
-Dapper~\cite{Dapper,DapperRepo} is an open-source micro \acrshort{orm} framework, originally developed by the team at Stack Overflow. It was created in response to the inefficiencies observed with LINQ to SQL, a predecessor of the Entity Framework (\acrshort{ef}), particularly under increasing traffic loads. Designed for performance and simplicity, Dapper functions as a lightweight wrapper around ADO.NET,\footnote{\url{https://learn.microsoft.com/en-gb/dotnet/framework/data/adonet/}} extending the \texttt{DbConnection} object with a set of additional methods to facilitate object mapping. Its primary focus lies in mapping \acrshort{sql} query results to .NET objects, and it does not offer built-in support for modelling relationships or managing database schemas.
+Dapper~\cite{Dapper,DapperRepo} is an open-source micro \acrshort{orm} framework, originally developed by the team at Stack Overflow. It was created in response to the inefficiencies observed with LINQ to SQL, a predecessor of the Entity Framework (\acrshort{ef}), particularly under increasing traffic loads. Designed for performance and simplicity, Dapper functions as a lightweight wrapper around ADO.NET,\footnote{\url{https://learn.microsoft.com/en-gb/dotnet/framework/data/adonet/}} extending the \texttt{DbConnection} object with a set of additional methods to facilitate object mapping. Its primary focus lies in mapping \acrshort{sql} query results to .NET objects, and it does not offer built-in support for modeling relationships or managing database schemas.
 
 The core strength of Dapper lies in minimal abstraction and high execution speed. Developers retain full control over \acrshort{sql} queries, which allows precise use of \acrshort{sql} dialect features specific to a given database system. Dapper is compatible with all \acrshort{dbms}(s) supported by ADO.NET, including Microsoft SQL Server,\footnote{\url{https://www.microsoft.com/en-gb/sql-server}} Oracle,\footnote{\url{https://www.oracle.com/database/}}  PostgreSQL,\footnote{\url{https://www.postgresql.org/}} and SQLite.\footnote{\url{https://sqlite.org/}} However, it delegates schema management entirely to the developer, as it does not provide mechanisms for schema versioning or migrations. Consequently, any changes to the database schema must be manually reflected in the \acrshort{sql} queries and the corresponding C\# entities.
 
@@ -56,23 +56,27 @@ Dapper does not include capabilities such as change tracking, data seeding, or q
 
 The project is distributed under the Apache 2.0 License\footnote{\url{https://github.com/DapperLib/Dapper/blob/main/License.txt}} and is freely available via GitHub\footnote{\url{https://github.com/DapperLib/Dapper}} and NuGet\footnote{\url{https://www.nuget.org/packages/dapper/}}. As of the latest release (version 2.1.66 in February 2025), Dapper has amassed over 496 million total downloads, with 144 million downloads in the past year alone.\footnote{\url{https://nugettrends.com/packages?months=72&ids=Dapper}} While the release cycle is not fixed, updates follow semantic versioning and are typically introduced in response to patches or new feature demands. The framework supports multiple .NET versions, including .NET Framework, .NET Standard, and .NET~8.
 
-In terms of community support, Dapper exhibits a healthy level of maintenance with active issue tracking and contributions. Although responses to GitHub issues may be delayed, many questions receive attention either from maintainers or the broader community, including the original authors. Documentation is primarily hosted on an external website, Learn Dapper,\footnote{\url{https://www.learndapper.com/}} which is maintained by a sponsor responsible for developing the commercial extension Dapper Plus.
+In terms of community support, Dapper exhibits a healthy level of maintenance with active issue tracking and contributions. Although responses to GitHub issues may be delayed, many questions receive attention either from maintainers or the broader community, including the original authors. Documentation is primarily hosted on an external website, Learn Dapper,\footnote{\url{https://www.learndapper.com/}} which is maintained by a sponsor responsible for developing the commercial extension Dapper Plus. All findings are summarized in Table~\ref{tab:comp_dapper}.
 
 \afterpage{
 \begin{landscape}
-\begin{table}[H]
+\begin{table}[p]
 \scriptsize
 \def\arraystretch{1.45}
 \centering
 \caption{Comparison overview of \acrshort{orm} framework: Dapper}
-\begin{tabular}{ll}
+\label{tab:comp_dapper}
+\begin{tabular}{
+>{\raggedright\arraybackslash}p{40.00mm}
+>{\arraybackslash}p{150.00mm}
+}
 \toprule
 \textbf{Property} & \textbf{Dapper} \\
 \midrule
 \textbf{Type} & Micro \acrshort{orm} for .NET \\
 \textbf{License} & Apache 2.0 \\
 \textbf{Cost} & Free; Dapper Plus is paid extension  \\
-\textbf{Sources} & \url{https://github.com/DapperLib/Dapper}, \url{https://www.nuget.org/packages/Dapper}, \url{https://www.learndapper.com} \\
+\textbf{Sources} & \url{https://github.com/DapperLib/Dapper} \newline \url{https://www.nuget.org/packages/Dapper} \newline \url{https://www.learndapper.com} \\
 \textbf{Latest version} & 2.1.66 (February 2025) \\
 \textbf{Supported .NET} & .NET Framework, .NET Standard, .NET 8 \\
 \textbf{\acrshort{orm} features} & Object mapping only; no relationship or collection support \\
@@ -137,25 +141,29 @@ No support for advanced data formats of collections is provided, with the except
 
 Queries executed by the framework can be inspected during debugging. Transactions are supported, including nested transactions if the underlying database system allows. However, bulk operations are not available. Asynchronous versions of all methods are also provided. Advanced capabilities such as versioning, change tracking, and data seeding are not provided. The only notable extension is an unofficial \texttt{PetaPoco.SqlKata}\footnote{\url{https://github.com/asherber/PetaPoco.SqlKata}}, which is a more extensive \acrshort{sql} builder than the native one.
 
-The library is distributed under the Apache 2.0 License\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/blob/development/LICENSE.txt}} and is open-sourced on GitHub\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco}} and NuGet.\footnote{\url{https://www.nuget.org/packages/PetaPoco.Compiled/}} PetaPoco was downloaded 1.8 million times in total, with 600 thousands in the last year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=PetaPoco.Compiled}} PetaPoco has been stagnating on major version 6 (6.0.683 in September 2024) for the past few years, with minor patches being done every few months in response to security patches or new feature demands. The library targets .NET Framework and Standard.
+The library is distributed under the Apache 2.0 License\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/blob/development/LICENSE.txt}} and is open-sourced on GitHub\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco}} and NuGet.\footnote{\url{https://www.nuget.org/packages/PetaPoco.Compiled/}} PetaPoco was downloaded 1.8 million times in total, with 600 thousand in the last year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=PetaPoco.Compiled}} PetaPoco has been stagnating on major version 6 (6.0.683 in September 2024) for the past few years, with minor patches being done every few months in response to security patches or new feature demands. The library targets .NET Framework and Standard.
 
-This \acrshort{orm} does not benefit from extensive community support, with the only extensive source of information being its GitHub wiki.\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/wiki}} Integration tests for most database systems are available and could be used for reference.
+This \acrshort{orm} does not benefit from extensive community support, with the only extensive source of information being its GitHub wiki.\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/wiki}} Integration tests for most database systems are available and could be used for reference. Table~\ref{tab:comp_petapoco} presents the summarized findings.
 
 \afterpage{
 \begin{landscape}
-\begin{table}[H]
+\begin{table}[p]
 \scriptsize
 \def\arraystretch{1.45}
 \centering
 \caption{Comparison overview of \acrshort{orm} framework: PetaPoco}
-\begin{tabular}{ll}
+\label{tab:comp_petapoco}
+\begin{tabular}{
+>{\raggedright\arraybackslash}p{40.00mm}
+>{\arraybackslash}p{150.00mm}
+}
 \toprule
 \textbf{Property} & \textbf{PetaPoco} \\
 \midrule
 \textbf{Type} & Micro \acrshort{orm} for .NET \\
 \textbf{License} & Apache 2.0 \\
 \textbf{Cost} & Free \\
-\textbf{Sources} & \url{https://github.com/CollaboratingPlatypus/PetaPoco}, \url{https://www.nuget.org/packages/PetaPoco.Compiled}  \\
+\textbf{Sources} & \url{https://github.com/CollaboratingPlatypus/PetaPoco} \newline \url{https://www.nuget.org/packages/PetaPoco.Compiled}  \\
 \textbf{Latest version} & 6.0.683 (September 2024) \\
 \textbf{Supported .NET} & .NET Framework, .NET Standard \\
 \textbf{\acrshort{orm} features} & Object mapping only; no relationship or collection support \\
@@ -209,24 +217,30 @@ The main focus of RepoDB is abstracting \acrshort{sql}. However, \acrshort{linq}
 
 Transactions are supported through ADO.NET. Application-level cache is supported in-memory, with options for custom providers. Database schema and queries are also cached, speeding up subsequent queries. The library offers a wide variety of interfaces for extension. One example can be query tracing and logging, which is provided by default but can be easily added. While the library provides asynchronous methods, there is no mention of them in the documentation. More advanced features such as change tracking, data seeding, or migration support are not provided. The \acrshort{orm} also focuses on providing the user with the implementation of common repository and unit of work patterns.
 
-The project is open-source and distributed under Apache 2.0 license\footnote{\url{https://github.com/mikependon/RepoDB/blob/master/LICENSE.txt}} on GitHub\footnote{\url{https://github.com/mikependon/RepoDB}} and NuGet.\footnote{\url{https://www.nuget.org/packages/repodb}} With the latest version 1.13.1 released in March 2023, the updates are infrequent. The development is currently paused as per the author's comment~\cite{PendonRepoDBComment}. The project has over 1.9 million total downloads, approximately half a million of those gained in the past year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=RepoDb}} .NET versions 7 and Standard are targeted. The documentation is hosted on a separate website~\cite{RepoDB}. It provides several tutorials and widely describes available classes and \acrshort{api}(s). However, it mostly reads as developer documentation; contextual explanations and longer examples are missing. Missing examples can be substituted by extensive unit and integration tests available in the repository. No extensions are provided, except those for specific database systems already discussed.
+The project is open-source and distributed under Apache 2.0 license\footnote{\url{https://github.com/mikependon/RepoDB/blob/master/LICENSE.txt}} on GitHub\footnote{\url{https://github.com/mikependon/RepoDB}} and NuGet.\footnote{\url{https://www.nuget.org/packages/repodb}} With the latest version 1.13.1 released in March 2023, the updates are infrequent. The development is currently paused as per the author's comment.\footnote{\url{https://github.com/mikependon/RepoDB/issues/1200\#issuecomment-2703682584}} The project has over 1.9 million total downloads, approximately half a million of those gained in the past year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=RepoDb}} .NET versions 7 and Standard are targeted. 
+
+The documentation is hosted on a separate website.\footnote{\url{https://repodb.net/}} It provides several tutorials and widely describes available classes and \acrshort{api}(s). However, it mostly reads as developer documentation; contextual explanations and longer examples are missing. Missing examples can be substituted by extensive unit and integration tests available in the repository. No extensions are provided, except those for specific database systems already discussed. All findings are summarized in Table~\ref{tab:comp_repodb}.
 
 
 \afterpage{
 \begin{landscape}
-\begin{table}[H]
+\begin{table}[p]
 \scriptsize
 \def\arraystretch{1.45}
 \centering
 \caption{Comparison overview of \acrshort{orm} framework: RepoDB}
-\begin{tabular}{ll}
+\label{tab:comp_repodb}
+\begin{tabular}{
+>{\raggedright\arraybackslash}p{40.00mm}
+>{\arraybackslash}p{150.00mm}
+}
 \toprule
 \textbf{Property} & \textbf{RepoDB} \\
 \midrule
 \textbf{Type} & \acrshort{orm} for .NET \\
 \textbf{License} & Apache 2.0 \\
 \textbf{Cost} & Free \\
-\textbf{Sources} & \url{https://repodb.net/}, \url{https://github.com/mikependon/RepoDB}, \url{https://www.nuget.org/packages/repodb}  \\
+\textbf{Sources} & \url{https://repodb.net/} \newline \url{https://github.com/mikependon/RepoDB} \newline \url{https://www.nuget.org/packages/repodb}  \\
 \textbf{Latest version} & 1.13.1  (March 2023) \\
 \textbf{Supported .NET} & .NET Standard, .NET 7 \\
 \textbf{\acrshort{orm} features} & Object mapping only; no relationship or collection support \\
@@ -253,7 +267,6 @@ The project is open-source and distributed under Apache 2.0 license\footnote{\ur
 \end{table}
 \end{landscape}
 }
-
 
 \subsection{LINQ to DB}
 \label{section:linqToDb}
@@ -292,22 +305,30 @@ While the \acrshort{linq} support is extensive, querying into data types like \a
 Database can be manipulated through exposed \acrshort{ddl} methods like \texttt{CreateTable} and \texttt{DropTable}, but the documentation provides no explanation. Data modification is possible through \texttt{Insert}, \texttt{Update} and \texttt{Delete} methods. Bulk data operations are available for selected database systems.
 Advanced \acrshort{sql} constructs like transactions, common table expressions (\acrshort{cte}), \texttt{MERGE}, and window analytic functions are supported. Of course, any raw \acrshort{sql} can be executed too, but it is not the concern of this \acrshort{orm}. Asynchronous variants of all methods are exposed.
 
+Some additional tooling is provided. Scaffolding database schema to generate entities and mapping is possible with a \acrshort{cli} tool. The library offers extendibility through exposed interceptor interfaces, which allow modifying behavior in different stages of querying. Support for profiling using MiniProfiler\footnote{\url{https://github.com/MiniProfiler/dotnet}} is also explicitly provided and described.
+LINQ to DB can be used alongside Entity Framework Core to extend its \acrshort{linq} to \acrshort{sql} translation capabilities. This is enabled using an official extension built into this library.
+
+The LINQ to DB framework is open-source and provided under the MIT license.\footnote{\url{https://github.com/linq2db/linq2db/blob/master/MIT-LICENSE.txt}} It is distributed via GitHub\footnote{\url{https://github.com/linq2db/linq2db}} and NuGet.\footnote{\url{https://www.nuget.org/packages/linq2db}} The last released version is 5.4.1 in April 2024, although major version 6 is currently being released under previews. The package was downloaded 17 million times in total, with almost 5 million downloads in the last year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=linq2db}} Project issues receive attention from contributors and are resolved relatively quickly. Documentation is provided on a separate page; it is quite extensive and covers a lot of areas. Examples, along with tests, are available in the repository. The framework supports multiple .NET versions, including .NET Framework, .NET Standard, and .NET 6. A summary of the investigation is shown in Table~\ref{tab:comp_linq2db}.
 
 \afterpage{
 \begin{landscape}
-\begin{table}[H]
+\begin{table}[p]
 \scriptsize
 \def\arraystretch{1.45}
 \centering
 \caption{Comparison overview of \acrshort{orm} framework: LINQ to DB}
-\begin{tabular}{ll}
+\label{tab:comp_linq2db}
+\begin{tabular}{
+>{\raggedright\arraybackslash}p{40.00mm}
+>{\arraybackslash}p{150.00mm}
+}
 \toprule
 \textbf{Property} & \textbf{LINQ to DB} \\
 \midrule
 \textbf{Type} & \acrshort{orm} for .NET \\
 \textbf{License} & MIT \\
 \textbf{Cost} & Free \\
-\textbf{Sources} & \url{https://linq2db.github.io/index.html}, \url{https://github.com/linq2db/linq2db}, \url{https://www.nuget.org/packages/linq2db}  \\
+\textbf{Sources} & \url{https://linq2db.github.io/index.html} \newline \url{https://github.com/linq2db/linq2db}, \url{https://www.nuget.org/packages/linq2db}  \\
 \textbf{Latest version} & 5.4.1 (April 2024) \\
 \textbf{Supported .NET} & .NET Framework, Standard, 7 \\
 \textbf{\acrshort{orm} features} & Object and relationship mapping \\
@@ -335,12 +356,6 @@ Advanced \acrshort{sql} constructs like transactions, common table expressions (
 \end{landscape}
 }
 
-Some additional tooling is provided. Scaffolding database schema to generate entities and mapping is possible with a \acrshort{cli} tool. The library offers extendibility through exposed interceptor interfaces, which allow modifying behavior in different stages of querying. Support for profiling using MiniProfiler\footnote{\url{https://github.com/MiniProfiler/dotnet}} is also explicitly provided and described.
-LINQ to DB can be used alongside Entity Framework Core to extend its \acrshort{linq} to \acrshort{sql} translation capabilities. This is enabled using an official extension built into this library.
-
-The LINQ to DB framework is open-source and provided under the MIT license.\footnote{\url{https://github.com/linq2db/linq2db/blob/master/MIT-LICENSE.txt}} It is distributed via GitHub\footnote{\url{https://github.com/linq2db/linq2db}} and NuGet.\footnote{\url{https://www.nuget.org/packages/linq2db}} The last released version is 5.4.1 in April 2024, although major version 6 is currently being released under previews. The package was downloaded 17 million times in total, with almost 5 million downloads in the last year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=linq2db}} Project issues receive attention from contributors and are resolved relatively quickly. Documentation is provided on a separate page; it is quite extensive and covers a lot of areas. Examples along with tests are available in the repository. The framework supports multiple .NET versions, including .NET Framework, .NET Standard, and .NET 6.
-
-
 
 \subsection{NHibernate}
 \label{section:nhibernate}
@@ -353,7 +368,7 @@ Schema must be managed in the \acrshort{dbms} by a developer. Exporting entities
 
 \begin{example}
 \small
-Let us look at two examples~\cite{fluentNH} of mapping supported by NHibernate:
+Let us consider two examples of supported mapping adapted from FluentNHibernate's documentation.\footnote{\url{https://fluentnhibernate.fandom.com/wiki/Getting_started}} The first one demonstrates mapping in \acrshort{xml} format.
 
 \begin{lstlisting}[language=xml]
 <?xml version="1.0" encoding="utf-8" ?>  
@@ -363,7 +378,6 @@ Let us look at two examples~\cite{fluentNH} of mapping supported by NHibernate:
     <property name="Name">  
       <column name="Name" length="16" not-null="true" />  
     </property> 
-    <property name="Sex" /> 
     <many-to-one name="Mate" />  
     <bag name="Kittens">  
       <key column="mother_id" />  
@@ -385,7 +399,6 @@ public class CatMap : ClassMap<Cat>
         Map(x => x.Name)
             .Length(16)
             .Not.Nullable();
-        Map(x => x.Sex);
         References(x => x.Mate);
         HasMany(x => x.Kittens);
     }
@@ -399,7 +412,7 @@ As both NHibernate and .NET developed over the years, new forms of querying coul
 
 \begin{example}
 \small
-This example~\cite{nhibernate} shows a difference between Criteria and \acrshort{linq} queries. Criteria queries were introduced prior to native \acrshort{linq} support in .NET. The example demonstrates the evolution from constructing query objects with expression builders to using extension methods that preserve entity type information and enable statically typed lambda expressions.
+This example from NHibernate's documentation\footnote{\url{https://nhibernate.info/doc/nhibernate-reference/}} shows a difference between Criteria and \acrshort{linq} queries. Criteria queries were introduced prior to native \acrshort{linq} support in .NET. The example demonstrates the evolution from constructing query objects with expression builders to using extension methods that preserve entity type information and enable statically typed lambda expressions.
 \qed
 
 \begin{lstlisting}[language=CSharp]
@@ -415,31 +428,35 @@ session.Query<Cat>()
 \end{lstlisting}
 \end{example}
 
-Caching is available both on session and application levels. Session cache speeds up repeated queries. Application-wide cache stores separate entities and shares them across sessions. The caches are highly configurable and different providers like memcached\footnote{\url{TODO}} or Redis\footnote{\url{TODO}} can be utilized.
+Caching is available both on session and application levels. Session cache speeds up repeated queries. Application-wide cache stores separate entities and shares them across sessions. The caches are highly configurable and different providers like memcached\footnote{\url{https://memcached.org/}} or Redis\footnote{\url{https://redis.io/}} can be utilized.
 The framework offers change tracking capabilities, keeping track of all loaded entities and then saving all changes on transaction commit.
 
 Despite being the oldest, it still receives maintenance and new features. It was downloaded 57 million times in total, with 14 million downloads in the last year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=NHibernate}} The latest version 5.5.2 was released in July 2024. The project is open source under GNU Lesser General Public License v2.1.\footnote{\url{https://github.com/nhibernate/nhibernate-core/blob/master/LICENSE.txt}} It is distributed on GitHub\footnote{\url{https://github.com/nhibernate}}, NuGet\footnote{\url{https://www.nuget.org/packages/nhibernate}} and SourceForge.\footnote{\url{https://sourceforge.net/projects/nhibernate/}} GitHub issues are responded to sparingly. However, the collection of questions on forums like Stack Overflow has grown large. NHibernate manages to keep up with new .NET versions, targeting Framework, Standard, and .NET 6.
 
 The documentation is published in both \acrshort{pdf} and \acrshort{html} formats. It is comprehensive, offering detailed explanations of numerous concepts. However, many sections are outdated, referencing tools and features that are no longer available. Some areas are undocumented, like the change tracking or mapping by code.
 
-Notable official extensions include the aforementioned FluentNHibernate, {NHibernate.Spatial}\footnote{\url{https://github.com/nhibernate/NHibernate.Spatial}} for working with spatial data and NHibernate-Search\footnote{\url{https://github.com/nhibernate/NHibernate-Search}} for full-text searching. NHibernate Profiler\footnote{\url{https://hibernatingrhinos.com/products/nhprof}} offers query profiling and analysis, but unfortunately, it is a paid unofficial tool. 
+Notable official extensions include the aforementioned FluentNHibernate, {NHibernate.Spatial}\footnote{\url{https://github.com/nhibernate/NHibernate.Spatial}} for working with spatial data and NHibernate-Search\footnote{\url{https://github.com/nhibernate/NHibernate-Search}} for full-text searching. NHibernate Profiler\footnote{\url{https://hibernatingrhinos.com/products/nhprof}} offers query profiling and analysis, but unfortunately, it is a paid unofficial tool. All findings are presented in Table~\ref{tab:comp_nhibernate}.
 
 
 \afterpage{
 \begin{landscape}
-\begin{table}[H]
+\begin{table}[p]
 \scriptsize
 \def\arraystretch{1.45}
 \centering
 \caption{Comparison overview of \acrshort{orm} framework: NHibernate}
-\begin{tabular}{ll}
+\label{tab:comp_nhibernate}
+\begin{tabular}{
+>{\raggedright\arraybackslash}p{40.00mm}
+>{\arraybackslash}p{150.00mm}
+}
 \toprule
 \textbf{Property} & \textbf{NHibernate} \\
 \midrule
 \textbf{Type} & macro \acrshort{orm} for .NET \\
 \textbf{License} & GNU Lesser General Public License v2.1 only \\
 \textbf{Cost} & Free \\
-\textbf{Sources} & \url{https://nhibernate.info/}, \url{https://github.com/nhibernate}, \url{https://www.nuget.org/packages/nhibernate}, \url{https://sourceforge.net/projects/nhibernate/}  \\
+\textbf{Sources} & \url{https://nhibernate.info/} \newline \url{https://github.com/nhibernate}, \url{https://www.nuget.org/packages/nhibernate} \newline \url{https://sourceforge.net/projects/nhibernate/}  \\
 \textbf{Latest version} & 5.5.2 (July 2024) \\
 \textbf{Supported .NET} & .NET Framework, Standard, 6 \\
 \textbf{\acrshort{orm} features} & Full object and relationship mapping \\
@@ -472,15 +489,15 @@ Entity Framework Core~\cite{efcore, efcoreRepo} is a modern \acrshort{orm} backe
 
 Wide range of database systems is supported including \acrshort{mssql}, MySQL, Oracle, PostgreSQL, SQLite, and Firebird. In-memory database is supported for testing purposes. Due to close relationship with Microsoft, \acrshort{ef} Core integrates tightly with \acrshort{mssql}, supporting even its more specific features. In addition, some non-relational databases are supported, such as Azure Cosmos DB\footnote{\url{https://azure.microsoft.com/en-us/products/cosmos-db}} or MongoDB.\footnote{\url{https://www.mongodb.com/docs/entity-framework/current/}}
 
-\acrshort{ef} Core operates with a \texttt{DbContext} object instead of a session. It represents a \textit{Unit of Work} pattern. It keeps track of all changes to the data, and when the operations are done, it commits everything into the database at once. These changes should usually be related and a part of one business transaction~\cite{FowlerUOW}. The developer actually inherits from the base \texttt{DbContext}, extending it with configuration, mappings, and access points to root entities. One application can contain multiple different \texttt{DbContext}(s) for different business domains. The context takes care of change \textit{tracking} and \textit{per-context caching}. Tracking can be toggled globally or per query; by default, it is enabled. Application-wide caching is not provided by default, but can be added via an extension. To save all changes, the \texttt{SaveChanges} method must be called and all changes will be propagated into the database within a transaction. Transactions can also be controlled manually. Save points can be created at any point, to which the transaction can be rolled back into.
+\acrshort{ef} Core operates with a \texttt{DbContext} object instead of a session. It represents a \textit{Unit of Work} pattern. It keeps track of all changes to the data, and when the operations are done, it commits everything into the database at once. These changes should usually be related and a part of one business transaction~\cite{FowlerUOW}. The developer actually inherits from the base \texttt{DbContext}, extending it with configuration, mappings, and access points to root entities. One application can contain multiple different \texttt{DbContext}(s) for different business domains. The context takes care of change \textit{tracking} and \textit{per-context caching}. Tracking can be toggled globally or per query; by default, it is enabled. Application-wide caching is not provided by default, but can be added via an extension. To save all changes, the \texttt{SaveChanges} method must be called and all changes will be propagated into the database within a transaction. Transactions can also be controlled manually. Save points can be created at any point, to which the transaction can be rolled back.
 
-Entity mapping can be configured using global conventions, entity attributes, or fluent code. Relationship mapping is fully supported, and \acrshort{ef} Core effectively infers relationships based on navigation properties and primary and foreign keys. In many-to-many relationships, the join table can be explicitly \textit{mapped} or \textit{hidden}. Different fetching strategies are available for relationships. By default navigation properties are not loaded; \textit{eager} loading requires \texttt{.Include} call in the query. Alternatively, \textit{lazy} loading or explicit (so-called \textit{later on demand}) strategies are configurable. 
+Entity mapping can be configured using global conventions, entity attributes, or fluent code. Relationship mapping is fully supported, and \acrshort{ef} Core effectively infers relationships based on navigation properties and primary and foreign keys. In many-to-many relationships, the join table can be explicitly \textit{mapped} or \textit{hidden}. Different fetching strategies are available for relationships. By default, navigation properties are not loaded; \textit{eager} loading requires \texttt{.Include} call in the query. Alternatively, \textit{lazy} loading or explicit (so-called \textit{later on demand}) strategies are configurable. 
 
 Querying is done using \acrshort{linq} with entities accessed through \texttt{DbContext}. Data manipulation methods are provided, data definition operations cannot be run through the framework. Database columns containing \acrshort{json} can be mapped and queried into using \acrshort{linq}. This is supported only for databases with \acrshort{json} query capabilities, namely \acrshort{mssql}, SQLite, and PostgreSQL. Batch operations are supported; bulk operations require extensions such as EFCore.BulkExtensions.\footnote{\url{https://github.com/borisdj/EFCore.BulkExtensions}} Asynchronous method variants are provided, but parallel operations cannot be done within one context.
 
 \begin{example}
 \small
-The following example~\cite{efcore} demonstrates a simple model created through \texttt{DbContext}. One entity, \texttt{Blog}, is accessible through an exposed property and configured to have a required \acrshort{url}.
+The following example from \acrshort{ef} Core's documentatio\footnote{\url{https://learn.microsoft.com/en-us/ef/core/modeling/\#use-fluent-api-to-configure-a-model}} demonstrates a simple model created through \texttt{DbContext}. One entity, \texttt{Blog}, is accessible through an exposed property and configured to have a required \acrshort{url}.
 \qed
 
 \begin{lstlisting}[language=CSharp]
@@ -506,26 +523,30 @@ public class Blog
 
 Database schema can be generated entirely from entities and is a recommended way to handle smaller applications. Subsequent changes can be handled with generated migrations. Migrations are generated through \acrshort{cli}. All changes to the schema are compared to the base migration and new statically typed C\# code is generated, which can be further edited and stored in source control. This allows not only upgrading to newer versions but also downgrading. Database first schema is also supported. And entities with mapping can be generated from an existing database. This process can be destructive unless partial classes are used. It is not recommended to be automated. Initial core data can be filled into the database using data seeding. That can be useful for necessary application data or enumerations.
 
-\acrshort{ef} Core is highly extensible, benefiting from numerous community tools and extensions. One notable example is \acrshort{ef} Core Power Tools,\footnote{\url{https://marketplace.visualstudio.com/items?itemName=ErikEJ.EFCorePowerTools}} a Visual Studio\footnote{\url{TODO}} extension that allows reverse-engineering databases, generating \texttt{DbContext} classes, and visualizing entity diagrams. \acrshort{ef} Core integrates well with MiniProfiler,\footnote{\url{https://miniprofiler.com/}} a free profiling tool useful for performance diagnostics. Multiple paid profiling solutions exist as well, though their use is often unnecessary since \acrshort{ef} Core integrates effectively with the Visual Studio debugger, providing insight into executed \acrshort{sql} statements and other runtime details.
+\acrshort{ef} Core is highly extensible, benefiting from numerous community tools and extensions. One notable example is \acrshort{ef} Core Power Tools,\footnote{\url{https://marketplace.visualstudio.com/items?itemName=ErikEJ.EFCorePowerTools}} a Visual Studio\footnote{\url{https://visualstudio.microsoft.com/}} extension that allows reverse-engineering databases, generating \texttt{DbContext} classes, and visualizing entity diagrams. \acrshort{ef} Core integrates well with MiniProfiler,\footnote{\url{https://miniprofiler.com/}} a free profiling tool useful for performance diagnostics. Multiple paid profiling solutions exist as well, though their use is often unnecessary since \acrshort{ef} Core integrates effectively with the Visual Studio debugger, providing insight into executed \acrshort{sql} statements and other runtime details.
 
 
-The \acrshort{orm} is distributed under the MIT license\footnote{\url{https://github.com/dotnet/efcore/blob/main/LICENSE.txt}} via GitHub \footnote{\url{https://github.com/dotnet/efcore}} and NuGet.\footnote{\url{https://www.nuget.org/packages/microsoft.entityframeworkcore}} The latest stable version, 9.0.6, was released in June 2025. With over 1.56 billion total downloads and 446 million in the past year alone,\footnote{\url{https://nugettrends.com/packages?months=72&ids=Microsoft.EntityFrameworkCore}} it stands as the most widely used .NET \acrshort{orm} framework. New releases are published frequently, typically on a monthly basis. It is being very actively developed with thousands of GitHub issues which receive relatively quick responses. Extensive documentation is provided on the Microsoft Learn site.\footnote{\url{https://learn.microsoft.com/en-gb/ef/core/}}
+The \acrshort{orm} is distributed under the MIT license\footnote{\url{https://github.com/dotnet/efcore/blob/main/LICENSE.txt}} via GitHub \footnote{\url{https://github.com/dotnet/efcore}} and NuGet.\footnote{\url{https://www.nuget.org/packages/microsoft.entityframeworkcore}} The latest stable version, 9.0.6, was released in June 2025. With over 1.56 billion total downloads and 446 million in the past year alone,\footnote{\url{https://nugettrends.com/packages?months=72&ids=Microsoft.EntityFrameworkCore}} it stands as the most widely used .NET \acrshort{orm} framework. New releases are published frequently, typically on a monthly basis. It is being very actively developed with thousands of GitHub issues which receive relatively quick responses. Extensive documentation is provided on the Microsoft Learn site.\footnote{\url{https://learn.microsoft.com/en-gb/ef/core/}} The findings are summarized in Table~\ref{tab:comp_efcore}.
 
 \afterpage{
 \begin{landscape}
-\begin{table}[H]
+\begin{table}[p]
 \scriptsize
 \def\arraystretch{1.45}
 \centering
 \caption{Comparison overview of \acrshort{orm} framework: Entity Framework Core}
-\begin{tabular}{ll}
+\label{tab:comp_efcore}
+\begin{tabular}{
+>{\raggedright\arraybackslash}p{40.00mm}
+>{\arraybackslash}p{150.00mm}
+}
 \toprule
 \textbf{Property} & \textbf{Entity Framework Core} \\
 \midrule
 \textbf{Type} & macro \acrshort{orm} for .NET \\
 \textbf{License} & MIT \\
 \textbf{Cost} & Free \\
-\textbf{Sources} & \url{https://learn.microsoft.com/en-gb/ef/core/}, \url{https://github.com/dotnet/efcore}, \url{https://www.nuget.org/packages/microsoft.entityframeworkcore}  \\
+\textbf{Sources} & \url{https://learn.microsoft.com/en-gb/ef/core/} \newline \url{https://github.com/dotnet/efcore} \newline \url{https://www.nuget.org/packages/microsoft.entityframeworkcore}  \\
 \textbf{Latest version} & 9.0.6 (June 2025) \\
 \textbf{Supported .NET} & the latest .NET version only \\
 \textbf{\acrshort{orm} features} & Full object and relationship mapping \\
@@ -554,7 +575,7 @@ The \acrshort{orm} is distributed under the MIT license\footnote{\url{https://gi
 }
 
 \subsection{Entity Framework 6}
-Entity Framework 6~\cite{ef6,ef6Repo} is a stable \acrshort{orm} developed by Microsoft with a long history. While it continues to receive security updates, no new features are being added. Since \acrshort{ef} Core builds upon \acrshort{ef}6, only notable differences are highlighted.
+Entity Framework 6~\cite{ef6,ef6Repo} is a stable \acrshort{orm} developed by Microsoft with a long history. While it continues to receive security updates, no new features are being added. Since \acrshort{ef} Core builds upon \acrshort{ef}6, only notable differences are highlighted and all properties are summarized in Table~\ref{tab:comp_ef6}.
 
 \acrshort{ef}6 is available under the MIT license\footnote{\url{https://github.com/dotnet/ef6/blob/main/LICENSE.txt}} and distributed via GitHub\footnote{\url{https://github.com/dotnet/ef6}} and NuGet.\footnote{\url{https://www.nuget.org/packages/EntityFramework/}} In earlier versions, it was directly integrated into the .NET standard library. Over its lifespan, it has accumulated over 336 million downloads, with 60 million in the past year alone.\footnote{\url{https://nugettrends.com/packages?months=72&ids=EntityFramework}} With the third highest download count, it indicates significant usage in legacy projects.
 
@@ -567,19 +588,23 @@ The database schema can be defined directly in the code and projected to the dat
 
 \afterpage{
 \begin{landscape}
-\begin{table}[H]
+\begin{table}[p]
 \scriptsize
 \def\arraystretch{1.45}
 \centering
 \caption{Comparison overview of \acrshort{orm} framework: Entity Framework 6}
-\begin{tabular}{ll}
+\label{tab:comp_ef6}
+\begin{tabular}{
+>{\raggedright\arraybackslash}p{40.00mm}
+>{\arraybackslash}p{150.00mm}
+}
 \toprule
 \textbf{Property} & \textbf{Entity Framework 6} \\
 \midrule
 \textbf{Type} & macro \acrshort{orm} for .NET \\
 \textbf{License} & MIT \\
 \textbf{Cost} & Free \\
-\textbf{Sources} & \url{https://learn.microsoft.com/en-gb/ef/ef6/}, \url{https://github.com/dotnet/ef6}, \url{https://www.nuget.org/packages/EntityFramework/}  \\
+\textbf{Sources} & \url{https://learn.microsoft.com/en-gb/ef/ef6/} \newline \url{https://github.com/dotnet/ef6} \newline \url{https://www.nuget.org/packages/EntityFramework/}  \\
 \textbf{Latest version} & 6.5.1 (June 2024) \\
 \textbf{Supported .NET} & .NET Framework, Standard, 6 \\
 \textbf{\acrshort{orm} features} & Full object and relationship mapping \\
