@@ -1,7 +1,7 @@
 \section{Important concepts}
 To better understand \acrshort{orm}(s) and the .NET\footnote{\url{https://dotnet.microsoft.com/en-us/}} ecosystem, important concepts have to be examined first, starting with relational data management in .NET applications. 
 
-To request data, \acrshort{sql} query must be composed, executed through an open database connection, and results must be manually parsed. This can be achieved with the help of the standard .NET library, particularly ADO.NET.\footnote{\url{https://learn.microsoft.com/en-gb/dotnet/framework/data/adonet/}} However, by directly using \acrshort{sql} in raw strings, dependencies on a query language that lacks static typing in the context of C\# are introduced. However, based on our observation, this can potentially lead to additional complexity. Nevertheless, ADO.NET remains crucial, and most .NET applications have it as a hidden dependency. All of the \acrshort{orm} frameworks introduced later rely on it for database communication. 
+To request data, \acrshort{sql} query must be composed, executed through an open database connection, and results must be manually parsed. This can be achieved with the help of the standard .NET library, particularly ADO.NET.\footnote{\url{https://learn.microsoft.com/en-gb/dotnet/framework/data/adonet/}} However, by directly using \acrshort{sql} in raw strings, dependencies on a query language that lacks static typing in the context of C\# are introduced. Based on our observations, this can potentially lead to additional complexity. Nevertheless, ADO.NET remains crucial, and most .NET applications have it as a hidden dependency. All of the \acrshort{orm} frameworks introduced later rely on it for database communication. 
 
 To lower complexity related to database communication and data persistence, abstraction provided by \acrshort{orm}(s) is used. The level of abstraction varies depending on the specific framework. There are generally two categories, micro and macro \acrshort{orm}(s)~\cite{shapovalov2024micro}. On one end of the spectrum, there are lightweight, usually performance-oriented frameworks. They offer a narrow set of features, some simple abstraction over ADO.NET. Some of those might not even be full \acrshort{orm}(s), omitting the ``relational'' part entirely~\cite{Dapper}. On the opposite end appear full-fledged frameworks that completely abstract away database communication, providing abstraction over \acrshort{sql} in the form of different query languages and an extensive set of features to simplify the work of developers.
 
@@ -40,11 +40,12 @@ using (SqlConnection connection = new(connectionString))
 \end{example}
 
 \subsection{Entities and mapping}
-Entities are a set of classes either mirroring database tables or reflecting a domain model. Entities should be plain old \acrshort{clr} objects (\acrshort{poco}(s)). The term is derived from plain old Java objects (\acrshort{pojo}(s)). It refers to classes that don't inherit from any base class or interface. And they are not dependent on any library~\cite{Fowler2003POJO}.
+Entities are a set of classes either mirroring database tables or reflecting a domain model. Entities should be plain old \acrshort{clr} objects (\acrshort{poco}(s)). The term is derived from plain old Java objects (\acrshort{pojo}(s)). It refers to classes that do not inherit from any base class or interface. And they are not dependent on any library~\cite{Fowler2003POJO}.
 
 \begin{example}
 \small
 An example of a purchase order class demonstrates a composition of \acrshort{poco}. It contains a set of properties with basic .NET data types. It has no dependencies and can be used within any framework. This entity contains no rules for mapping. It would work only with a query whose result columns match the entity properties. And of course, data types and nullability would have to match as well.
+\qed
 \begin{lstlisting}[language=CSharp]
 class PurchaseOrder
 {
@@ -55,12 +56,11 @@ class PurchaseOrder
     string? Comments { get; set; }
 }
 \end{lstlisting}
-\qed
 \end{example}
 
 Micro \acrshort{orm}(s) do not usually use any entity mapping. They simply load resulting records into entities that match projected columns. Frameworks performing more complex non-read operations require further configuration to avoid mismatches. In some use cases, such as domain-driven development, entities might be initially designed in an application and then the corresponding schema generated with the help of some tool~\cite{FowlerDDD}.
 
-Entity mapping might be done in multiple ways. The simplest form is inferred mapping or global conventions. The framework guesses, e.g., table and column names, data types, and nullability from the way an entity is named and declared or through global rules. An example of such a framework is Entity Framework Core\footnote{\url{https://learn.microsoft.com/en-us/ef/core/modeling/}}, which, without any mapping, uses default conventions to infer the mapping. Clearly, inferred mapping lacks constraints including concrete data types, numeric precision, or encoding. Those details can be specified by property and class attributes. That makes mapping coupled with an entity, making it framework dependent. That could be a problem if the domain model should be isolated from database access to not leak abstraction. Mapping through code or a configuration file allows separation and is usually more expressive and powerful.
+Entity mapping might be done in multiple ways. The simplest form is inferred mapping or global conventions. The framework guesses, e.g., table and column names, data types, and nullability from entity declaration or global rules. An example of such a framework is Entity Framework Core\footnote{\url{https://learn.microsoft.com/en-us/ef/core/modeling/}}, which, without any mapping, uses default conventions to infer the mapping. Clearly, inferred mapping lacks constraints including concrete data types, numeric precision, or encoding. Those details can be specified by property and class attributes. Coupling the mapping with the entity makes it framework-dependent, which can be problematic if the domain model is meant to remain isolated from database access to avoid abstraction leakage. Mapping through code or a configuration file allows separation and is usually more expressive and powerful.
 
 \begin{example}
 \small
@@ -97,9 +97,9 @@ The second mapping is in the form of \acrshort{xml} mapping file using NHibernat
 Relationships are usually mapped through navigation properties. If the relationship has a single target, the navigation property is of the related entity's type. In contrast, if the relationship can target multiple entries, a collection of the related type (e.g. \texttt{List<T>}) is used instead.
 
 \subsection{Querying}\label{sec:queries}
-Relational databases generally support only \acrshort{sql} query language. Some \acrshort{orm}(s) use \acrshort{sql} directly. But relational data and queries do not translate well into a statically typed object-oriented language. That is why Language Integrated Queries (\acrshort{linq})\footnote{\url{https://learn.microsoft.com/en-us/dotnet/csharp/linq/}} were eventually introduced into C\#.\footnote{\url{https://learn.microsoft.com/en-gb/dotnet/csharp/}} It abstracts the data source and can operate over relational databases as well as other sources such as \acrshort{xml} documents, object databases, or web services.
+Relational databases generally support only \acrshort{sql} query language. Some \acrshort{orm}(s) use \acrshort{sql} directly. But relational data and queries do not translate well into a statically typed object-oriented language. That is why Language Integrated Queries (\acrshort{linq})\footnote{\url{https://learn.microsoft.com/en-us/dotnet/csharp/linq/}} were eventually introduced into C\#.\footnote{\url{https://learn.microsoft.com/en-gb/dotnet/csharp/}} They abstract the data source and can operate over relational databases as well as other sources such as \acrshort{xml} documents, object databases, or web services.
 
-There are two ways to write \acrshort{linq} queries. The first is called \textit{declarative query syntax} and the second a \textit{method syntax}. The query syntax is more \acrshort{sql}-like and should be easier to read. However, it doesn't syntactically fit within the C\# language, and the compiler translates it into the method syntax anyway.
+There are two ways to write \acrshort{linq} queries. The first is called \textit{declarative query syntax} and the second \textit{method syntax}. The query syntax is more \acrshort{sql}-like and should be easier to read. However, it does not syntactically fit within the C\# language, and the compiler translates it into the method syntax anyway.
 
 \begin{example}
 \small

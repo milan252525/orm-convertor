@@ -1,7 +1,7 @@
 \section{Feature comparison}
 The process begins by gathering sources for each \acrshort{orm}, including links to documentation, repositories, and package managers. Each framework is briefly introduced, primarily based on claims made in its official documentation. This is followed by an overview of distribution channels, licensing, and versioning information. To assess relevancy, development activity, community engagement, and available tool support are reviewed. The focus then shifts to more technical aspects, such as supported database systems and configuration options, as well as how each \acrshort{orm} handles entity and relationship mapping and various aspects of database operations.
 
-In the context of the .NET ecosystem, the focus is placed on supported versions. Therefore, only versions explicitly targeted by the package are listed. However, as previously discussed, .NET packages typically maintain both backward and forward compatibility, and the use of .NET Standard enables targeting both .NET Framework and .NET Core.
+In the context of the .NET ecosystem, the focus is placed on supported versions. Therefore, only versions explicitly targeted by the package are listed. However, as previously discussed, the use of .NET Standard enables targeting both .NET Framework and .NET Core. And .NET packages typically maintain both backward and forward compatibility.
 
 To help assess usage, download counts are considered. These figures are obtained from the respective NuGet package pages, with aggregate counts sourced from the NuGet Trends website.\footnote{\url{https://nugettrends.com/}} Yearly downloads reflect the period between 30th June 2024 and 29th June 2025.
 
@@ -107,9 +107,9 @@ In terms of community support, Dapper exhibits a healthy level of maintenance wi
 \subsection{PetaPoco}
 \label{sec:feat_petapoco}
 
-PetaPoco~\cite{PetaPoco} is the second chosen micro \acrshort{orm}. Although it changed recently, it used to have a single-file codebase with no dependencies. It is focused on performance and simplicity. Internally it uses ADO.NET like Dapper, yet it provides its own abstractions over it. The framework is configurable through a builder, resulting in \texttt{IDatabase} interface, on which methods are called. With a focus on mapping query results to objects, it does not provide any support for relationships. It provides full control over \acrshort{sql} with an inbuilt \acrshort{sql} builder to make composing it easier. 
+PetaPoco~\cite{PetaPoco} is the second chosen micro \acrshort{orm}. Although recently changed, it previously had a single-file codebase with no external dependencies. It is focused on performance and simplicity. Internally it uses ADO.NET like Dapper, yet it provides its own abstractions over it. The framework is configurable through a builder, resulting in \texttt{IDatabase} interface, on which methods are called. With a focus on mapping query results to objects, it does not provide any support for relationships. It provides full control over \acrshort{sql} with an inbuilt \acrshort{sql} builder to make composing queries easier. 
 
-Its small feature set and zero dependencies enable compatibility with a wide selection of database systems, including \acrshort{mssql}, MS Access,\footnote{\url{https://support.microsoft.com/en-us/access}} SQLite, MySQL,\footnote{\url{https://www.mysql.com/}} MariaDB,\footnote{\url{https://mariadb.org/}} and Oracle. Schema management is left to the developer. Templates for entity generation out of a database schema were provided, but were deprecated in the last major version.
+Its small feature set and zero dependencies enable compatibility with a wide selection of database systems, including \acrshort{mssql}, \acrshort{ms} Access,\footnote{\url{https://support.microsoft.com/en-us/access}} SQLite, MySQL,\footnote{\url{https://www.mysql.com/}} MariaDB,\footnote{\url{https://mariadb.org/}} and Oracle. Schema management is left to the developer. Templates for generating entities from a database schema were provided but were deprecated in the latest major version.
 
 Entity mapping supports automatic configuration through naming conventions, such as pluralizing property names to match database columns. A limited set of mapping attributes is offered. These can be used to map table and column names, primary keys, and ignore class properties. Like Dapper, it does not automatically handle relationships but provides helper methods for manual JOINs management.
 
@@ -137,13 +137,13 @@ var orderLines = db.Fetch<OrderLine>(
 \end{lstlisting}
 \end{example}
 
-No support for advanced data formats of collections is provided, with the exception of writing native \acrshort{sql} that can work with these structures. \acrshort{linq} is not supported. Unofficial extension \texttt{StaTypPocoQueries.PetaPoco}\footnote{\url{https://github.com/asherber/StaTypPocoQueries.PetaPoco}} provides result modification methods such as \texttt{First}, \texttt{Single}, \texttt{Page}, and \texttt{Delete} with some selection capabilities. For \textit{data manipulation language} (\acrshort{dml}) operations, strongly-typed methods like \texttt{Insert}, \texttt{Save}, \texttt{Update}, and \texttt{Delete} are provided. 
+No support for advanced data formats or collections is provided, with the exception of writing native \acrshort{sql} that can work with these structures. \acrshort{linq} is not supported. Unofficial extension \texttt{StaTypPocoQueries.PetaPoco}\footnote{\url{https://github.com/asherber/StaTypPocoQueries.PetaPoco}} provides result modification methods such as \texttt{First}, \texttt{Single}, \texttt{Page}, and \texttt{Delete} with some selection capabilities. For \textit{data manipulation language} (\acrshort{dml}) operations, strongly-typed methods like \texttt{Insert}, \texttt{Save}, \texttt{Update}, and \texttt{Delete} are provided. 
 
-Queries executed by the framework can be inspected during debugging. Transactions are supported, including nested transactions if the underlying database system allows. However, bulk operations are not available. Asynchronous versions of all methods are also provided. Advanced capabilities such as versioning, change tracking, and data seeding are not provided. The only notable extension is an unofficial \texttt{PetaPoco.SqlKata}\footnote{\url{https://github.com/asherber/PetaPoco.SqlKata}}, which is a more extensive \acrshort{sql} builder than the native one.
+Queries executed by the framework can be inspected during debugging. Transactions are supported, including nested transactions if the underlying database system allows. However, bulk operations are not available. Asynchronous versions of all methods are provided. Advanced capabilities such as versioning, change tracking, and data seeding are not offered. The only notable extension is an unofficial \texttt{PetaPoco.SqlKata}\footnote{\url{https://github.com/asherber/PetaPoco.SqlKata}}, which is a more extensive \acrshort{sql} builder than the native one.
 
 The library is distributed under the Apache 2.0 License\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/blob/development/LICENSE.txt}} and is open-sourced on GitHub\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco}} and NuGet.\footnote{\url{https://www.nuget.org/packages/PetaPoco.Compiled/}} PetaPoco was downloaded 1.8 million times in total, with 600 thousand in the last year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=PetaPoco.Compiled}} PetaPoco has been stagnating on major version 6 (6.0.683 in September 2024) for the past few years, with minor patches being done every few months in response to security patches or new feature demands. The library targets .NET Framework and Standard.
 
-This \acrshort{orm} does not benefit from extensive community support, with the only extensive source of information being its GitHub wiki.\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/wiki}} Integration tests for most database systems are available and could be used for reference. Table~\ref{tab:comp_petapoco} presents the summarized findings.
+This \acrshort{orm} does not benefit from extensive community support, with the only source of information being its GitHub wiki.\footnote{\url{https://github.com/CollaboratingPlatypus/PetaPoco/wiki}} Integration tests for most database systems are available and could be used for reference. Table~\ref{tab:comp_petapoco} presents the summarized findings.
 
 \afterpage{
 \begin{landscape}
@@ -183,7 +183,7 @@ This \acrshort{orm} does not benefit from extensive community support, with the 
 \textbf{Extensions (official)} & None \\
 \textbf{Extensions (community)} & PetaPoco.SqlKata, StaTypPocoQueries.PetaPoco \\
 \textbf{Tooling} & None available \\
-\textbf{Supported databases} & \acrshort{mssql}, MS Access, SQLite, MySQL, MariaDB, Oracle, etc. \\
+\textbf{Supported databases} & \acrshort{mssql}, \acrshort{ms} Access, SQLite, MySQL, MariaDB, Oracle, etc. \\
 \textbf{Ideal use cases} & High-performance data reading, performance bottleneck zones, apps requiring full \acrshort{sql} control \\
 \bottomrule
 \end{tabular}
@@ -194,13 +194,13 @@ This \acrshort{orm} does not benefit from extensive community support, with the 
 
 
 \subsection{RepoDB}
-RepoDB~\cite{RepoDB, RepoDBRepo} is an \acrshort{orm} for .NET bridging the gap between micro and macro \acrshort{orm}(s). It supposedly focuses on improving the developer experience, while maintaining the speed of macro \acrshort{orm}(s). It requires only a connection string and should work \textit{out of the box}. Developed by Michael Camara Pendon, it is one of the more recent libraries, starting development in 2018. It provides a set of extension methods over \texttt{Microsoft.Data.SqlClient.SqlConnection} object. 
+RepoDB~\cite{RepoDB, RepoDBRepo} is an \acrshort{orm} bridging the gap between micro and macro \acrshort{orm}(s). It supposedly focuses on improving the developer experience, while maintaining the speed of macro \acrshort{orm}(s). It requires only a connection string and should work \textit{out of the box}. Developed by Michael Camara Pendon, it is one of the more recent libraries, starting development in 2018. It provides a set of extension methods over \texttt{Microsoft.Data.SqlClient.SqlConnection} object. 
 
-The core package supports any database system through ADO.NET, limiting querying through raw \acrshort{sql}. To utilize strongly typed queries, database-specific extension package is required. The developer can select from \acrshort{mssql}, SQLite, MySQL, and PostgreSQL. Schema management or entity generation is not offered. Automatic entity mapping to a result can be extended using property and class attributes or a fluent mapping interface. Relationship mapping is not supported, an interface for querying multiple results at once can be utilized. Raw join \acrshort{sql} query with manual handling is another option.
+The core package supports any database system through ADO.NET, limiting querying through raw \acrshort{sql}. To utilize strongly typed queries, database-specific extension package is required. The developer can select from \acrshort{mssql}, SQLite, MySQL, and PostgreSQL. Schema management or entity generation is not offered. Automatic entity mapping to a result can be extended using property and class attributes or a fluent mapping interface. Relationship mapping is not supported, an interface for querying multiple results at once can be utilized.
 
 \begin{example}
 \small
-In the example~\cite{RepoDB} below, the fluent mapping interface can be seen on a \texttt{Customer} entity. The main advantages here are separation from the entity and more programmatic configuration.
+In this example adapted from RepoDB's documentation~\footnote{\url{https://repodb.net/mapper/fluentmapper}}, the fluent mapping interface can be seen on a \texttt{Customer} entity. The main advantages here are separation from the entity and more programmatic configuration.
 \qed
 
 \begin{lstlisting}[language=CSharp]
@@ -215,7 +215,7 @@ FluentMapper
 
 The main focus of RepoDB is abstracting \acrshort{sql}. However, \acrshort{linq} is not supported, and queries have to be performed through one of the following options. The main interface is type-safe expressions -- for example, see the following example querying one customer by id: \lstinline{connection.Query<Customer>(e => e.Id == 25)}. The second option is \texttt{QueryField} and \texttt{QueryGroup} objects. As you can see in \lstinline{connection.Query<Customer>(new QueryField("Id", Operation.Equal, 25))}, this option is not type-safe, but should be more expressive as operator support for the first option is limited. In addition, there are more provided functions over the connection, such as \texttt{Sum}, \texttt{Max}, \texttt{Exists} functions. Data manipulation is possible using \texttt{Insert}, \texttt{Update} and \texttt{Delete} functions. Both batch and bulk operations are supported, though the latter only for \acrshort{mssql} and PostgreSQL.
 
-Transactions are supported through ADO.NET. Application-level cache is supported in-memory, with options for custom providers. Database schema and queries are also cached, speeding up subsequent queries. The library offers a wide variety of interfaces for extension. One example can be query tracing and logging, which is provided by default but can be easily added. While the library provides asynchronous methods, there is no mention of them in the documentation. More advanced features such as change tracking, data seeding, or migration support are not provided. The \acrshort{orm} also focuses on providing the user with the implementation of common repository and unit of work patterns.
+Transactions are handled through ADO.NET. Application-level cache is supported in-memory, with options for custom providers. Database schema and queries are also cached, speeding up subsequent queries. The library offers a wide variety of interfaces for extension. One example can be query tracing and logging, which is not provided by default but can be easily added. While the library provides asynchronous methods, there is no mention of them in the documentation. More advanced features such as change tracking, data seeding, or migration support are not provided. The \acrshort{orm} also focuses on providing the user with the implementation of common repository and unit of work patterns.
 
 The project is open-source and distributed under Apache 2.0 license\footnote{\url{https://github.com/mikependon/RepoDB/blob/master/LICENSE.txt}} on GitHub\footnote{\url{https://github.com/mikependon/RepoDB}} and NuGet.\footnote{\url{https://www.nuget.org/packages/repodb}} With the latest version 1.13.1 released in March 2023, the updates are infrequent. The development is currently paused as per the author's comment.\footnote{\url{https://github.com/mikependon/RepoDB/issues/1200\#issuecomment-2703682584}} The project has over 1.9 million total downloads, approximately half a million of those gained in the past year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=RepoDb}} .NET versions 7 and Standard are targeted. 
 
@@ -243,7 +243,7 @@ The documentation is hosted on a separate website.\footnote{\url{https://repodb.
 \textbf{Sources} & \url{https://repodb.net/} \newline \url{https://github.com/mikependon/RepoDB} \newline \url{https://www.nuget.org/packages/repodb}  \\
 \textbf{Latest version} & 1.13.1  (March 2023) \\
 \textbf{Supported .NET} & .NET Standard, .NET 7 \\
-\textbf{\acrshort{orm} features} & Object mapping only; no relationship or collection support \\
+\textbf{\acrshort{orm} features} & Object mapping only; no relationship  support \\
 \textbf{Query support} & Limited lambda expression support, QueryField and QueryGroup objects \\
 \textbf{Mapping} & Attributes and fluent interface \\
 \textbf{Relationship mapping} & Not supported directly; JOINs and result splitting possible manually \\
@@ -273,7 +273,7 @@ The documentation is hosted on a separate website.\footnote{\url{https://repodb.
 
 LINQ to DB~\cite{linq2db, linq2dbRepo}, alternatively linq2db, is an \acrshort{orm} that focuses primarily on offering a type-safe layer above \acrshort{sql} through \acrshort{linq}. Statically typed, compiler-checked queries are a huge benefit for bigger projects and allow easier refactoring. It supports extensive entity and relationship mapping and should offer the best performance in terms of querying through \acrshort{linq}. Relative to that focus, it does not offer features expected from full-fledged macro \acrshort{orm}(s). There is no change tracking or caching with this framework.
 
-LINQ to DB is compatible with a big range of database systems, e.g., \acrshort{mssql}, MySQL, Oracle, PostgreSQL, MS Access, SQLite, and even less common ones like SAP HANA,\footnote{\url{https://www.sap.com/products/data-cloud/hana/what-is-sap-hana.html}} ClickHouse,\footnote{\url{https://clickhouse.com/}}. Database schema must be handled by the developer, but entity generation from the database is available. Configuration is fairly simple through the \texttt{DataConnection} object. This object can be inherited from, allowing configuration of a wide set of options, including entity mapping. Mapping can be done using fluent methods using the aforementioned object. Another option is attributes on the entity class and properties. Convention-based and automatic mapping is also an option. All multiplicities of relationships are configurable, although the documentation provides limited information on this topic.\footnote{\url{https://linq2db.github.io/index.html\#configuration-using-mapping-attributes}}
+LINQ to DB is compatible with a big range of database systems, e.g., \acrshort{mssql}, MySQL, Oracle, PostgreSQL, \acrshort{ms} Access, SQLite, and even less common ones like SAP HANA,\footnote{\url{https://www.sap.com/products/data-cloud/hana/what-is-sap-hana.html}} ClickHouse,\footnote{\url{https://clickhouse.com/}}. Database schema must be handled by the developer, but entity generation from the database is available. Configuration is fairly simple through the \texttt{DataConnection} object. This object can be inherited from, allowing configuration of a wide set of options, including entity mapping. Mapping can be done using fluent methods using the aforementioned object. Another option is attributes on the entity class and properties. Convention-based and automatic mapping is also a possibility. All multiplicities of relationships are configurable, although the documentation provides limited information on this topic.\footnote{\url{https://linq2db.github.io/index.html\#configuration-using-mapping-attributes}}
 
 \begin{example}
 \small
@@ -301,14 +301,14 @@ var order = db.Orders
 \end{lstlisting}
 \end{example}
 
-While the \acrshort{linq} support is extensive, querying into data types like \acrshort{json} or \acrshort{xml} remain unsupported. 
+While the \acrshort{linq} support is extensive, querying into data types like \acrshort{json} or \acrshort{xml} remains unsupported. 
 Database can be manipulated through exposed \acrshort{ddl} methods like \texttt{CreateTable} and \texttt{DropTable}, but the documentation provides no explanation. Data modification is possible through \texttt{Insert}, \texttt{Update} and \texttt{Delete} methods. Bulk data operations are available for selected database systems.
-Advanced \acrshort{sql} constructs like transactions, common table expressions (\acrshort{cte}), \texttt{MERGE}, and window analytic functions are supported. Of course, any raw \acrshort{sql} can be executed too, but it is not the concern of this \acrshort{orm}. Asynchronous variants of all methods are exposed.
+Advanced \acrshort{sql} constructs like transactions, common table expressions (\acrshort{cte}), \texttt{MERGE}, and window analytic functions are supported. Asynchronous variants of all methods are exposed.
 
 Some additional tooling is provided. Scaffolding database schema to generate entities and mapping is possible with a \acrshort{cli} tool. The library offers extendibility through exposed interceptor interfaces, which allow modifying behavior in different stages of querying. Support for profiling using MiniProfiler\footnote{\url{https://github.com/MiniProfiler/dotnet}} is also explicitly provided and described.
-LINQ to DB can be used alongside Entity Framework Core to extend its \acrshort{linq} to \acrshort{sql} translation capabilities. This is enabled using an official extension built into this library.
+LINQ to DB can be used alongside Entity Framework Core to extend its translation capabilities from \acrshort{linq} to \acrshort{sql}. This is enabled using an official extension built into this library.
 
-The LINQ to DB framework is open-source and provided under the MIT license.\footnote{\url{https://github.com/linq2db/linq2db/blob/master/MIT-LICENSE.txt}} It is distributed via GitHub\footnote{\url{https://github.com/linq2db/linq2db}} and NuGet.\footnote{\url{https://www.nuget.org/packages/linq2db}} The last released version is 5.4.1 in April 2024, although major version 6 is currently being released under previews. The package was downloaded 17 million times in total, with almost 5 million downloads in the last year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=linq2db}} Project issues receive attention from contributors and are resolved relatively quickly. Documentation is provided on a separate page; it is quite extensive and covers a lot of areas. Examples, along with tests, are available in the repository. The framework supports multiple .NET versions, including .NET Framework, .NET Standard, and .NET 6. A summary of the investigation is shown in Table~\ref{tab:comp_linq2db}.
+The LINQ to DB framework is open-source and provided under the MIT license.\footnote{\url{https://github.com/linq2db/linq2db/blob/master/MIT-LICENSE.txt}} It is distributed via GitHub\footnote{\url{https://github.com/linq2db/linq2db}} and NuGet.\footnote{\url{https://www.nuget.org/packages/linq2db}} The last released version is 5.4.1 in April 2024, although major version 6 is currently being released under previews. The package was downloaded 17 million times in total, with almost 5 million downloads in the last year.\footnote{\url{https://nugettrends.com/packages?months=72&ids=linq2db}} Project issues receive attention from contributors and are resolved relatively quickly. Documentation is provided on a separate page; it is quite extensive and covers a lot of areas. Examples, along with tests, are available in the repository. The framework supports multiple .NET versions, including .NET Framework, .NET Standard, and .NET 6. A summary of the analysis is shown in Table~\ref{tab:comp_linq2db}.
 
 \afterpage{
 \begin{landscape}
@@ -328,9 +328,9 @@ The LINQ to DB framework is open-source and provided under the MIT license.\foot
 \textbf{Type} & \acrshort{orm} for .NET \\
 \textbf{License} & MIT \\
 \textbf{Cost} & Free \\
-\textbf{Sources} & \url{https://linq2db.github.io/index.html} \newline \url{https://github.com/linq2db/linq2db}, \url{https://www.nuget.org/packages/linq2db}  \\
+\textbf{Sources} & \url{https://linq2db.github.io/index.html} \newline \url{https://github.com/linq2db/linq2db} \newline \url{https://www.nuget.org/packages/linq2db}  \\
 \textbf{Latest version} & 5.4.1 (April 2024) \\
-\textbf{Supported .NET} & .NET Framework, Standard, 7 \\
+\textbf{Supported .NET} & .NET Framework, .NET Standard, .NET 7 \\
 \textbf{\acrshort{orm} features} & Object and relationship mapping \\
 \textbf{Query support} & Extensive \acrshort{linq} support \\
 \textbf{Mapping} & Attributes and fluent interface \\
@@ -338,7 +338,7 @@ The LINQ to DB framework is open-source and provided under the MIT license.\foot
 \textbf{Schema handling} & No migrations; schema scaffolding from DB \\
 \textbf{Change tracking} & Not supported \\
 \textbf{Data seeding} & Not supported \\
-\textbf{Query logging} & Extensible interceptors+ must be implemented \\
+\textbf{Query logging} & Extensible interceptors must be implemented \\
 \textbf{Transactions} & Supported \\
 \textbf{Bulk operations} & Supported for some \acrshort{dbms}(s)\\
 \textbf{Async support} & Supported \\
@@ -348,7 +348,7 @@ The LINQ to DB framework is open-source and provided under the MIT license.\foot
 \textbf{Extensions (official)} & \acrshort{ef} Core extension \\
 \textbf{Extensions (community)} & None \\
 \textbf{Tooling} & MiniProfiler integration, \acrshort{cli} scaffolding tool \\
-\textbf{Supported databases} & \acrshort{mssql}, MySQL, Oracle, PostgreSQL, SQLite, MS Access, SAP HANA, ClickHouse and more  \\
+\textbf{Supported databases} & \acrshort{mssql}, MySQL, Oracle, PostgreSQL, SQLite, \acrshort{ms} Access, SAP HANA, ClickHouse and more  \\
 \textbf{Ideal use cases} & Little \acrshort{sql} knowledge, any project size, complex queries \\
 \bottomrule
 \end{tabular}
@@ -408,7 +408,7 @@ public class CatMap : ClassMap<Cat>
 
 Relationship mapping can be done into various forms of collections, e.g., list, set, and hash map, and all multiplicities are supported. Even class inheritance on entities can be mapped into the database. Different loading strategies are configurable. Entities can be loaded eagerly on query execution or lazily, where the loading occurs only on accessing the associated collection. To allow this, NHibernate requires every property to be \texttt{virtual},
 
-As both NHibernate and .NET developed over the years, new forms of querying could be introduced, leading to the eventual adoption of \acrshort{linq}. Predecessors to NHibernate's \acrshort{linq} are still present (Criteria and QueryOver \acrshort{api}(s)), although rarely used. Those were used before the addition of lambda expressions and extension methods into the language. Another available query language is Hibernate Query Language (\acrshort{hql}).\footnote{\url{https://nhibernate.info/doc/nhibernate-reference/queryhql.html}} \acrshort{hql} is very similar to \acrshort{sql} but object-oriented. It is not commonly used in the .NET world, and the queries are not statically typed as is the case with \acrshort{linq}. And lastly, raw \acrshort{sql} queries can be executed with a lot of helper methods. \acrshort{sql} queries can also be stored in \acrshort{xml} mapping files to avoid duplication. \acrshort{dml} is fully supported along with transactions but not in bulk operations. Logging of generated \acrshort{sql} can be enabled. NHibernate supports \acrshort{xml} type columns, but no querying capabilities inside it. NHibernate operates using a session, an object responsible for managing interactions with the database. In typical web applications, a session is short-lived and scoped to a single \acrshort{http} request. That ensures all database operations with that request are isolated and consistent.
+As both NHibernate and .NET developed over the years, new forms of querying could be introduced, leading to the eventual adoption of \acrshort{linq}. Predecessors to NHibernate's \acrshort{linq} are still present (Criteria and QueryOver \acrshort{api}(s)), although rarely used. Those were used before the addition of lambda expressions and extension methods into the language. Another available query language is Hibernate Query Language (\acrshort{hql}).\footnote{\url{https://nhibernate.info/doc/nhibernate-reference/queryhql.html}} \acrshort{hql} is very similar to \acrshort{sql} but object-oriented. It is not commonly used in the .NET world, and the queries are not statically typed as is the case with \acrshort{linq}. And lastly, raw \acrshort{sql} queries can be executed with a lot of helper methods. \acrshort{sql} queries can also be stored in \acrshort{xml} mapping files to avoid duplication. \acrshort{dml} is fully supported along with transactions but not in bulk operations. Logging of generated \acrshort{sql} can be enabled. NHibernate supports \acrshort{xml} type columns, but no querying capabilities inside it. NHibernate operates using a \textit{session}, an object responsible for managing interactions with the database. In typical web applications, a session is short-lived and scoped to a single \acrshort{http} request. That ensures all database operations with that request are isolated and consistent.
 
 \begin{example}
 \small
@@ -417,8 +417,8 @@ This example from NHibernate's documentation\footnote{\url{https://nhibernate.in
 
 \begin{lstlisting}[language=CSharp]
 session.CreateCriteria<Cat>()
-    .Add( Expression.Like("Name", "Fritz%") )
-    .Add( Expression.Between("Weight", minWeight, maxWeight) )
+    .Add(Expression.Like("Name", "Fritz%"))
+    .Add(Expression.Between("Weight", minWeight, maxWeight))
     .List<Cat>();
 
 session.Query<Cat>()
@@ -489,7 +489,7 @@ Entity Framework Core~\cite{efcore, efcoreRepo} is a modern \acrshort{orm} backe
 
 Wide range of database systems is supported including \acrshort{mssql}, MySQL, Oracle, PostgreSQL, SQLite, and Firebird. In-memory database is supported for testing purposes. Due to close relationship with Microsoft, \acrshort{ef} Core integrates tightly with \acrshort{mssql}, supporting even its more specific features. In addition, some non-relational databases are supported, such as Azure Cosmos DB\footnote{\url{https://azure.microsoft.com/en-us/products/cosmos-db}} or MongoDB.\footnote{\url{https://www.mongodb.com/docs/entity-framework/current/}}
 
-\acrshort{ef} Core operates with a \texttt{DbContext} object instead of a session. It represents a \textit{Unit of Work} pattern. It keeps track of all changes to the data, and when the operations are done, it commits everything into the database at once. These changes should usually be related and a part of one business transaction~\cite{FowlerUOW}. The developer actually inherits from the base \texttt{DbContext}, extending it with configuration, mappings, and access points to root entities. One application can contain multiple different \texttt{DbContext}(s) for different business domains. The context takes care of change \textit{tracking} and \textit{per-context caching}. Tracking can be toggled globally or per query; by default, it is enabled. Application-wide caching is not provided by default, but can be added via an extension. To save all changes, the \texttt{SaveChanges} method must be called and all changes will be propagated into the database within a transaction. Transactions can also be controlled manually. Save points can be created at any point, to which the transaction can be rolled back.
+\acrshort{ef} Core operates with a \texttt{DbContext} object instead of a session. It represents a \textit{Unit of Work} pattern. It keeps track of all changes to the data, and when the operations are done, it commits everything into the database at once. These changes should usually be related and a part of one business transaction~\cite{FowlerUOW}. The developer actually inherits from the base \texttt{DbContext}, extending it with configuration, mappings, and access points to root entities. One application can contain multiple different \texttt{DbContext}(s) for different business domains. The context takes care of change \textit{tracking} and \textit{per-context caching}. Tracking can be toggled globally or per query; by default, it is enabled. Application-wide caching is not provided by default, but can be added via an extension. To save all changes, the \texttt{SaveChanges} method must be called and all updates will be propagated into the database within a transaction. Transactions can also be controlled manually. Save points can be created at any point, to which the transaction can be rolled back.
 
 Entity mapping can be configured using global conventions, entity attributes, or fluent code. Relationship mapping is fully supported, and \acrshort{ef} Core effectively infers relationships based on navigation properties and primary and foreign keys. In many-to-many relationships, the join table can be explicitly \textit{mapped} or \textit{hidden}. Different fetching strategies are available for relationships. By default, navigation properties are not loaded; \textit{eager} loading requires \texttt{.Include} call in the query. Alternatively, \textit{lazy} loading or explicit (so-called \textit{later on demand}) strategies are configurable. 
 
@@ -497,7 +497,7 @@ Querying is done using \acrshort{linq} with entities accessed through \texttt{Db
 
 \begin{example}
 \small
-The following example from \acrshort{ef} Core's documentatio\footnote{\url{https://learn.microsoft.com/en-us/ef/core/modeling/\#use-fluent-api-to-configure-a-model}} demonstrates a simple model created through \texttt{DbContext}. One entity, \texttt{Blog}, is accessible through an exposed property and configured to have a required \acrshort{url}.
+The following example from \acrshort{ef} Core's documentation\footnote{\url{https://learn.microsoft.com/en-us/ef/core/modeling/\#use-fluent-api-to-configure-a-model}} demonstrates a simple model created through \texttt{DbContext}. One entity, \texttt{Blog}, is accessible through an exposed property and configured to have a required \acrshort{url}.
 \qed
 
 \begin{lstlisting}[language=CSharp]
@@ -606,7 +606,7 @@ The database schema can be defined directly in the code and projected to the dat
 \textbf{Cost} & Free \\
 \textbf{Sources} & \url{https://learn.microsoft.com/en-gb/ef/ef6/} \newline \url{https://github.com/dotnet/ef6} \newline \url{https://www.nuget.org/packages/EntityFramework/}  \\
 \textbf{Latest version} & 6.5.1 (June 2024) \\
-\textbf{Supported .NET} & .NET Framework, Standard, 6 \\
+\textbf{Supported .NET} & .NET Framework, .NET Standard, .NET 6 \\
 \textbf{\acrshort{orm} features} & Full object and relationship mapping \\
 \textbf{Query support} & \acrshort{linq} support \\
 \textbf{Mapping} & Attributes, fluent code \\

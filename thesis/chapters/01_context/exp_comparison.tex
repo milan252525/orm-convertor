@@ -5,28 +5,28 @@ This section presents an experimental comparison of the seven selected \acrshort
 
 For each framework, we create a set of unit tests performing pre-selected queries. They should cover different areas of querying through \acrshort{orm}(s), such as entity mapping, relationships, result modification, and aggregation.
 
-Notify that we only test read, i.e., \texttt{SELECT}, queries. Those cover a sufficiently large area of features and provide us with enough information to get some insight on capabilities and performance. Other non-read operations, including insert, update, and delete queries, could be explored in future work.
+It should be noted that only read, i.e., \texttt{SELECT}, queries are tested. Those cover a sufficiently large area of features and provide enough information to get some insight on capabilities and performance. Other non-read operations, including insert, update, and delete queries, could be explored in future work.
 
 \subsection{Dataset and database}
 \label{sec:dataset_database}
 % https://learn.microsoft.com/en-us/sql/samples/wide-world-importers-what-is?view=sql-server-ver16
-To adequately test performance, we need a sufficiently large data set. Microsoft offers pre-made open source datasets.
-For this comparison, the Wide World Importers sample database~\cite{microsoftWWI} has been selected.
+To adequately test performance, a sufficiently large data set is needed. Microsoft offers pre-made open source datasets.
+For this comparison, the Wide World Importers sample database~\cite{microsoftWWI} was selected.
 It contains a diverse set of fictional data about a company Wide World Importers described as ``wholesale novelty goods importer and distributor operating from the San Francisco bay area.''~\cite{microsoftWWI}
 
-The database contains over thirty tables split into four schemas, namely \texttt{Application}, \texttt{Purchasing}, \texttt{Sales}, and \texttt{Warehouse}. For each query, we select a suitable table and columns that can best showcase the desired feature.
+The database contains over thirty tables split into four schemas, namely \texttt{Application}, \texttt{Purchasing}, \texttt{Sales}, and \texttt{Warehouse}. For each query, a suitable table and columns are selected that can best showcase the intended feature.
 
 % database, docker, test project, .net
-The dataset is made for \acrshort{mssql}.\footnote{\acrshort{mssql} is the third most popular database management system as of March 2025 according to DB-Engines Ranking~\cite{DBEngines2025Ranking}. With a score of 788.14, it is behind Oracle (1253.08) and MySQL (988.13). The score takes into account the number of mentions on websites, frequency of technical discussions, number of job offers mentioning the system, relevance in social networks, and other parameters~\cite{DBEnginesRankingMetrics}.}, which represents database system commonly used in .NET applications, where \acrshort{ef} Core framework is used.\footnote{All the three products are developed and maintained by Microsoft corporation.}  
-Unit tests should be easy to set up and run. Configuring a database can turn into a complicated task. We will create a Docker container running \acrshort{mssql}. The dataset will be loaded on startup. Execution of unit tests will be just a matter of starting the Docker container and running the \texttt{dotnet test} command (or alternatively using Visual Studio Test Explorer). 
+The dataset is made for \acrshort{mssql}.\footnote{\acrshort{mssql} is the third most popular database management system as of March 2025 according to DB-Engines Ranking (Ranking archived at \url{https://web.archive.org/web/20250306124229/https://db-engines.com/en/ranking\#expand}). With a score of 788.14, it is behind Oracle (1253.08) and MySQL (988.13). The score takes into account the number of mentions on websites, frequency of technical discussions, number of job offers mentioning the system, relevance in social networks, and other parameters. (\url{https://db-engines.com/en/ranking_definition})}, which represents database system commonly used in .NET applications.
+Unit tests should be easy to set up and run. Configuring a database can turn into a complicated task. A Docker container running \acrshort{mssql} is provided for easier setup. The dataset is loaded on startup. Execution of unit tests is just a matter of starting the Docker container and running the \texttt{dotnet test} command (or alternatively using Visual Studio Test Explorer). 
 
 \subsection{Selected queries}
 \label{sec:selected_queries}
-Our goal is to test the query capabilities as broadly as possible. We want to create queries that use different conditions, result modifications, aggregations, relationships between tables, etc. The queries are grouped into categories \textbf{A -- H} by the type of features they test. Table~\ref{tab:queries-sum} provides an overview of each query purpose. In particular, we go over each query and provide an example of what the query should look like in raw \acrshort{sql}. The example can be used to directly query the test database to preview results. The example might be simplified for this text. Unit tests might use a different query language where available.
+Our goal is to test the query capabilities as broadly as possible. We want to create queries that use different conditions, result modifications, aggregations, relationships between tables, etc. The queries are grouped into categories \textbf{A -- H} by the type of features they test. In particular, we go over each query and provide an example of what the query should look like in raw \acrshort{sql}. The example can be used to directly query the test database to preview results. The example might be simplified for this text. Unit tests might use a different query language where available. Table~\ref{tab:queries-sum} provides an overview of the purpose of each query.
 
 \begin{table}[th]
 \centering
-\caption{Benchmark queries}\label{tab:queries-sum}
+\caption{Overview of intended tested features of queries.}\label{tab:queries-sum}
 \begin{tabular}{ll}
 \toprule
 \textbf{ID} & \textbf{Query type} \\ 
@@ -59,12 +59,11 @@ Our goal is to test the query capabilities as broadly as possible. We want to cr
 \end{table}
 
 \subsubsection{Group A -- Entity projection}
-This group will test how well \acrshort{orm} can handle projecting table columns onto a user-defined entity or entities. Queries \textbf{A1}, \textbf{A2}, and \textbf{A3} will fetch one row based on its \textit{identifier}. The measured time and memory allocation will then show the overhead of the \acrshort{orm} framework when mapping data to the resulting entities. Query \textbf{A4} returns a large number of results, so it is the first query that shows us the performance with high-volume data.
+This group tests how well can \acrshort{orm} handle projecting table columns onto a user-defined entity or entities. Queries \textbf{A1}, \textbf{A2}, and \textbf{A3} fetch one row based on its \textit{identifier}. The measured time and memory allocation will show the overhead of the \acrshort{orm} framework when mapping data to the resulting entities. Query \textbf{A4} returns a large number of results, so it is the first query that shows the performance with high-volume data.
 
 \paragraph{Query A1 -- Entity identical to a table}
 \label{query:a1}
-The query retrieves a table row and map it to an entity with properties identical to table columns. 
-Table \texttt{Purchasing.PurchaseOrders} is queried and one item retrieved based on its identifier \texttt{PurchaseOrderId}.
+The query retrieves a table row, mapping it to an entity with properties corresponding to table columns. One item is retrieved based on its identifier.
 
 \begin{lstlisting}[language=SQL]
 SELECT * FROM Purchasing.PurchaseOrders 
@@ -73,8 +72,7 @@ WHERE PurchaseOrderId = 25
 
 \paragraph{Query A2 -- Subset of columns}
 \label{query:a2}
-The resulting entity has fewer properties than table columns. Only the data we really need should be transferred. 
-Table \texttt{Purchasing.Suppliers} is queried, and only columns related to the supplier's contact info are retrieved.
+The resulting entity has fewer properties than table columns, fetching only needed data. Supplier information is queried, retrieving only contact info.
 
 \begin{lstlisting}[language=SQL]
 SELECT SupplierID, SupplierName, PhoneNumber, FaxNumber, WebsiteURL, ValidFrom, ValidTo 
@@ -84,8 +82,7 @@ WHERE SupplierID = 10
 
 \paragraph{Query A3 -- One row to multiple entities}
 \label{query:a3}
-Single table is queried and the resultis divided into two different entities. 
-Table \texttt{Purchasing.Suppliers} is used again, from which we retrieve contact information and bank account information into two separate entities. 
+Supplier information from a single table is retrieved, while contact information and bank account information are split into two separate entities. 
 
 \begin{lstlisting}[language=SQL]
 SELECT 
@@ -101,7 +98,7 @@ This query executes a stored procedure, limited by parameters, and loads the res
 The executed stored procedure is \texttt{Integration.GetOrderUpdates} with parameters \texttt{LastCutoff} and \texttt{NewCutoff}. 
 We limit the cut-off to a one-year range from 2014 to 2015. 66741 order updates should be returned.
 
-This stored procedure returns columns with spaces in their names, for example, ``WWI Order ID''. As properties in the C\# language cannot contain spaces, it is interesting to see how and if different frameworks can handle this.
+This stored procedure returns columns with spaces in their names, for example, ``WWI Order ID''. As properties in the C\# language cannot contain spaces, it is interesting to see how different frameworks handle this problem.
 
 \begin{lstlisting}[language=SQL]
 EXEC WideWorldImporters.Integration.GetOrderUpdates 
@@ -109,11 +106,11 @@ EXEC WideWorldImporters.Integration.GetOrderUpdates
 \end{lstlisting}
 
 \subsubsection{Group B -- Selection}
-Probably the most common query operation is limiting results based on a condition (i.e., filtering). This set of queries queries table \texttt{Sales.OrderLines} with varied conditions.
+Probably the most common query operation is selection --- filtering results based on a condition. This set of queries queries table \texttt{Sales.OrderLines} with varied conditions.
 
 \paragraph{Query B1 -- Selection over indexed column}
 \label{query:b1}
-The query retrieves one order line based on the identifier \texttt{OrderId}. The identifier is a foreign key with an index built over it.
+The query retrieves one order line based on the identifier of its order. The identifier is a foreign key with an index built over it.
 
 \begin{lstlisting}[language=SQL]
 SELECT * FROM Sales.OrderLines WHERE OrderID = 26866
@@ -141,8 +138,8 @@ BETWEEN '2014-12-20' AND '2014-12-31'
 
 \paragraph{Query B4 -- IN list filter}
 \label{query:b4}
-When a range is not sufficient and we want specific values not fitting into an interval, we can provide a collection of values.
-This query will return order lines belonging to orders with \texttt{OrderId} equal to '1', '10', '100', '1000', or '10000'.
+When a range is not sufficient and specific values out of a continuous interval are needed, a collection of values can be provided.
+This query will return order lines belonging to orders with identifier equal to '1', '10', '100', '1000', or '10000'.
 
 \begin{lstlisting}[language=SQL]
 SELECT * FROM Sales.OrderLines 
@@ -160,7 +157,7 @@ WHERE Description LIKE '%C++%'
 
 \paragraph{Query B6 -- Paging}
 \label{query:b6}
-When filtering with a broad condition, a large amount of data might be returned. So we may opt to receive the data in batches. Another use case might be a paged table displayed to a user. For these, a paging query with skip and take might be useful.
+When filtering with a broad condition, a large amount of data might be returned. In such cases, it may be preferable to receive the data in batches. Another use case might be a paged table. For these, a paging query with skip and take might be useful.
 This query fetches all order lines ordered by identifier, but will skip the first 1000 rows and take only the next 50 rows.
 
 \begin{lstlisting}[language=SQL]
@@ -170,11 +167,11 @@ OFFSET 1000 ROWS FETCH NEXT 50 ROWS ONLY
 \end{lstlisting}
 
 \subsubsection{Group C -- Aggregation}
-Aggregation functions are often used when performing calculations on data. In this group, we test a selected sample of them.
+Aggregation functions are often used when performing calculations on data. In this group, a selected sample of them is tested.
 
 \paragraph{Query C1 -- Count}
 \label{query:c1}
-Count is very useful when we need to know the number of records that correspond to a specific condition. We combine it with \texttt{GROUP BY} clause to retrieve distinct tax rates and the number of their occurrences.
+\texttt{COUNT} is useful when we need to know the number of records that correspond to a specific condition. Here it is combined with the \texttt{GROUP BY} clause to retrieve each distinct tax rate along with the number of its occurrences.
 
 \begin{lstlisting}[language=SQL]
 SELECT TaxRate, COUNT(TaxRate) as Count 
@@ -185,7 +182,7 @@ ORDER BY Count DESC
 
 \paragraph{Query C2 -- Max}
 \label{query:c2}
-Maximum and minimum are also commonly used. We attempt to retrieve the maximum unit price for all order lines.
+Fetching maximum and minimum is also often required. The goal is to retrieve the maximum unit price for all order lines.
 
 \begin{lstlisting}[language=SQL]
 SELECT MAX(UnitPrice) FROM Sales.OrderLines
@@ -193,27 +190,24 @@ SELECT MAX(UnitPrice) FROM Sales.OrderLines
 
 \paragraph{Query C3 -- Sum}
 \label{query:c3}
-Aggregation functions also allow performing operations. In this test, we combine the \texttt{SUM} function with a multiplication inside. The result is the total price across all order lines.
+Aggregation functions also allow performing operations. This test combines the \texttt{SUM} function with a multiplication inside. The result is the total price across all order lines.
 
 \begin{lstlisting}[language=SQL]
 SELECT SUM(Quantity * UnitPrice) FROM Sales.OrderLines
 \end{lstlisting}
 
 \subsubsection{Group D -- Relations}
-An important feature of \acrshort{orm} should be mapping relations. Our domain entities are often connected, representing relations in real life.
-However, as we found out in our previous analysis, not all the selected frameworks support mapping relations. 
+An important feature of \acrshort{orm} should be mapping relations. Domain entities are often connected, representing real-life relationships.
+However, the previous analysis showed that not all selected frameworks support mapping relations.
 
-Our test data contain no one-to-one relation. There should be a small difference between mapping one-to-one and one-to-many. We cover the other types in sufficient detail.
+The test data contain no one-to-one relation. There should be a small difference between mapping one-to-one and one-to-many. The other types are covered in sufficient detail.
 
-Some \acrshort{orm}(s) support lazy loading\footnote{\url{https://nhibernate.info/doc/nh/en/index.html\#collections-lazy}, \url{https://learn.microsoft.com/en-us/ef/core/querying/related-data/lazy}}, i.e., loading entities in a relation only after accessing the corresponding collection. That would result in more queries being sent and a potential slowdown.
-We prevent this by setting the loading strategy to eager when possible.
+Some \acrshort{orm}(s) support lazy loading\footnote{\url{https://nhibernate.info/doc/nh/en/index.html\#collections-lazy}}\footnote{\url{https://learn.microsoft.com/en-us/ef/core/querying/related-data/lazy}}, i.e., loading entities in a relation only after accessing the corresponding collection. That would result in more queries being sent and a potential slowdown. To avoid this, the loading strategy is set to eager when possible.
 
 \paragraph{Query D1 -- One-to-many}
 \label{query:d1}
-In a one-to-many relation, we have one parent and multiple children. A parent entity should have a collection containing its children. Optionally, a child entity can have a reference to its parent.
-In this test, we use the relation between an order and its order lines. We fetch one specific order along with all its lines.
-
-We need to verify all child entities were returned and the parent collection filled. 
+In a one-to-many relation, one parent is associated with multiple children. The parent entity should include a collection of its children, and optionally, each child can hold a reference to its parent. This test uses the relation between an order and its order lines, fetching one specific order along with all its lines.
+It must be verified that all child entities are returned and the parent’s collection is properly populated.
 
 \begin{lstlisting}[language=SQL]
 SELECT o.*, ol.* FROM Sales.Orders o
@@ -225,8 +219,7 @@ WHERE o.OrderID = 530
 \label{query:d2}
 In a many-to-many relation, both sides can be connected with multiple entities of the same type. Therefore, it will be represented by a collection on both sides. The collection can contain the entity directly, which makes it easier for developers to work with. If necessary, it can contain entities that represent the join table for this relationship.
 
-This test consists of two queries. We want to test accessing the relationship from both sides. The first query fetches stock items with their stock groups. And the other one stock groups with their stock items.
-The relationship is represented by a join table \texttt{Warehouse.StockItemStockGroups}. If possible, we try to map this relation without a join entity in our tests.
+This test consists of two queries to verify access to the relationship from both sides. The first query fetches stock items with their stock groups, and the second one fetches stock groups with their stock items. The relationship is represented by a join table \texttt{Warehouse.StockItemStockGroups}. If possible, the relation is mapped without a join entity in the tests.
 
 \begin{lstlisting}[language=SQL]
 SELECT si.*, sg.* FROM Warehouse.StockItems si
@@ -245,11 +238,11 @@ ORDER BY si.StockItemID
  ORDER BY sg.StockGroupID
 \end{lstlisting}
 
-Note that the queries utilise left join, so we get all stock items, even if they belong to no stock groups. And vice versa for the other query.
+Note that the queries use a left join to ensure all stock items are returned, even if they do not belong to any stock groups --- and vice versa for the other query.
 
 \paragraph{Query D3 -- Optional one-to-many relationship}
 \label{query:d3}
-In test case \hyperref[query:d1]{D1}, the one-to-many relation was not optional. Each order has at least one order line. In test case \hyperref[query:d2]{D2}, each item belonged to at least one category as well. In contrary to previous cases, this test case utilizes an optional one-to-many relation between a customer and a transaction. 
+In test case \hyperref[query:d1]{D1}, the one-to-many relation was not optional. Each order has at least one order line. In test case \hyperref[query:d2]{D2}, each item belonged to at least one category as well. In contrast to previous cases, this test case utilizes an optional one-to-many relation between a customer and a transaction. 
 
 \begin{lstlisting}[language=SQL]
 SELECT c.*, ct.* FROM Sales.Customers c
@@ -259,12 +252,12 @@ ORDER BY c.CustomerID
 \end{lstlisting}
 
 \subsubsection{Group E -- Result modification}
-This category tests modifying the result set. We test sorting by a column and filtering distinct result values.
+This category focuses on modifying the result set by testing sorting based on a column and filtering distinct values.
 
 \paragraph{Query E1 -- Sorting with limit}
 \label{query:e1}
-Although we have used sorting to order the results of some previous tests to get deterministic results, this test focuses solely on sorting.
-We sort all purchase orders by their expected delivery date and retrieve only the first one thousand.
+Although sorting was used in previous tests to ensure deterministic results, this test focuses solely on sorting.
+All purchase orders are sorted by expected delivery date, and only the first one thousand are retrieved.
 
 \begin{lstlisting}[language=SQL]
 SELECT TOP (1000) * FROM Purchasing.PurchaseOrders 
@@ -273,7 +266,7 @@ ORDER BY ExpectedDeliveryDate ASC
 
 \paragraph{Query E2 -- Distinct projection}
 \label{query:e2}
-To test fetching only unique values, we request all supplier references from purchase orders.
+To test fetching only unique values, all supplier references are retrieved from purchase orders.
 
 \begin{lstlisting}[language=SQL]
 SELECT DISTINCT SupplierReference 
@@ -281,15 +274,13 @@ FROM Purchasing.PurchaseOrders
 \end{lstlisting}
 
 \subsubsection{Group F -- JSON queries}
-\acrshort{mssql} supports storing and querying \acrshort{json} data~\cite{mssqljson}. It is worth testing if our selected \acrshort{orm}(s) support constructing queries into the stored \acrshort{json}.
-Table \texttt{Application.People} contains text columns storing \acrshort{json} values.
+\acrshort{mssql} supports storing and querying \acrshort{json} data.\footnote{\url{https://learn.microsoft.com/en-us/sql/relational-databases/json/json-data-sql-server?view}} It is worth testing if selected \acrshort{orm}(s) support constructing queries into the stored \acrshort{json}. Table \texttt{Application.People} contains text columns storing \acrshort{json} values.
 
-During the static comparison, we found that none of the selected \acrshort{orm}(s) supports \acrshort{xml} or any other data format, therefore we do not cover for those.
+During the static comparison, it was found that none of the selected \acrshort{orm}(s) support \acrshort{xml} or any other data format; therefore, those are not covered.
 
 \paragraph{Query F1 -- JSON object query}
 \label{query:f1}
-Column \texttt{CustomFields} contains a \acrshort{json} with many different values. In this test, we focus on property \texttt{Title}. We query all people with a title set to ``Team Member''.
-We accomplish that using the \texttt{JSON\_VALUE} \acrshort{sql} function.
+Column \texttt{CustomFields} contains a \acrshort{json} with many different values. In this test, the focus is on property \texttt{Title}. All people with a title set to ``Team Member'' are queried. This is accomplish using the \texttt{JSON\_VALUE} \acrshort{sql} function.
 
 \begin{lstlisting}[language=SQL]
 SELECT * FROM Application.People
@@ -311,11 +302,11 @@ WHERE EXISTS (
 \end{lstlisting}
 
 \subsubsection{Group G -- Set operations}
-In the last group we will test common set operations. Those are useful when having to combine two sets of data.
+The last group tests common set operations, which are useful when combining multiple sets of data.
 
 \paragraph{Query G1 -- Union}
 \label{query:g1}
-Union combines results from both queries. In this test, we combine results from two different intervals of IDs and ensure that they are all present in the result.
+Union combines results from both queries. This test merges results from two different ID intervals and ensures all are present in the final result.
 
 \begin{lstlisting}[language=SQL]
 SELECT SupplierID FROM Purchasing.Suppliers 
@@ -328,7 +319,7 @@ ORDER BY SupplierID
 
 \paragraph{Query G2 -- Intersection}
 \label{query:g2}
-Intersection includes results that appear in both of the queries. We try combining supplier IDs in two overlapping intervals and assert that only the overlap is included. 
+Intersection includes results that appear in both queries. This test combines supplier IDs from two overlapping intervals and asserts that only the overlap is included. 
 
 \begin{lstlisting}[language=SQL]
 SELECT SupplierID FROM Purchasing.Suppliers 
@@ -340,11 +331,11 @@ ORDER BY SupplierID
 \end{lstlisting}
 
 \subsubsection{Group H -- Metadata lookup}
-In the last section, we briefly test the \acrshort{orm} framework's ability to query information about the database itself. While not commonly used in applications, such data can be required in specific cases.
+The last section briefly tests the \acrshort{orm} framework's ability to query database metadata. While not commonly used in typical applications, such information may be required in specific scenarios.
 
 \paragraph{Query H1 -- Column data type}
 \label{query:h1}
-The final query attempts to retrieve the data type of a table column. All information about the database schema is available through \texttt{INFORMATION\_SCHEMA.COLUMNS} table. The selected column has \texttt{NVARCHAR} type. Note that the table contains information such as nullability, or maximum length, but for demonstration purposes, a simple query returning only data type should be sufficient.
+The final query attempts to retrieve the data type of a table column. All information about the database schema is available through \texttt{INFORMATION\_SCHEMA.COLUMNS} table. The selected column has \texttt{NVARCHAR} type. Note that the table contains information such as nullability or maximum length, but for demonstration purposes, a simple query returning only data type should be sufficient.
 
 \begin{lstlisting}[language=SQL]
 SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
@@ -354,29 +345,27 @@ WHERE TABLE_SCHEMA = 'Purchasing'
 \end{lstlisting}
 
 \subsubsection{Summary of the selected queries}
-We tried to pick as broad a selection of features as possible. 
-The set is not exhaustive but representative enough to give us a fair idea of how different \acrshort{orm}(s) perform. 
+A broad selection of features was chosen. While not exhaustive, the set is representative enough to provide a fair view of how different \acrshort{orm}(s) perform.
 
-The tests perform queries across different tables and fetch different amounts of data. 
-Measured time and memory allocation will not allow us to make any assumptions when comparing different test cases for the same \acrshort{orm}.
-But we will be able to compare identical test cases across different \acrshort{orm}(s).
+The tests perform queries across different tables and fetch varying amounts of data. 
+Measured time and memory allocation do not allow us to make any assumptions when comparing different test cases for the same \acrshort{orm}, but we will be able to compare identical test cases across different \acrshort{orm}(s).
 
-We can expect to see a difference in time performance between micro frameworks made to be efficient and feature-rich macro frameworks.
-The micro frameworks utilize raw \acrshort{sql} and have very little overhead. When using a macro framework, the \acrshort{linq} query has to be compiled into \acrshort{sql}. Rich mapping capabilities may also cause significant slowdown. And extra features may even cause higher memory consumption.
+We can expect a difference in time performance between micro frameworks optimized for efficiency and feature-rich macro frameworks.
+The micro frameworks utilize raw \acrshort{sql} and have very little overhead. When using a macro framework, the \acrshort{linq} query has to be compiled into \acrshort{sql}. Rich mapping capabilities may also cause significant slowdowns. And extra features may even cause higher memory consumption.
 
 \subsection{Testing approach}
 \label{sec:testing_approach}
 We prefer to use \acrshort{linq} where possible as it is tightly integrated into the .NET environment. 
 If \acrshort{linq} integration is not available, we use any suitable alternative. And if there are no other possibilities, we default to raw \acrshort{sql} queries. 
 
-There are multiple different methods for mapping database tables to entities. We use different methods to show the variety and their impact or trade-offs. 
+There are multiple different methods for mapping database tables to entities. Different methods are used to show the variety and their impacts or trade-offs. 
 
-If \acrshort{orm} supports caching entities, we disable it so that our benchmarks are not affected. 
-A feature related to caching is change tracking. For example, \acrshort{ef} Core tracks changes made to an entity, so that it can later perform an update. All our tests will only execute read operations. Change tracking would unnecessarily increase measured time or allocated memory, so we will disable it.
+If \acrshort{orm} supports caching entities, it is disabled so that the benchmarks are not affected. 
+A feature related to caching is change tracking. For example, \acrshort{ef} Core tracks changes made to an entity, so that it can later perform an update. All the tests execute only read operations. Change tracking would unnecessarily increase measured time or allocated memory, so we will disable it.
 
-Logging is turned off for performance tests. In feature tests, we might want to compare generated \acrshort{sql}. So, we enable \acrshort{sql} logging into the test output window where possible.
+Logging is turned off for performance tests. In feature tests, we might want to compare generated \acrshort{sql}. Therefore, \acrshort{sql} logging into the test output window is enabled where possible.
 
-To showcase different approaches to mapping, we try to select a different method for each framework test. Mapping is usually compiled on application startup or the first query and then cached. So performance should not be affected by a choice of mapping. Dapper does not use any mapping. PetaPoco and RepoDB use attributes to declare table schema and name, and in some cases column names; the rest is inferred. LINQ to DB utilizes mapping by code through the builder pattern. NHibernate uses its proprietary mapping through files in \acrshort{xml} format. Both versions of Entity Framework use attribute mapping combined with mapping through code. Their attribute mapping is much more powerful than those of PetaPoco and RepoDB, but in more complex cases, mapping by code has to be supplied.
+Mapping is usually compiled on application startup or the first query and then cached. As a result, performance should not be affected by a choice of mapping. Dapper does not use any mapping. PetaPoco and RepoDB use attributes to declare table schema and name, and in some cases column names; the rest is inferred. LINQ to DB utilizes mapping by code through the builder pattern. NHibernate uses its proprietary mapping through files in \acrshort{xml} format. Both versions of Entity Framework use attribute mapping combined with mapping through code. Their attribute mapping is much more powerful than those of PetaPoco and RepoDB, but in more complex cases, mapping by code has to be supplied.
 
 \subsection{Implementation}
 The comparison was implemented in the form of a Visual Studio solution, containing a project folder for each framework. Each project folder contains three projects -- entities, feature tests, and performance benchmark. 
@@ -388,18 +377,18 @@ The comparison was implemented in the form of a Visual Studio solution, containi
   \label{fig:test_project_dependencies}
 \end{figure}
 
-Common project is also included. It contains a single class handling loading the database connection string from a configuration file. Dependencies are demonstrated in Figure~\ref{fig:test_project_dependencies}. There is no dependency between feature tests and performance tests. It could be argued that the code for queries could be extracted to a separate class to avoid duplication. But it was kept duplicated to isolate unit tests from performance benchmarks. This structure is repeated for each of the seven frameworks we are examining. There is again no dependency between the different frameworks for isolation purposes.
+Common project is also included. It contains a single class handling loading the database connection string from a configuration file. Dependencies are demonstrated in Figure~\ref{fig:test_project_dependencies}. There is no dependency between feature tests and performance tests. It could be argued that the code for queries could be extracted to a separate class to avoid duplication. But it was kept duplicated to isolate unit tests from performance benchmarks. This structure is repeated for each of the seven examined frameworks.
 
 \subsubsection{Technology overview}
-As we have decided before implementation in Section~\ref{sec:dataset_database}, we are using \acrshort{mssql} with World Wide Importers data set. The database system is running in a Docker container. Base image used is \texttt{mssql/server:2022-latest}\footnote{\url{https://hub.docker.com/r/microsoft/mssql-server}} provided by Microsoft. The image imports our dataset and waits until it is ready.
+As decided before implementation in Section~\ref{sec:dataset_database}, \acrshort{mssql} with World Wide Importers data set is used. The database system is running in a Docker container. Base image used is \texttt{mssql/server:2022-latest}\footnote{\url{https://hub.docker.com/r/microsoft/mssql-server}} provided by Microsoft. The image imports the dataset and waits until it is ready.
 
 The .NET tests are structured in .NET projects grouped in one solution. .NET version 8 was chosen as it is the latest long term support (\acrshort{lts}) version at the time of writing.\footnote{\url{https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core}} Tests are developed and run using Microsoft Visual Studio 2022, but \texttt{dotnet} \acrshort{cli} commands are provided as well.
 
 \subsubsection{Installation instructions}
-Source code of unit tests and performance benchmarks, in addition to Dockerfile, are available in a public GitHub repository.~\footnote{\url{https://github.com/milan252525/orm-convertor}} The container was tested both in Docker\footnote{\url{https://docs.docker.com/}} and Podman\footnote{\url{https://podman.io/docs}}. A \texttt{Dockerfile} is provided in \texttt{benchmarks/Dockerfile}. Container image can be built and started using the two commands below. Replace \texttt{'docker'} with \texttt{'podman'} if needed. The database system will be exposed on port 1444, under username \texttt{'SA'} and password \texttt{'Testingorms123'}.
-The third command can be used to test connection. The \texttt{sqlcmd} utility is available only if you have \acrshort{mssql} installed locally. Otherwise, use any database management tool of your choice.
+Source code of unit tests and performance benchmarks, in addition to Dockerfile, are available in a public GitHub repository.\footnote{\url{https://github.com/milan252525/orm-convertor}} The container was tested both in Docker\footnote{\url{https://docs.docker.com/}} and Podman\footnote{\url{https://podman.io/docs}}. A \texttt{Dockerfile} is provided in \texttt{benchmarks/Dockerfile}. Container image can be built and started using the two commands in Listing~\ref{lst:docker_commands}. If needed, \texttt{'docker'} should be replaced by \texttt{'podman'}. The database system will be exposed on port 1444, under username \texttt{'SA'} and password \texttt{'Testingorms123'}.
+The third command in Listing~\ref{lst:docker_commands} can be used to test connection. The \texttt{sqlcmd} utility is available only if \acrshort{mssql} is installed locally. Otherwise, any database management tool of choice can be used.
 
-\begin{lstlisting}[language=sh]
+\begin{lstlisting}[language=sh,caption={Command to build, run, and test connection to Docker container.},label={lst:docker_commands}]
 docker build -t orm-comparison .
 
 docker run -d --name orm-comparison -p 1444:1433 orm-comparison
@@ -414,7 +403,7 @@ To run performance benchmarks, set \texttt{BenchmarkMain} as a startup project. 
 Console command for running benchmarks is \lstinline{dotnet run --configuration Release --project BenchmarkMain\BenchmarkMain.csproj}. To run with a shorter test configuration, append \lstinline{-- --testb} at the end of the command.
 
 \subsubsection{Feature tests}
-For each query defined in Section~\ref{sec:selected_queries}, a unit test in the form of an isolated method was implemented. Connection and other configuration are created outside of the test in a setup part. The method executes the query and correct results are asserted. Assertion checks the amount of results and their order. Each property is tested to contain correct data to ensure mapping was done correctly.
+For each query defined in Section~\ref{sec:selected_queries}, a unit test in the form of an isolated method is implemented. Connection and other configuration are created outside of the test in a setup part. The method executes the query and correct results are asserted. Assertion checks the amount of results and their order. Each property is tested to contain correct data to ensure mapping was done correctly.
 
 The example below shows Query A1 (see Section~\ref{query:a1}) implemented for Dapper. A single purchase order is retrieved based on its ID, and its properties are checked for correct values. 
 \begin{lstlisting}[language=CSharp]
@@ -436,15 +425,14 @@ public void A1_EntityIdenticalToTable()
 }
 \end{lstlisting}
 
-As decided in Section~\ref{sec:testing_approach}, we have attempted to use \acrshort{linq} query language. Where not supported we have used any available alternative that did not involve just writing raw \acrshort{sql}. And finally, where nothing else was possible we have used the raw alternative to have a passing test.  
-%TODO mention the table that will have feature comparison
+As decided in Section~\ref{sec:testing_approach}, the \acrshort{linq} query language is used where possible. Otherwise, any available alternative that does not involve just writing raw \acrshort{sql} is preferred. And finally, where nothing else is possible, the raw \acrshort{sql} alternative is selected to have a passing test.  
 
 \subsubsection{Performance benchmarks}
 Feature tests can assert the correctness of returned results and overall functionality. But their execution time can greatly vary. There can be some overhead, coming from test initialization or assertions. The system the benchmarks are running on can also impact results.
 
-To solve these problems we have used BenchmarkDotNet library~\cite{BenchmarkDotNet}. It allows writing benchmark methods very similar to unit tests. In fact, they are completely identical to unit tests, the only differences are missing assertions and a different method attribute. It allows us to ``transform methods into benchmarks, track their performance, and share reproducible measurement experiments''~\cite{BenchmarkDotNet}. Work with the library was quite easy, it is very configurable and easy to run. 
+To solve these problems, BenchmarkDotNet library\footnote{\url{https://benchmarkdotnet.org/}} is used. It allows writing benchmark methods very similar to unit tests. In fact, they are completely identical to unit tests; the only differences are missing assertions and a different method attribute. It allows us to ``transform methods into benchmarks, track their performance, and share reproducible measurement experiments''~\cite{BenchmarkDotNet}. Work with the library is quite easy, it is very configurable and straightforward to run. 
 
-It runs benchmark for each method multiple times. It starts with a few iterations which will not be included in the results. The first few ensure \textit{just-in-time} (\acrshort{jit}) compilation has taken effect, then multiple iterations without actually running the method code are started to compile overhead. The overhead is removed from the results, ensuring reliability. 
+It runs benchmarks for each method multiple times. It starts with a few iterations which will not be included in the results. The first few ensure \textit{just-in-time} (\acrshort{jit}) compilation has taken effect, then multiple iterations without actually running the method code are started to compile overhead. The overhead is removed from the results, ensuring reliability. 
 
 According to BenchmarkDotNet documentation~\cite{BenchmarkDotNetHow}, a single benchmark run consists of the following stages:
 \begin{itemize}
@@ -456,7 +444,7 @@ According to BenchmarkDotNet documentation~\cite{BenchmarkDotNetHow}, a single b
     \item \textit{WorkloadResult} -- Result calculated from the actual run without the overhead.
 \end{itemize}
 
-After the benchmark run finishes, results and run log can be found in folder \path{benchmarks/BenchmarkMain/bin/Release/net8.0/} saved in file \path{Benchmark-\\DotNet.Artifacts}.
+After the benchmark run finishes, results and run log can be found in folder \path{benchmarks/BenchmarkMain/bin/Release/net8.0/} under a file name \path{BenchmarkDotNet.Artifacts}.
 
 \smallskip
 The referenced run results are copied to \path{benchmarks/results/joined}.
@@ -495,7 +483,7 @@ The negative results are discussed in detail further in the subsequent text.
 \begin{landscape}
 \begin{table}[htp]
 \centering
-\caption{Feature comparison}
+\caption{Feature comparison results}
 \label{tab:feature_comp}
 \scriptsize
 \begin{threeparttable}[!htb]
@@ -544,11 +532,11 @@ H1\_Metadata &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &Y raw SQL &
 \end{landscape}
 }
 
-Table~\ref{tab:benchmark_results_time} presents measured execution time (in microseconds), and Table~\ref{tab:benchmark_results_memory} presents allocated memory during the run of the benchmark. Reported numbers in text will be rounded to the nearest integer.
+Table~\ref{tab:benchmark_results_time} presents measured execution time (in microseconds), and Table~\ref{tab:benchmark_results_memory} presents allocated memory during the run of the benchmark. Reported numbers in text are rounded to the nearest integer.
 
-Performance tests have to be considered in the context of the feature test results. It was not possible to write all tests in the same way across all frameworks. In some cases, pure ADO.NET queries were used when the framework failed entirely. Additionally, some queries required additional processing in memory, significantly affecting memory usage. These anomalies will be explicitly noted.
+Performance tests have to be considered in the context of the feature test results. It was not possible to write all tests in the same way across all frameworks. In some cases, pure ADO.NET queries were used when the framework failed entirely. Additionally, some queries required additional processing in memory, significantly affecting memory usage. These anomalies are explicitly noted.
 
-Certain frameworks cannot log generated \acrshort{sql} statements to console or file. For those, Microsoft SQL Server Profiler~\cite{sqlProfiler} was used. It allows capturing of any event happening in the Microsoft SQL Server database, including incoming \acrshort{sql} queries. That makes us able to inspect the raw query after it leaves our application and the frameworks can make no further edits to it.
+Certain frameworks cannot log generated \acrshort{sql} statements to console or file. For those, Microsoft SQL Server Profiler\footnote{\url{https://learn.microsoft.com/en-us/sql/tools/sql-server-profiler/sql-server-profiler}} is used. It allows capturing of any event happening in the \acrshort{mssql} database, including incoming \acrshort{sql} queries. That allows inspection of the raw query after it leaves the application as the frameworks can make no further edits to it.
 
 \afterpage{
 \begin{landscape}
@@ -676,14 +664,14 @@ All selection queries \hyperref[query:b1]{B1} -- \hyperref[query:b6]{B6} passed 
 
 Query \hyperref[query:b1]{B1}, which returns 5 records, showed macro \acrshort{orm}(s) allocating significantly more memory (NHibernate 49 KB, \acrshort{ef}6 102 KB) compared to Dapper (9 KB) or PetaPoco (14 KB). Query \hyperref[query:b2]{B2}, returning thousands of records, again showed NHibernate and \acrshort{ef}6 taking drastically more time and memory (7 and 16 times more), even though generated \acrshort{sql} queries were identical.
 
-Query \hyperref[query:b3]{B3} showed unexpectedly slower performance from Dapper, PetaPoco, and RepoDB. There is a difference in the query. In Dapper and PetaPoco, where \acrshort{sql} is written by us, we used \texttt{BETWEEN} condition for selecting a date range. Other \acrshort{orm}(s) broke this condition down into two operators ($\leq$ and $\geq$). But RepoDB does not use \texttt{BETWEEN}, hinting that this had no impact.
+Query \hyperref[query:b3]{B3} showed unexpectedly slower performance from Dapper, PetaPoco, and RepoDB. There is a difference in the query. In Dapper and PetaPoco, where \acrshort{sql} is written by us, we used \texttt{BETWEEN} condition for selecting a date range. Other \acrshort{orm}(s) broke this condition down into two operators ($\leq$ and $\geq$). But RepoDB does not use \texttt{BETWEEN}, hinting that the difference had no impact on performance.
 
 Queries \hyperref[query:b4]{B4}, \hyperref[query:b5]{B5}, and \hyperref[query:b6]{B6} had generally consistent execution times across all frameworks. But NHibernate and \acrshort{ef}6 showed consistently elevated memory allocation. Interestingly, in some cases, Dapper showed higher memory usage compared to PetaPoco, indicating differences in internal memory optimization. 
 
 \subsubsection{Group C -- Aggregation}
-Aggregation tests \hyperref[query:c1]{C1} -- \hyperref[query:c3]{C3} tested handling of groupings and aggregate functions. RepoDB lacked support for \texttt{group by} operation in query \hyperref[query:c1]{C1}, failing the test entirely. NHibernate and \acrshort{ef}6 have approximately a 4 and 10 times memory consumption increase, respectively, although execution times remain comparable. 
+Aggregation tests \hyperref[query:c1]{C1} -- \hyperref[query:c3]{C3} tested handling of groupings and aggregate functions. RepoDB lacked support for \texttt{GROUP BY} operation in query \hyperref[query:c1]{C1}, failing the test entirely. NHibernate and \acrshort{ef}6 have approximately 4 and 10 times memory consumption increase, respectively, although execution times remain comparable. 
 
-\hyperref[query:c2]{C2} showed consistent performance and memory usage across frameworks. However, in \hyperref[query:c3]{C3}, RepoDB incorrectly handled a multiplication when using its \texttt{Sum} function. It omitted part of the multiplication inside the \texttt{Sum} aggregation function, returning incorrect results. We had to use a raw \acrshort{sql} query instead. The measured time is consistent across all frameworks. The returned result is just one number and we can see some slight increase in memory consumption for the macro \acrshort{orm}(s).
+\hyperref[query:c2]{C2} showed consistent performance and memory usage across frameworks. However, in \hyperref[query:c3]{C3}, RepoDB incorrectly handled a multiplication when using its \texttt{Sum} function. It omitted part of the multiplication inside the \texttt{Sum} aggregation function, returning incorrect results. A raw \acrshort{sql} query had to be used instead. The measured time is consistent across all frameworks. The returned result is just one number and we can see some slight increase in memory consumption for the macro \acrshort{orm}(s).
 
 In summary, RepoDB did not handle aggregation functions well. \acrshort{ef} Core is showing its optimization by approaching the results of micro \acrshort{orm}(s).
 
@@ -692,7 +680,7 @@ This group evaluates how effectively \acrshort{orm}(s) handle relational data --
 
 In query \hyperref[query:d1]{D1}, one parent with a few children was fetched. NHibernate and \acrshort{ef}6 again showed increased memory usage, around 4 to 6 times higher.
 
-Query \hyperref[query:d2]{D2} examined a dense many-to-many relationship involving 227 entities on one side and 10 on the other. RepoDB passed the other two queries, but this one had to be done in memory. linq2db required an explicit join entity, while the other macro \acrshort{orm}(s) directly mapped child collections within parent entities.
+Query \hyperref[query:d2]{D2} examined a dense many-to-many relationship involving 227 entities on one side and 10 on the other. RepoDB passed the other two queries, but this one had to be done in memory. Linq2db required an explicit join entity, while the other macro \acrshort{orm}(s) directly mapped child collections within parent entities.
 
 Query \hyperref[query:d3]{D3} tested an optional one-to-many relationship. Linq2db had the best results, using separate queries for parents and children without any optimization enabled. Surprisingly, \acrshort{ef} Core performed the worst, taking 2548 ms compared to Dapper's 187 ms. This inefficiency remained even after experimenting with different tracking settings and the split query feature. When running the raw generated query directly, it was executed in less than 200 ms.
 
