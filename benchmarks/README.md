@@ -1,4 +1,12 @@
-Visual studio projects containing unit and benchmark tests for 7 different .NET ORMs.
+Visual Studio projects containing unit and benchmark tests for 7 different .NET ORMs.
+
+Visual Studio Test Explorer window can be used to run unit tests.
+
+To run performance benchmarks, set `BenchmarkMain` as a startup project. Configuration must be set to `Release`. Then start the project without debugging (CTRL + F5). A console window will appear. It contains instructions on how to target specific benchmarks. To run all, type in an asterisk (*) and press enter. This will trigger a full run, which takes approximately one hour to finish. You can switch to the test configuration which does only a few numbers of iterations in `BenchmarkMain/Program.cs` file. 
+
+Console command for running benchmarks is `dotnet run --configuration Release --project BenchmarkMain\BenchmarkMain.csproj`. To run with a shorter test configuration, append `-- --testb` at the end of the command.
+
+Tests will not execute without a database running locally. The instructions to start an instance are below.
 
 # Database setup
 Dockerfile is provided to initialize Microsoft SQL Server database and fill it with data. Tested using Podman and Docker.
