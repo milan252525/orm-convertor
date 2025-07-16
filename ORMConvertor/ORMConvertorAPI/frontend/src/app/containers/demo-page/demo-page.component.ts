@@ -1,5 +1,5 @@
 import { CommonModule, KeyValuePipe } from "@angular/common";
-import { Component, DestroyRef, inject, OnInit } from "@angular/core";
+import { Component, DestroyRef, inject, OnInit, AfterViewInit, HostListener, ElementRef } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormsModule } from "@angular/forms";
 import { finalize, of } from "rxjs";
@@ -30,7 +30,7 @@ import { SAMPLES } from "../../model/samples";
   templateUrl: "./demo-page.component.html",
   styleUrls: ["./demo-page.component.less"],
 })
-export class DemoPageComponent implements OnInit {
+export class DemoPageComponent implements OnInit, AfterViewInit {
   private destroyRef = inject(DestroyRef);
 
   ormTypeEnum = ORMType;
@@ -67,7 +67,7 @@ export class DemoPageComponent implements OnInit {
 
   samples: Map<number, string> = new Map();
 
-  constructor(private ormService: OrmService) {}
+  constructor(private ormService: OrmService, private elRef: ElementRef) {}
 
   ngOnInit(): void {
     this.ormService
@@ -162,6 +162,8 @@ export class DemoPageComponent implements OnInit {
             this.loadingInterval = undefined;
           }
           this.loadingDots = "";
+          // ensure textareas are resized after content is rendered
+          setTimeout(() => this.resizeAll(), 0);
         })
       )
       .subscribe({
@@ -198,7 +200,10 @@ export class DemoPageComponent implements OnInit {
       if (sample !== undefined) {
         this.contentByUnit[u.id] = sample;
       }
+      this.resizeAll();
     });
+    // resize after filling samples
+    setTimeout(() => this.resizeAll(), 0);
   }
 
   /**
@@ -210,5 +215,35 @@ export class DemoPageComponent implements OnInit {
       'input[type="checkbox"]'
     ) as NodeListOf<HTMLInputElement>;
     boxes.forEach((b) => (b.checked = true));
+  }
+  /**
+   * Auto-resize textareas to fit content, no vertical scroll.
+   */
+  @HostListener('input', ['$event'])
+  onInput(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
+    if (target && target.tagName.toLowerCase() === 'textarea' && target.classList.contains('code-area')) {
+      this.resizeTextArea(target);
+    }
+  }
+
+  ngAfterViewInit(): void {
+    this.resizeAll();
+  }
+
+  /**
+   * Resize a single textarea to fit its content.
+   */
+  private resizeTextArea(textarea: HTMLTextAreaElement): void {
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }
+
+  /**
+   * Resize all code-area textareas within this component.
+   */
+  private resizeAll(): void {
+    const areas: NodeListOf<HTMLTextAreaElement> = this.elRef.nativeElement.querySelectorAll('textarea.code-area');
+    areas.forEach((ta) => this.resizeTextArea(ta));
   }
 }

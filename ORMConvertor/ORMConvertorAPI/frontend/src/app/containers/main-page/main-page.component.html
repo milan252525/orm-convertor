@@ -20,19 +20,12 @@
       <app-content-display
         [description]="unit.description"
         [contentType]="unit.contentType"
+        [autoResize]="true"
         [(content)]="contentByUnit[unit.id]">
       </app-content-display>
     }
 
   </div>
-
-  <button
-    class="middle-button"
-    (click)="convert()"
-    [disabled]="isLoading"
-  >
-    {{ isLoading ? 'Converting…' : 'Convert' }}
-  </button>
 
   <div class="pane right">
     <label>
@@ -44,11 +37,20 @@
       </select>
     </label>
 
+    <button
+      class="middle-button"
+      (click)="convert()"
+      [disabled]="isLoading"
+    >
+      {{ isLoading ? 'Converting…' : 'Convert' }}
+    </button>
+
     @for (unit of convertedUnits; track $index) {
       <app-content-display
         [description]="unit.contentType | contentTypeToString"
         [contentType]="unit.contentType"
         [content]="unit.content"
+        [autoResize]="true"
         [readonly]="true">
       </app-content-display>
     }

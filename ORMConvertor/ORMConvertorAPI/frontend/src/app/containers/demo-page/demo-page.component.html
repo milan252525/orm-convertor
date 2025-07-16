@@ -20,7 +20,8 @@
       <app-content-display
         [description]="unit.description"
         [contentType]="unit.contentType"
-        [(content)]="contentByUnit[unit.id]">
+        [(content)]="contentByUnit[unit.id]"
+        [autoResize]="true">
       </app-content-display>
     }
 
@@ -74,7 +75,8 @@
           [description]="unit.contentType | contentTypeToString"
           [contentType]="unit.contentType"
           [content]="unit.content"
-          [readonly]="true">
+          [readonly]="true"
+          [autoResize]="true">
         </app-content-display>
       }
     }
