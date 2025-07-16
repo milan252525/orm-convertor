@@ -1,10 +1,10 @@
 <div class="pane-container">
 
   <div class="pane left">
-    <label>
+    <label class="orm-label">
       Source ORM
       <select [(ngModel)]="sourceOrm" (ngModelChange)="onSourceOrmChange($event)">
-        @for (opt of (ormTypeEnum | keyvalue); track opt.key) {
+        @for (opt of ormTypeOptions; track opt.value) {
           <option [value]="opt.value">{{ opt.key }}</option>
         }
       </select>
@@ -26,23 +26,36 @@
 
   </div>
 
-  <button
-    class="middle-button"
-    (click)="convert()"
-    [disabled]="isLoading"
-  >
-    {{ isLoading ? 'Converting…' : 'Convert' }}
-  </button>
 
   <div class="pane right">
-    <label>
-      Target ORM
-      <select [(ngModel)]="targetOrm" (ngModelChange)="onTargetOrmChange($event)">
-        @for (opt of (ormTypeEnum | keyvalue); track opt.key) {
-          <option [value]="opt.value">{{ opt.key }}</option>
-        }
-      </select>
-    </label>
+    <h3>Constraints</h3>
+    <div class="constraints">
+      <label>
+        Memory (KB)
+        <input class="constraint-input" type="number" placeholder="" />
+      </label>
+      <label>
+        Max Frameworks
+        <input class="constraint-input" type="number" placeholder="" />
+      </label>
+    </div>
+
+    <h3>Target Frameworks</h3>
+
+    <div #tfGroup class="target-frameworks">
+      @for (opt of ormTypeOptions; track opt.value) {
+        <label>
+          <input type="checkbox"
+                 [value]="opt.value" />
+          {{ opt.key }}
+        </label>
+      }
+      <button class="select-all-btn" (click)="selectAllTargets(tfGroup)">Select All</button>
+    </div>
+
+    <div class="results">
+      <app-result-table></app-result-table>
+    </div>
 
     @for (unit of convertedUnits; track $index) {
       <app-content-display
@@ -52,6 +65,10 @@
         [readonly]="true">
       </app-content-display>
     }
+
+    <button class="middle-button" (click)="convert()" [disabled]="isLoading">
+      {{ isLoading ? 'Converting…' : 'Convert' }}
+    </button>
   </div>
 
 </div>

@@ -13,6 +13,7 @@ import {
 } from "../../model/required-content";
 import { ContentTypeToStringPipe } from "../../pipes/content-type-to-string.pipe";
 import { OrmService } from "../../services/orm.service";
+import { ResultTableComponent } from "../../components/result-table/result-table.component";
 
 @Component({
   selector: "app-demo-page",
@@ -20,9 +21,9 @@ import { OrmService } from "../../services/orm.service";
   imports: [
     CommonModule,
     FormsModule,
-    KeyValuePipe,
     ContentDisplayComponent,
     ContentTypeToStringPipe,
+    ResultTableComponent
   ],
   templateUrl: "./demo-page.component.html",
   styleUrls: ["./demo-page.component.less"],
@@ -31,12 +32,21 @@ export class DemoPageComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   ormTypeEnum = ORMType;
+  
+  /**
+   * Filtered list of ORM options (only enum names, excluding numeric reverse mappings).
+   */
+  readonly ormTypeOptions: { key: string; value: ORMType }[] = Object.keys(ORMType)
+    .filter(k => isNaN(Number(k)))
+    .map(k => ({ key: k, value: (ORMType as any)[k] as ORMType }));
   contentTypeEnum = ContentType;
 
   isLoading = false;
 
   sourceOrm: ORMType = ORMType.EFCore;
   targetOrm: ORMType = ORMType.Dapper;
+  // Selected target ORMs for conversion (multiple selection)
+  targetOrms: ORMType[] = [];
   text = "";
   result = "";
   error = "";
@@ -77,6 +87,15 @@ export class DemoPageComponent implements OnInit {
   onTargetOrmChange(newOrm: string) {
     this.targetOrm = +newOrm as ORMType;
     this.convertedUnits = [];
+  }
+  
+  /**
+   * Toggle selection of a target ORM framework.
+   * @param ormValue - The ORM type value
+   * @param checked - Whether the checkbox is checked
+   */
+  onTargetOrmToggle(ormValue: ORMType, checked: boolean): void {
+    // Logic for handling multiple target ORM selection to be implemented
   }
 
   private updateRequiredUnits() {
@@ -127,5 +146,14 @@ export class DemoPageComponent implements OnInit {
         this.contentByUnit[u.id] = sample;
       }
     });
+  }
+
+  /**
+   * Visually checks all target framework checkboxes.
+   * @param container - The container element holding the checkboxes
+   */
+  selectAllTargets(container: HTMLElement): void {
+    const boxes = container.querySelectorAll('input[type="checkbox"]') as NodeListOf<HTMLInputElement>;
+    boxes.forEach(b => b.checked = true);
   }
 }

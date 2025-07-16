@@ -1,0 +1,38 @@
+.metrics {
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+
+  th,
+  td {
+    border: 2px solid #000;
+    padding: 0.25rem 0.75rem;
+    // font-family: Arial, sans-serif;
+    text-align: right;
+
+    &:first-child {
+      /* row headers */
+      text-align: left;
+    }
+  }
+
+  thead th {
+    // background: #eaeaea;
+    font-weight: 700;
+  }
+
+//   tbody tr:nth-child(odd) {
+//     background: #f6f6f6; /* subtle zebra striping */
+//   }
+
+  .sum th {
+    /* SUM row label */
+    font-weight: 700;
+  }
+
+  .good {
+    background: #c8e6c9;
+  } /* light‑green */
+  .bad {
+    background: #f8d7da;
+  } /* light‑red  */
+}
