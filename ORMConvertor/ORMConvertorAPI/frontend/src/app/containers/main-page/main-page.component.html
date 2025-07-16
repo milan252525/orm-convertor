@@ -4,9 +4,9 @@
     <label>
       Source ORM
       <select [(ngModel)]="sourceOrm" (ngModelChange)="onSourceOrmChange($event)">
-        @for (opt of (ormTypeEnum | keyvalue); track opt.key) {
-          <option [value]="opt.value">{{ opt.key }}</option>
-        }
+        <option [value]="ormTypeEnum.Dapper">Dapper</option>
+        <option [value]="ormTypeEnum.NHibernate">NHibernate</option>
+        <option [value]="ormTypeEnum.EFCore">EFCore</option>
       </select>
     </label>
 
@@ -38,9 +38,9 @@
     <label>
       Target ORM
       <select [(ngModel)]="targetOrm" (ngModelChange)="onTargetOrmChange($event)">
-        @for (opt of (ormTypeEnum | keyvalue); track opt.key) {
-          <option [value]="opt.value">{{ opt.key }}</option>
-        }
+        <option [value]="ormTypeEnum.Dapper">Dapper</option>
+        <option [value]="ormTypeEnum.NHibernate">NHibernate</option>
+        <option [value]="ormTypeEnum.EFCore">EFCore</option>
       </select>
     </label>
 
