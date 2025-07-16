@@ -1,4 +1,4 @@
-import { CommonModule, KeyValuePipe } from "@angular/common";
+import { CommonModule, KeyValuePipe, Location } from "@angular/common";
 import { Component, DestroyRef, inject, OnInit, AfterViewInit, HostListener, ElementRef } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormsModule } from "@angular/forms";
@@ -67,7 +67,7 @@ export class DemoPageComponent implements OnInit, AfterViewInit {
 
   samples: Map<number, string> = new Map();
 
-  constructor(private ormService: OrmService, private elRef: ElementRef) {}
+  constructor(private ormService: OrmService, private elRef: ElementRef, private location: Location) {}
 
   ngOnInit(): void {
     this.ormService
@@ -130,7 +130,7 @@ export class DemoPageComponent implements OnInit, AfterViewInit {
     // start dots animation: one dot per second up to three, then reset
     this.loadingDots = "";
     this.loadingInterval = setInterval(() => {
-      if (this.loadingDots.length < 5) {
+      if (this.loadingDots.length < 6) {
         this.loadingDots += ".";
       } else {
         this.loadingDots = "";
@@ -245,5 +245,10 @@ export class DemoPageComponent implements OnInit, AfterViewInit {
   private resizeAll(): void {
     const areas: NodeListOf<HTMLTextAreaElement> = this.elRef.nativeElement.querySelectorAll('textarea.code-area');
     areas.forEach((ta) => this.resizeTextArea(ta));
+  }
+  
+  /** Navigate back to previous page */
+  back(): void {
+    this.location.back();
   }
 }

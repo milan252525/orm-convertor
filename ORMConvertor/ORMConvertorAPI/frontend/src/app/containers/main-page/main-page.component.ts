@@ -1,4 +1,4 @@
-import { CommonModule } from "@angular/common";
+import { CommonModule, Location } from "@angular/common";
 import { Component, DestroyRef, inject, OnInit } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormsModule } from "@angular/forms";
@@ -47,7 +47,7 @@ export class MainPageComponent implements OnInit {
 
   samples: Map<number, string> = new Map();
 
-  constructor(private ormService: OrmService) {}
+  constructor(private ormService: OrmService, private location: Location) {}
 
   ngOnInit(): void {
     this.ormService
@@ -126,5 +126,9 @@ export class MainPageComponent implements OnInit {
         this.contentByUnit[u.id] = sample;
       }
     });
+  }
+  
+  back(): void {
+    this.location.back();
   }
 }
