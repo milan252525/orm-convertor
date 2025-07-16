@@ -2,39 +2,22 @@ import {
   Component,
   DestroyRef,
   inject,
-  OnDestroy,
   OnInit,
 } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { CommonModule } from "@angular/common";
+import { finalize } from "rxjs";
+import { OrmService } from "./services/orm.service";
+import { CommonModule, KeyValuePipe } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { ContentDisplayComponent } from "./components/content-display/content-display.component";
 import { ORMType } from "./model/orm-type";
 import { ContentType } from "./model/content-type";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ContentTypeToStringPipe } from "./pipes/content-type-to-string.pipe";
-
-interface SourceUnit {
-  contentType: ContentType;
-  content: string;
-}
-interface ConvertRequest {
-  sourceOrm: ORMType;
-  targetOrm: ORMType;
-  sources: SourceUnit[];
-}
-interface ConvertResponse {
-  sources: SourceUnit[];
-}
-interface RequiredContentUnit {
-  id: number;
-  contentType: ContentType;
-  description: string;
-}
-interface RequiredContentDefinition {
-  ormType: ORMType;
-  required: RequiredContentUnit[];
-}
+import { SourceUnit, ConvertRequest, ConvertResponse } from "./model/convert";
+import {
+  RequiredContentUnit,
+  RequiredContentDefinition,
+} from "./model/required-content";
 
 @Component({
   selector: "app-root",
@@ -42,6 +25,7 @@ interface RequiredContentDefinition {
   imports: [
     CommonModule,
     FormsModule,
+    KeyValuePipe,
     ContentDisplayComponent,
     ContentTypeToStringPipe,
   ],
@@ -53,6 +37,8 @@ export class AppComponent implements OnInit {
 
   ormTypeEnum = ORMType;
   contentTypeEnum = ContentType;
+
+  isLoading = false;
 
   sourceOrm: ORMType = ORMType.EFCore;
   targetOrm: ORMType = ORMType.Dapper;
@@ -67,19 +53,19 @@ export class AppComponent implements OnInit {
 
   samples: Map<number, string> = new Map();
 
-  constructor(private http: HttpClient) {}
+  constructor(private ormService: OrmService) {}
 
   ngOnInit(): void {
-    this.http
-      .get<RequiredContentDefinition[]>("/orm/required-content")
+    this.ormService
+      .getRequiredContent()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((required) => {
         this.requiredContent = required;
         this.updateRequiredUnits();
       });
 
-    this.http
-      .get<Map<number, string>>("/orm/samples")
+    this.ormService
+      .getSamples()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((samples) => {
         this.samples = new Map(
@@ -93,7 +79,7 @@ export class AppComponent implements OnInit {
     this.updateRequiredUnits();
   }
 
-  onTargetOrmChange(newOrm: string){
+  onTargetOrmChange(newOrm: string) {
     this.targetOrm = +newOrm as ORMType;
     this.convertedUnits = [];
   }
@@ -112,6 +98,7 @@ export class AppComponent implements OnInit {
   }
 
   convert(): void {
+    this.isLoading = true;
     const body: ConvertRequest = {
       sourceOrm: this.sourceOrm,
       targetOrm: this.targetOrm,
@@ -121,12 +108,14 @@ export class AppComponent implements OnInit {
       })),
     };
 
-    this.result = "Converting…";
     this.error = "";
     this.convertedUnits = [];
-    this.http
-      .post<ConvertResponse>("/orm/convert", body)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.ormService
+      .convert(body)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => (this.isLoading = false))
+      )
       .subscribe({
         next: (r) => {
           this.convertedUnits = r.sources;

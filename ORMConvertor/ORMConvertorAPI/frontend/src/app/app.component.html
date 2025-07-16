@@ -4,9 +4,9 @@
     <label>
       Source ORM
       <select [(ngModel)]="sourceOrm" (ngModelChange)="onSourceOrmChange($event)">
-        <option [value]="ormTypeEnum.Dapper">Dapper</option>
-        <option [value]="ormTypeEnum.NHibernate">NHibernate</option>
-        <option [value]="ormTypeEnum.EFCore">EFCore</option>
+        @for (opt of (ormTypeEnum | keyvalue); track opt.key) {
+          <option [value]="opt.value">{{ opt.key }}</option>
+        }
       </select>
     </label>
 
@@ -26,15 +26,21 @@
 
   </div>
 
-  <button class="middle-button" (click)="convert()">Convert</button>
+  <button
+    class="middle-button"
+    (click)="convert()"
+    [disabled]="isLoading"
+  >
+    {{ isLoading ? 'Converting…' : 'Convert' }}
+  </button>
 
   <div class="pane right">
     <label>
       Target ORM
       <select [(ngModel)]="targetOrm" (ngModelChange)="onTargetOrmChange($event)">
-        <option [value]="ormTypeEnum.Dapper">Dapper</option>
-        <option [value]="ormTypeEnum.NHibernate">NHibernate</option>
-        <option [value]="ormTypeEnum.EFCore">EFCore</option>
+        @for (opt of (ormTypeEnum | keyvalue); track opt.key) {
+          <option [value]="opt.value">{{ opt.key }}</option>
+        }
       </select>
     </label>
 

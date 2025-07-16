@@ -11,8 +11,8 @@ export class ContentTypeToStringPipe implements PipeTransform {
         return "C# Entity";
       case ContentType.XML:
         return "XML";
-        case ContentType.CSharpQuery:
-          return "C# Query";
+      case ContentType.CSharpQuery:
+        return "C# Query";
       default:
         return "Unknown";
     }
