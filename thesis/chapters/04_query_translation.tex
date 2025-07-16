@@ -3,7 +3,7 @@ Following the abstraction and conversion processes established for entities and 
 
 
 \section{Query abstraction}
-The analyzed frameworks offer only two main query languages -- \acrshort{sql} and \acrshort{linq}. RepoDB's lambda expressions can be considered a very limited subset of \acrshort{linq}, while \acrshort{hql}, used only by NHibernate, is syntactically similar to \acrshort{sql} sees minimal adoption and is not recommended.\footnote{\url{https://www.red-gate.com/simple-talk/development/dotnet-development/some-nhibernate-best-practices/\#forget-about-hql}} As discussed in Section~\ref{sec:core_translation}, \acrshort{linq} is typically translated into \acrshort{sql} before the database query is executed. Therefore, \acrshort{sql} can serve as a good foundation for abstraction. However, it is not used directly, as doing so would restrict potential future extensions. A simpler, yet less general approach -- executing a \acrshort{linq} query, capturing the generated \acrshort{sql}, and reusing it with a raw \acrshort{sql} query method in another \acrshort{orm} -- is an approach not considered in this work.
+The analyzed frameworks offer only two main query languages -- \acrshort{sql} and \acrshort{linq}. RepoDB's lambda expressions can be considered a very limited subset of \acrshort{linq}. \acrshort{hql}, used only by NHibernate, is syntactically similar to \acrshort{sql}, but sees minimal adoption and is generally not recommended.\footnote{\url{https://www.red-gate.com/simple-talk/development/dotnet-development/some-nhibernate-best-practices/\#forget-about-hql}} As discussed in Section~\ref{sec:core_translation}, \acrshort{linq} is typically translated into \acrshort{sql} before the database query is executed. Therefore, \acrshort{sql} can serve as a good foundation for abstraction. However, it is not used directly, as doing so would restrict potential future extensions. A simpler, yet less general approach -- executing a \acrshort{linq} query, capturing the generated \acrshort{sql}, and reusing it with a raw \acrshort{sql} query method in another \acrshort{orm} -- is an approach not considered in this work.
 
 While entity and mapping definitions follow a relatively limited set of formats and possibilities, parsing \acrshort{linq} queries becomes a challenge of parsing arbitrary C\# code. Queries must be interpreted in the context of the framework and the surrounding method in which they appear. They are rarely standalone, often referencing method arguments or external variables. Each framework uses a distinct object to represent a database connection or session. This object is responsible for query initialization and typically exposes methods for executing raw \acrshort{sql}. For \acrshort{linq} queries, it provides access to the implementation of the \texttt{IQueryable} interface,\footnote{\url{https://learn.microsoft.com/en-us/dotnet/csharp/linq/get-started/introduction-to-linq-queries\#the-data-source}} parametrized with the source entity type and extended through chained \acrshort{linq} method calls.
 
@@ -23,7 +23,7 @@ Among the frameworks that support \acrshort{linq}, it is evident that they share
 \begin{tabular}{
 >{\raggedright\arraybackslash}p{20.00mm}
 >{\arraybackslash}p{30.00mm}
->{\arraybackslash}p{30.00mm}
+>{\arraybackslash}p{35.00mm}
 >{\arraybackslash}p{30.00mm}
 >{\arraybackslash}p{30.00mm}
 >{\arraybackslash}p{30.00mm}
@@ -98,7 +98,7 @@ The \texttt{ORDER\_BY} instruction indicates an attribute by which to sort the r
 This instruction-based abstraction does not fully capture all \acrshort{sql} features, but it covers the most common constructs and provides a solid foundation that can be extended in the future to support more advanced use cases.
 
 \section{Query translation}
-Similarly, to entity translation, a query translation will have \textit{parser} in one direction and \textit{builder} in the other. As illustrated in Figure~\ref{fig:translation_process_query}, the parser processes the source query (i.e., \textit{parsing phase}) and the builder generates the target framework query from the abstract instructions (i.e., \textit{building phase}).
+Similarly to entity translation, a query translation will have \textit{parser} in one direction and \textit{builder} in the other. As illustrated in Figure~\ref{fig:translation_process_query}, the parser processes the source query (i.e., \textit{parsing phase}) and the builder generates the target framework query from the abstract instructions (i.e., \textit{building phase}).
 
 \begin{figure}[h]
   \centering
@@ -134,7 +134,7 @@ Query builder constructs the abstract instructions internally, without exposing 
 
 As the parser begins processing a query or any subquery, it calls the method \texttt{Push}. When leaving the nesting, it calls its counterpart \texttt{Pop}. The builder keeps track of the start of the nesting and, when it ends, collects all the instructions, wrapping them in the \texttt{SUBQUERY} instruction. When parsing is complete, the list of instructions should contain a single element. It must be either a \texttt{SUBQUERY} or a \texttt{SET\_OPERATION} instruction.
 
-The \texttt{SetOperation} assumes the parser just left a nested query and \texttt{SUBQUERY} is the last in the list. The builder remembers the set operation and when returning from nesting on the same level, it constructs a \texttt{SET\_OPERATION} instruction, setting both side and the operation type.
+The \texttt{SetOperation} assumes the parser just left a nested query and \texttt{SUBQUERY} is the last in the list. The builder remembers the set operation and when returning from nesting on the same level, it constructs a \texttt{SET\_OPERATION} instruction, setting both sides and the operation type.
 Methods such as \texttt{From}, \texttt{Project}, \texttt{Select}, \texttt{Join}, \texttt{OrderBy}, \texttt{GroupBy}, and \texttt{Having} correspond directly to the respective instruction types, including their arguments. 
 
 Listing~\ref{lst:aqb} presents the structure of the \texttt{AbstractQueryBuilder} class. All methods that build the internal instruction representation are public and fully implemented. Two abstract methods are declared and must be implemented by concrete framework implementations. The \texttt{BuildSQL} method serves to generate output queries using raw \acrshort{sql}. For Dapper and PetaPoco, which support only \acrshort{sql} queries, the purpose is straightforward. Other frameworks that primarily use \acrshort{linq} also offer an option to execute raw \acrshort{sql}. In such cases, this method enables that functionality if desired by the user. Otherwise, the \texttt{Build} method is exposed to generate a \acrshort{linq}-based variant. The builder does not declare any private abstract methods. As query structures differ significantly across frameworks, the internal implementation is left entirely to a developer.
@@ -375,7 +375,7 @@ Algorithm~\ref{alg:query_parser_where} illustrates a visitor for the selection m
     \label{alg:query_parser_where}
 \end{algorithm}
 
-Finally, algorithm~\ref{alg:query_parser_orderby} handles multiple ordering method calls, namely \texttt{OrderBy}, \texttt{OrderByDescending}, \texttt{ThenBy}, and \texttt{ThenByDescending}. The sort direction is explicitly indicated by the method name. It extracts the entity and property from the lambda expression, typically structured as \texttt{entity => entity.Property}. Here, the parser utilizes the entity mapping information to convert entity and property names to their corresponding table and column names. The remaining visitors employe a similar strategy and are not explicitly shown.
+Finally, algorithm~\ref{alg:query_parser_orderby} handles multiple ordering method calls, namely \texttt{OrderBy}, \texttt{OrderByDescending}, \texttt{ThenBy}, and \texttt{ThenByDescending}. The sort direction is explicitly indicated by the method name. It extracts the entity and property from the lambda expression, typically structured as \texttt{entity => entity.Property}. Here, the parser utilizes the entity mapping information to convert entity and property names to their corresponding table and column names. The remaining visitors employ a similar strategy and are not explicitly shown.
 
   \begin{lstlisting}[caption={ISyntaxVisitor interface structure}, language=pseudo, label={lst:syntaxvisitor}]
 interface ISyntaxVisitor

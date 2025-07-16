@@ -77,7 +77,7 @@ class PurchaseOrder
     DateTime OrderDate { get; set; }
 }
 \end{lstlisting}
-The second mapping is in the form of \acrshort{xml} mapping file using NHibernate \acrshort{orm}\footnote{\url{https://nhibernate.info/}}. This assumes a corresponding \acrshort{poco} is somewhere else in the project. This configuration is more verbose and requires more information, but prevents any issues with inference. The mapping isolation from the entity might be good for architecture, but in this case, it completely prevents automated refactoring and schema change reflection.
+The second mapping is in the form of \acrshort{xml} mapping file using NHibernate \acrshort{orm}.\footnote{\url{https://nhibernate.info/}} This assumes a corresponding \acrshort{poco} is somewhere else in the project. This configuration is more verbose and requires more information, but prevents any issues with inference. The mapping isolation from the entity might be good for architecture, but in this case, it completely prevents automated refactoring and schema change reflection.
 
 \qed
 \begin{lstlisting}[language=CSharp]

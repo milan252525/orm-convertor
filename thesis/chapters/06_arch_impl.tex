@@ -27,7 +27,7 @@ There are three distinct project types used. The first is an ASP.NET\footnote{\u
   \label{fig:app_architecture}
 \end{figure}
 
-\texttt{Model} is a first representative of a library project. It represents a central project containing domain models. It houses models for entity mapping intermediate representation designed in Chapter~\ref{chapter:entity_translation} along with immutable records representing instructions for queries from Chapter~\ref{chapter:query_translation}. In addition, it includes enumerations, exception types, and other objects the application depends on. The project is referenced by almost all others as it is essential to the application function.
+\texttt{Model} is a first representative of a library project. It represents a central project containing domain models. It houses models for entity mapping intermediate representation designed in Chapter~\ref{chapter:entity_translation} along with immutable records representing instructions for queries from Chapter~\ref{chapter:query_translation}. In addition, it includes enumerations, exception types, and other objects the application depends on. The project is referenced by almost all others as it is essential to the application's function.
 
 \texttt{AbstractWrappers} is another library project. As such, it defines interfaces for builders and parsers. As builders share some common functionality, they are declared as \textit{abstract} classes with certain methods implemented. Parsers only declare an interface without any implementation. Concrete wrappers are then implemented in \texttt{ConcreteWrappers} project folder. Each ORM has its own project to isolate them and to decouple dependencies.
 
@@ -40,7 +40,7 @@ Entity parsers for each framework follow a similar approach, leveraging the Rosl
 
 Currently, only parsing of \acrshort{ef} Core \acrshort{linq} queries is supported. Due to the flexibility of \acrshort{linq}, in method order and lambda expressions, parsing is fairly complex. The implementation extends \texttt{CSharpSyntaxTree}, overriding the \texttt{Visit} method to analyze method call expressions. 
 
-Entity builders follow an identical strategy, populating string templates and collecting the final structure in \texttt{StringBuilder}. The NHibernate builder separately constructs the entity class and its corresponding \acrshort{xml} mapping, producing two outputs.
+All entity builders follow an identical strategy, populating string templates and collecting the final structure in \texttt{StringBuilder}. The NHibernate builder separately constructs the entity class and its corresponding \acrshort{xml} mapping, producing two outputs.
 
 As for query builder, only the Dapper \acrshort{sql} builder is implemented. It uses \texttt{StringBuilder} to sequentially assemble query components, while a dedicated visitor class handles concrete syntax generation.
 
@@ -48,12 +48,12 @@ As for query builder, only the Dapper \acrshort{sql} builder is implemented. It 
 \section{Interaction}
 To allow easy user interaction, the translation tool has a minimal frontend. It also exposes a \acrshort{rest} \acrshort{api} allowing for programmatic access or automation. Documentation for the \acrshort{api} is auto-generated using Swagger\footnote{\url{https://swagger.io/}} and is available at \texttt{/orm/swagger} endpoint.
 
-Figure~\ref{fig:tool_interface} showcases the appearance of the web page when opened. It is split into two panes. On the left, the user selects the source \acrshort{orm} and inputs the required data i.e., entity class, mapping and query. Inputs change based on the selected framework and implemented wrappers. In the figure, NHibernate appears by default, requiring C\# entity and \acrshort{xml} mapping. For easier testing, sample inputs can be loaded for each framework, using the \texttt{'Fill~Samples'} button. Figure~\ref{fig:tool_interface_translated} demonstrates translation from \acrshort{ef} Core to Dapper. Entity gets translated, losing all mapping in the process as Dapper does not support it. The \acrshort{linq} query is converted into \acrshort{sql}.
+Figure~\ref{fig:tool_interface} showcases the appearance of the web page when opened. It is split into two panes. On the left, the user selects the source \acrshort{orm} and inputs the required data i.e., entity class, mapping, and query. Inputs change based on the selected framework and implemented wrappers. In the figure, NHibernate appears by default, requiring C\# entity and \acrshort{xml} mapping. For easier testing, sample inputs can be loaded for each framework, using the \texttt{'Fill~Samples'} button. Figure~\ref{fig:tool_interface_translated} demonstrates translation from \acrshort{ef} Core to Dapper. Entity gets translated, losing all mapping in the process as Dapper does not support it. The \acrshort{linq} query is converted into \acrshort{sql}.
 
 \begin{figure}[!htp]
   \centering
   \fbox{\includegraphics[scale=1]{thesis/img/thesis/06_app_ui.png}}
-  \caption{Interface of the translation tool}
+  \caption{Interface of the translation tool.}
   \label{fig:tool_interface}
 \end{figure}
 
@@ -62,7 +62,7 @@ Figure~\ref{fig:tool_interface} showcases the appearance of the web page when op
 \begin{figure}[!htp]
   \centering
   \fbox{\includegraphics[width=0.9\textwidth]{thesis/img/thesis/06_app_ui_translated.png}}
-  \caption{Translation tool interface when translating from \acrshort{ef} Core to Dapper}
+  \caption{Translation tool interface when translating from \acrshort{ef} Core to Dapper.}
   \label{fig:tool_interface_translated}
 \end{figure}
 \end{landscape}
