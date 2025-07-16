@@ -24,20 +24,30 @@
       </app-content-display>
     }
 
+    @if (showResults) {
+      <hr>
+      <label class="orm-label">Results (Dapper)</label>
+
+      @for (unit of convertedUnits; track $index) {
+        <app-content-display
+          [description]="unit.contentType | contentTypeToString"
+          [contentType]="unit.contentType"
+          [content]="unit.content"
+          [readonly]="true">
+        </app-content-display>
+      }
+    }
+
   </div>
 
 
   <div class="pane right">
     <h3>Constraints</h3>
     <div class="constraints">
-      <label>
-        Memory (KB)
-        <input class="constraint-input" type="number" placeholder="" />
-      </label>
-      <label>
-        Max Frameworks
-        <input class="constraint-input" type="number" placeholder="" />
-      </label>
+      <label for="memory-kb" class="constraint-label">Memory (KB)</label>
+      <input id="memory-kb" class="constraint-input" type="number" placeholder="" />
+      <label for="max-frameworks" class="constraint-label">Max Frameworks</label>
+      <input id="max-frameworks" class="constraint-input" type="number" placeholder="" />
     </div>
 
     <h3>Target Frameworks</h3>
@@ -53,22 +63,20 @@
       <button class="select-all-btn" (click)="selectAllTargets(tfGroup)">Select All</button>
     </div>
 
-    <div class="results">
-      <app-result-table></app-result-table>
-    </div>
-
-    @for (unit of convertedUnits; track $index) {
-      <app-content-display
-        [description]="unit.contentType | contentTypeToString"
-        [contentType]="unit.contentType"
-        [content]="unit.content"
-        [readonly]="true">
-      </app-content-display>
-    }
-
     <button class="middle-button" (click)="convert()" [disabled]="isLoading">
-      {{ isLoading ? 'Converting…' : 'Convert' }}
+      Convert
     </button>
+
+    @if (showResults) {
+      <div class="results">
+        <app-result-table></app-result-table>
+        <div>
+          <h3>Recommendation: Dapper</h3>
+          <p>Runtime: 960 ms</p>
+          <p>Memory: 43,082 kB</p>
+        </div>
+      </div>
+    }
   </div>
 
 </div>

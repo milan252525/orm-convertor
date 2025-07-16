@@ -8,11 +8,11 @@ export class ContentTypeToStringPipe implements PipeTransform {
   transform(value: ContentType): string {
     switch (value) {
       case ContentType.CSharpEntity:
-        return "C# Entity";
+        return "Entity Class";
       case ContentType.XML:
-        return "XML";
+        return "XML Mapping";
       case ContentType.CSharpQuery:
-        return "C# Query";
+        return "Query Method";
       default:
         return "Unknown";
     }

@@ -8,7 +8,7 @@ export const routes: Routes = [
     component: MainPageComponent,
   },
   {
-    path: "demo",
+    path: "advisor",
     component: DemoPageComponent,
   },
 ];

@@ -6,15 +6,15 @@ public static class RequiredContent
 {
     public static List<RequiredContentDefinition> GetRequiredContent => [
         new (ORMEnum.Dapper, [
-            new(1, ConversionContentType.CSharpEntity, "Entity (C# class)")
+            new(1, ConversionContentType.CSharpEntity, "Entity Class")
         ]),
         new (ORMEnum.NHibernate, [
-            new (2, ConversionContentType.CSharpEntity, "Entity (C# class)"),
-            new (3, ConversionContentType.XML, "Mapping File (XML)"),
+            new (2, ConversionContentType.CSharpEntity, "Entity Class"),
+            new (3, ConversionContentType.XML, "XML Mapping"),
         ]),
         new (ORMEnum.EFCore, [
-            new(4, ConversionContentType.CSharpEntity, "Entity (C# class)"),
-            new (5, ConversionContentType.CSharpQuery, "LINQ Query (optional, wrapped in a method)"),
+            new(4, ConversionContentType.CSharpEntity, "Entity Class"),
+            new (5, ConversionContentType.CSharpQuery, "Query Method"),
         ]),
     ];
 }

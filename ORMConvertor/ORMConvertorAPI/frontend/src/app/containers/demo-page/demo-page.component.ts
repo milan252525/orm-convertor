@@ -32,6 +32,8 @@ export class DemoPageComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   ormTypeEnum = ORMType;
+
+  showResults = false;
   
   /**
    * Filtered list of ORM options (only enum names, excluding numeric reverse mappings).
@@ -128,7 +130,7 @@ export class DemoPageComponent implements OnInit {
       .convert(body)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => (this.isLoading = false))
+        finalize(() => {this.isLoading = false; this.showResults = true;})
       )
       .subscribe({
         next: (r) => {
