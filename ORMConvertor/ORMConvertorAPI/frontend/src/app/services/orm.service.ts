@@ -12,6 +12,10 @@ export class OrmService {
     return this.http.get<RequiredContentDefinition[]>("/required-content");
   }
 
+  getRequiredContentAdvisor(): Observable<RequiredContentDefinition[]> {
+    return this.http.get<RequiredContentDefinition[]>("/required-content-advisor");
+  }
+
   getSamples(): Observable<Record<number, string>> {
     return this.http.get<Record<number, string>>("/samples");
   }

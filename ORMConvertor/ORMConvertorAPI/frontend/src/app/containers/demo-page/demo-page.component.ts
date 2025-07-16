@@ -2,7 +2,8 @@ import { CommonModule, KeyValuePipe } from "@angular/common";
 import { Component, DestroyRef, inject, OnInit } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormsModule } from "@angular/forms";
-import { finalize } from "rxjs";
+import { finalize, of } from "rxjs";
+import { delay } from "rxjs/operators";
 import { ContentDisplayComponent } from "../../components/content-display/content-display.component";
 import { ContentType } from "../../model/content-type";
 import { ConvertRequest, SourceUnit } from "../../model/convert";
@@ -14,6 +15,7 @@ import {
 import { ContentTypeToStringPipe } from "../../pipes/content-type-to-string.pipe";
 import { OrmService } from "../../services/orm.service";
 import { ResultTableComponent } from "../../components/result-table/result-table.component";
+import { SAMPLES } from "../../model/samples";
 
 @Component({
   selector: "app-demo-page",
@@ -23,7 +25,7 @@ import { ResultTableComponent } from "../../components/result-table/result-table
     FormsModule,
     ContentDisplayComponent,
     ContentTypeToStringPipe,
-    ResultTableComponent
+    ResultTableComponent,
   ],
   templateUrl: "./demo-page.component.html",
   styleUrls: ["./demo-page.component.less"],
@@ -34,16 +36,21 @@ export class DemoPageComponent implements OnInit {
   ormTypeEnum = ORMType;
 
   showResults = false;
-  
+
   /**
    * Filtered list of ORM options (only enum names, excluding numeric reverse mappings).
    */
-  readonly ormTypeOptions: { key: string; value: ORMType }[] = Object.keys(ORMType)
-    .filter(k => isNaN(Number(k)))
-    .map(k => ({ key: k, value: (ORMType as any)[k] as ORMType }));
+  readonly ormTypeOptions: { key: string; value: ORMType }[] = Object.keys(
+    ORMType
+  )
+    .filter((k) => isNaN(Number(k)))
+    .map((k) => ({ key: k, value: (ORMType as any)[k] as ORMType }));
   contentTypeEnum = ContentType;
 
   isLoading = false;
+  // Animated dots for optimizing indicator
+  loadingDots: string = "";
+  private loadingInterval?: any;
 
   sourceOrm: ORMType = ORMType.EFCore;
   targetOrm: ORMType = ORMType.Dapper;
@@ -64,7 +71,7 @@ export class DemoPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.ormService
-      .getRequiredContent()
+      .getRequiredContentAdvisor()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((required) => {
         this.requiredContent = required;
@@ -75,9 +82,14 @@ export class DemoPageComponent implements OnInit {
       .getSamples()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((samples) => {
-        this.samples = new Map(
-          Object.entries(samples).map(([k, v]) => [Number(k), v as string])
-        );
+        // this.samples = new Map(
+        //   Object.entries(samples).map(([k, v]) => [Number(k), v as string])
+        // );
+        this.samples = new Map();
+        this.samples.set(4, SAMPLES.entity);
+        this.samples.set(5, SAMPLES.query1);
+        this.samples.set(6, SAMPLES.query2);
+        this.samples.set(7, SAMPLES.query3);
       });
   }
 
@@ -90,7 +102,7 @@ export class DemoPageComponent implements OnInit {
     this.targetOrm = +newOrm as ORMType;
     this.convertedUnits = [];
   }
-  
+
   /**
    * Toggle selection of a target ORM framework.
    * @param ormValue - The ORM type value
@@ -115,6 +127,15 @@ export class DemoPageComponent implements OnInit {
 
   convert(): void {
     this.isLoading = true;
+    // start dots animation: one dot per second up to three, then reset
+    this.loadingDots = "";
+    this.loadingInterval = setInterval(() => {
+      if (this.loadingDots.length < 5) {
+        this.loadingDots += ".";
+      } else {
+        this.loadingDots = "";
+      }
+    }, 500);
     const body: ConvertRequest = {
       sourceOrm: this.sourceOrm,
       targetOrm: this.targetOrm,
@@ -126,15 +147,45 @@ export class DemoPageComponent implements OnInit {
 
     this.error = "";
     this.convertedUnits = [];
-    this.ormService
-      .convert(body)
+    // use fake observable instead of real service
+    of(null)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => {this.isLoading = false; this.showResults = true;})
+        // artificial delay of 5 seconds before completing
+        delay(10000),
+        finalize(() => {
+          this.isLoading = false;
+          this.showResults = true;
+          // stop dots animation
+          if (this.loadingInterval) {
+            clearInterval(this.loadingInterval);
+            this.loadingInterval = undefined;
+          }
+          this.loadingDots = "";
+        })
       )
       .subscribe({
         next: (r) => {
-          this.convertedUnits = r.sources;
+          // this.convertedUnits = r.sources;
+          // demo content
+          this.convertedUnits = [
+            {
+              contentType: ContentType.CSharpEntity,
+              content: SAMPLES.entityTarget,
+            },
+            {
+              contentType: ContentType.CSharpQuery,
+              content: SAMPLES.tquery1,
+            },
+            {
+              contentType: ContentType.CSharpQuery,
+              content: SAMPLES.tquery2,
+            },
+            {
+              contentType: ContentType.CSharpQuery,
+              content: SAMPLES.tquery3,
+            },
+          ];
           this.result = "";
         },
         error: (err) => (this.error = err.message),
@@ -155,7 +206,9 @@ export class DemoPageComponent implements OnInit {
    * @param container - The container element holding the checkboxes
    */
   selectAllTargets(container: HTMLElement): void {
-    const boxes = container.querySelectorAll('input[type="checkbox"]') as NodeListOf<HTMLInputElement>;
-    boxes.forEach(b => b.checked = true);
+    const boxes = container.querySelectorAll(
+      'input[type="checkbox"]'
+    ) as NodeListOf<HTMLInputElement>;
+    boxes.forEach((b) => (b.checked = true));
   }
 }

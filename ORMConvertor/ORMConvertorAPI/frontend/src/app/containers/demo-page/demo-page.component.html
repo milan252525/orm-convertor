@@ -24,20 +24,6 @@
       </app-content-display>
     }
 
-    @if (showResults) {
-      <hr>
-      <label class="orm-label">Results (Dapper)</label>
-
-      @for (unit of convertedUnits; track $index) {
-        <app-content-display
-          [description]="unit.contentType | contentTypeToString"
-          [contentType]="unit.contentType"
-          [content]="unit.content"
-          [readonly]="true">
-        </app-content-display>
-      }
-    }
-
   </div>
 
 
@@ -64,8 +50,12 @@
     </div>
 
     <button class="middle-button" (click)="convert()" [disabled]="isLoading">
-      Convert
+      Optimize
     </button>
+    
+    <h3 *ngIf="isLoading" class="optimizing-text">
+      Optimizing{{ loadingDots }}
+    </h3>
 
     @if (showResults) {
       <div class="results">
@@ -76,7 +66,19 @@
           <p>Memory: 43,082 kB</p>
         </div>
       </div>
+      <hr>
+      <label class="orm-label">Results (Dapper)</label>
+
+      @for (unit of convertedUnits; track $index) {
+        <app-content-display
+          [description]="unit.contentType | contentTypeToString"
+          [contentType]="unit.contentType"
+          [content]="unit.content"
+          [readonly]="true">
+        </app-content-display>
+      }
     }
   </div>
+  
 
 </div>

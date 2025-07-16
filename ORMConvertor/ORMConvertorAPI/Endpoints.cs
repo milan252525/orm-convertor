@@ -13,6 +13,11 @@ public static class Endpoints
             .Produces<List<RequiredContentDefinition>>(StatusCodes.Status200OK)
             .WithOpenApi();
 
+        app.MapGet("/required-content-advisor", () => RequiredContent.GetRequiredContentAdvisor)
+            .WithName("RequiredContentAdvisor")
+            .Produces<List<RequiredContentDefinition>>(StatusCodes.Status200OK)
+            .WithOpenApi();
+
         app.MapPost("/convert", ConvertHandler)
            .WithName("Convert")
            .Produces<ConvertResponse>(StatusCodes.Status200OK)

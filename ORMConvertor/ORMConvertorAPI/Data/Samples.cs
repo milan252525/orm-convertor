@@ -11,5 +11,7 @@ public static class Samples
         { 3, CustomerSampleNHibernate.XmlMapping },
         { 4, CustomerSampleEFCore.Entity},
         { 5, CustomerSampleEFCore.Query },
+        { 6, CustomerSampleEFCore.Query },
+        { 7, CustomerSampleEFCore.Query },
     };
 }
