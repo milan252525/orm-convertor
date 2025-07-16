@@ -53,7 +53,7 @@ public static class ConversionHandler
         }
 
         results.AddRange(entityBuilder.Build());
-        if (queryBuilder != null)
+        if (queryBuilder != null && sources.Any(x => x.ContentType == ConversionContentType.CSharpQuery))
         {
             results.AddRange(queryBuilder.Build());
         }
