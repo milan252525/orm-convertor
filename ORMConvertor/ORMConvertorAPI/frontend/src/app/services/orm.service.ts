@@ -9,14 +9,14 @@ export class OrmService {
   constructor(private http: HttpClient) {}
 
   getRequiredContent(): Observable<RequiredContentDefinition[]> {
-    return this.http.get<RequiredContentDefinition[]>("/orm/required-content");
+    return this.http.get<RequiredContentDefinition[]>("/required-content");
   }
 
   getSamples(): Observable<Record<number, string>> {
-    return this.http.get<Record<number, string>>("/orm/samples");
+    return this.http.get<Record<number, string>>("/samples");
   }
 
   convert(req: ConvertRequest): Observable<ConvertResponse> {
-    return this.http.post<ConvertResponse>("/orm/convert", req);
+    return this.http.post<ConvertResponse>("/convert", req);
   }
 }
