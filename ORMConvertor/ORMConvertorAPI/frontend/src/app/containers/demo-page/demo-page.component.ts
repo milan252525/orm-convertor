@@ -152,7 +152,7 @@ export class DemoPageComponent implements OnInit, AfterViewInit {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         // artificial delay before completing
-        delay(15000),
+        delay(20000),
         finalize(() => {
           this.isLoading = false;
           this.showResults = true;
