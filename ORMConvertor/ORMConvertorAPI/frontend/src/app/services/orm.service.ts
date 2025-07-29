@@ -6,21 +6,23 @@ import { RequiredContentDefinition } from "../model/required-content";
 
 @Injectable({ providedIn: "root" })
 export class OrmService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
+
+  private base = "/orm";
 
   getRequiredContent(): Observable<RequiredContentDefinition[]> {
-    return this.http.get<RequiredContentDefinition[]>("/required-content");
+    return this.http.get<RequiredContentDefinition[]>(`${this.base}/required-content`);
   }
 
   getRequiredContentAdvisor(): Observable<RequiredContentDefinition[]> {
-    return this.http.get<RequiredContentDefinition[]>("/required-content-advisor");
+    return this.http.get<RequiredContentDefinition[]>(`${this.base}/required-content-advisor`);
   }
 
   getSamples(): Observable<Record<number, string>> {
-    return this.http.get<Record<number, string>>("/samples");
+    return this.http.get<Record<number, string>>(`${this.base}/samples`);
   }
 
   convert(req: ConvertRequest): Observable<ConvertResponse> {
-    return this.http.post<ConvertResponse>("/convert", req);
+    return this.http.post<ConvertResponse>(`${this.base}/convert`, req);
   }
 }

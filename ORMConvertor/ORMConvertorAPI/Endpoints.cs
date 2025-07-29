@@ -8,23 +8,25 @@ public static class Endpoints
 {
     public static void Map(WebApplication app)
     {
-        app.MapGet("/required-content", () => RequiredContent.GetRequiredContent)
+        var group = app.MapGroup("/orm");
+
+        group.MapGet("/required-content", () => RequiredContent.GetRequiredContent)
             .WithName("RequiredContent")
             .Produces<List<RequiredContentDefinition>>(StatusCodes.Status200OK)
             .WithOpenApi();
 
-        app.MapGet("/required-content-advisor", () => RequiredContent.GetRequiredContentAdvisor)
+        group.MapGet("/required-content-advisor", () => RequiredContent.GetRequiredContentAdvisor)
             .WithName("RequiredContentAdvisor")
             .Produces<List<RequiredContentDefinition>>(StatusCodes.Status200OK)
             .WithOpenApi();
 
-        app.MapPost("/convert", ConvertHandler)
+        group.MapPost("/convert", ConvertHandler)
            .WithName("Convert")
            .Produces<ConvertResponse>(StatusCodes.Status200OK)
            .ProducesProblem(StatusCodes.Status400BadRequest)
            .WithOpenApi();
 
-        app.MapGet("/samples", () => Samples.GetSamples)
+        group.MapGet("/samples", () => Samples.GetSamples)
             .Produces<Dictionary<int, string>>(StatusCodes.Status200OK)
             .WithOpenApi();
     }
