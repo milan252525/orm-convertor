@@ -3,6 +3,9 @@
 # Repository structure
 The repository is structured into several directories. The `thesis` folder contains the LaTeX source files for the thesis. The `diagrams` directory holds diagrams created using [draw.io](https://www.drawio.com/). Experimental comparisons, including unit tests and benchmarks, are located in the `benchmarks` directory. The `ORMConvertor` folder includes a prototype tool for translating between different .NET ORM frameworks. Finally, `notes` contains thesis-related notes written in Czech.
 
+# ORMConvertor
+The translation and advisor tool are currently hosted at [http://116.203.208.55/orm/home](http://116.203.208.55/orm/home).
+
 # Thesis topic
 **Framework-Agnostic Query Adaptation: Ensuring SQL Compatibility Across .NET Database Frameworks**
 
@@ -22,5 +25,3 @@ The compared ORMs are:
 - [Entity Framework Core](https://github.com/dotnet/efcore)
 - [Entity Framework 6](https://github.com/dotnet/ef6)
 
-# ORMConvertor
-The translation tool is currently hosted at [http://116.203.208.55/orm/](http://116.203.208.55/orm/).
