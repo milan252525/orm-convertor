@@ -8,3 +8,17 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     restart: unless-stopped
+    depends_on:
+      - mssql_db
+
+  mssql_db:
+    build:
+      context: .
+      dockerfile: database.Dockerfile
+    ports:
+      - "1444:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Testingorms123
+      - MSSQL_PID=Developer
+    restart: unless-stopped
