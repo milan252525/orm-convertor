@@ -1,0 +1,10 @@
+services:
+  ormconvertor:
+    build:
+      context: .
+      dockerfile: ORMConvertorAPI/Dockerfile
+    ports:
+      - "5072:5072"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    restart: unless-stopped
