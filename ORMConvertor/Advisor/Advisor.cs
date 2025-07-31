@@ -15,16 +15,16 @@ public unsafe partial class Advisor
         int* out_assignment
     );
 
-    /// <param name="mem">long[] memory requirements (Q*F)</param>
-    /// <param name="cost">double[] cost table (Q*F)</param>
-    /// <param name="z">int[] query weights (Q)</param>
-    /// <param name="MEM">total memory</param>
-    /// <param name="N">max number of frameworks</param>
-    /// <param name="Q">number of queries</param>
-    /// <param name="F">number of frameworks</param>
-    /// <param name="objective">out int for optimal value</param>
-    /// <param name="selected">output: framework selected (out array, length F)</param>
-    /// <param name="assignment">output: per-query assignment (out array, length Q)</param>
+    /// <param name="mem">Allocated memory (Q*F)</param>
+    /// <param name="cost">Runtime cost (Q*F)</param>
+    /// <param name="z">Query weights (Q)</param>
+    /// <param name="MEM">Max memory constraint</param>
+    /// <param name="N">Max number of selected frameworks</param>
+    /// <param name="Q">Number of queries</param>
+    /// <param name="F">Number of frameworks</param>
+    /// <param name="objective">Output: Best combined runtime</param>
+    /// <param name="selected">Output: Selected frameworks for best runtime (out array, length F)</param>
+    /// <param name="assignment">Output: Final framework assignment per query (out array, length Q)</param>
     /// <returns>0 on success, negative for error</returns>
     public static int Solve(
         long[] mem,
@@ -38,27 +38,27 @@ public unsafe partial class Advisor
     {
         if (mem.Length < Q * F)
         {
-            throw new ArgumentException("mem array too short");
+            throw new ArgumentException("Memory array too short");
         }
 
         if (cost.Length < Q * F)
         {
-            throw new ArgumentException("cost array too short");
+            throw new ArgumentException("Cost array too short");
         }
 
         if (z.Length < Q)
         {
-            throw new ArgumentException("z array too short");
+            throw new ArgumentException("Z array (query weights) too short");
         }
 
         if (selected.Length < F)
         {
-            throw new ArgumentException("selected array too short");
+            throw new ArgumentException("Selected array too short");
         }
 
         if (assignment.Length < Q)
         {
-            throw new ArgumentException("assignment array too short");
+            throw new ArgumentException("Assignment array too short");
         }
 
         int obj = 0;

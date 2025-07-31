@@ -1,6 +1,7 @@
 ﻿using OrmConvertor;
 using ORMConvertorAPI.Data;
 using ORMConvertorAPI.Dtos;
+using ORMConvertorAPI.Dtos.Advisor;
 
 namespace ORMConvertorAPI;
 
@@ -29,6 +30,12 @@ public static class Endpoints
         group.MapGet("/samples", () => Samples.GetSamples)
             .Produces<Dictionary<int, string>>(StatusCodes.Status200OK)
             .WithOpenApi();
+
+        group.MapPost("/advisor-test", AdvisorTestHandler)
+            .WithName("AdvisorTest")
+              .Produces<AdvisorSolveResponse>(StatusCodes.Status200OK)
+              .ProducesProblem(StatusCodes.Status400BadRequest)
+              .WithOpenApi();
     }
 
     private static IResult ConvertHandler(ConvertRequest req)
@@ -37,6 +44,27 @@ public static class Endpoints
         {
             var converted = ConversionHandler.Convert(req.SourceOrm, req.TargetOrm, req.Sources);
             return Results.Ok(new ConvertResponse(converted));
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
+    }
+
+    private static IResult AdvisorTestHandler(AdvisorSolveRequest req)
+    {
+        try
+        {
+            int[] selected = new int[req.F];
+            int[] assignment = new int[req.Q];
+            int status = Advisor.Advisor.Solve(
+                req.Memory, req.Cost, req.Z, req.MEM, req.N, req.Q, req.F,
+                out int objective, selected, assignment
+            );
+            var response = new AdvisorSolveResponse(
+                status, objective, (int[])selected.Clone(), (int[])assignment.Clone()
+            );
+            return Results.Ok(response);
         }
         catch (Exception e)
         {
