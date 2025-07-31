@@ -141,11 +141,20 @@ int** solve_problem(glp_prob *lp, int Q, int F, int *objective, int *selected) {
     return x;
 }
 
-// Entry point for C# (P/Invoke).
-//  - out_selected must have length F
-//  - out_assignment must have length Q (each entry is 0..F-1, or -1 on failure)
-//  - out_objective receives the integral objective value
-// Return: 0 on success; negative on failure.
+// Entry point for C# (P/Invoke) or C.
+//
+// Arguments:
+//   mem           : int64_t[MEM] memory requirements, flat array
+//   cost          : double[Q*F] cost table, flat array
+//   z             : int[Q] weights
+//   MEM           : (int64_t) total available memory
+//   N             : (int) number of frameworks to choose
+//   Q             : (int) number of queries
+//   F             : (int) number of frameworks
+//   out_objective : int*    out: receives optimal value
+//   out_selected  : int[F]  out: 1 if framework f is selected, 0 otherwise
+//   out_assignment: int[Q]  out: for each query, which framework it is assigned to (0..F-1 or -1)
+// Returns 0 on success; negative on failure.
 EXPORT int ilp_solve(
     const int64_t *mem,
     const double *cost,
@@ -156,7 +165,8 @@ EXPORT int ilp_solve(
     int *out_assignment
 )
 {
-    if (!out_objective || !out_selected || !out_assignment) return -2;
+    if (!out_objective || !out_selected || !out_assignment)
+        return -2;
 
     glp_prob *lp = build_problem(mem, cost, z, MEM, N, Q, F);
     if (!lp) return -3;
